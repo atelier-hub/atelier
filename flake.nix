@@ -26,13 +26,6 @@
         final: prev: {
           haskellPackages = prev.haskellPackages.override {
             overrides = hfinal: hprev: {
-              eve = prev.haskellPackages.callCabal2nix "eve" (prev.fetchFromGitHub {
-                owner = "cgeorgii";
-                repo = "eve";
-                rev = "nixified";
-                sha256 = "sha256-wX1UTtO7e0FHk8eoGywocYCMUa9r+BYzR6RWFKjM2C8=";
-              }) { };
-
               # Build tmp-postgres from source with tests disabled
               tmp-postgres = prev.haskell.lib.dontCheck (
                 prev.haskellPackages.callCabal2nix "tmp-postgres" tmp-postgres { }
