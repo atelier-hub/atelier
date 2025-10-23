@@ -35,6 +35,7 @@ dependencies:
 - hasql
 - hasql-pool
 - hasql-transaction
+- ki
 - network-uri
 - rel8
 - servant
