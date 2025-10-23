@@ -59,6 +59,7 @@ default-extensions:
 - OverloadedLabels
 - OverloadedRecordDot
 - OverloadedStrings
+- StrictData
 - TemplateHaskell
 - TypeFamilies
 
