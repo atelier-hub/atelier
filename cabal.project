@@ -1,0 +1,6 @@
+packages: .
+
+-- Use CHaP (Cardano Haskell Packages) repository
+repository cardano-haskell-packages
+  url: https://chap.intersectmbo.org/
+  secure: True

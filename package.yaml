@@ -25,6 +25,7 @@ dependencies:
 - aeson
 - async
 - bytestring
+- cardano-api
 - casing
 - containers
 - data-default
@@ -80,6 +81,8 @@ tests:
     source-dirs:         test
     ghc-options:
     - -threaded
+    build-tools:
+    - tasty-discover:tasty-discover
     dependencies:
     - hoard
     - hspec
