@@ -15,6 +15,9 @@ let
     postgresql
     pre-commit
     sqitchPg
+    sops # secret encryption/decryption
+    age # encryption tool for sops
+    ssh-to-age # convert SSH keys to age format
   ];
 in
 project.shellFor {

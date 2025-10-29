@@ -29,15 +29,18 @@ dependencies:
 - casing
 - containers
 - data-default
+- directory
 - effectful
 - effectful-core
 - effectful-th
+- filepath
 - hashable
 - hasql
 - hasql-pool
 - hasql-transaction
 - ki
 - network-uri
+- optparse-applicative
 - rel8
 - servant
 - servant-server
@@ -48,12 +51,14 @@ dependencies:
 - unordered-containers
 - uuid
 - warp
+- yaml
 
 default-extensions:
 - BlockArguments
 - DataKinds
 - DeriveAnyClass
 - DerivingStrategies
+- DerivingVia
 - DuplicateRecordFields
 - FlexibleContexts
 - GADTs
