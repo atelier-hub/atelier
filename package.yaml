@@ -26,6 +26,10 @@ dependencies:
 - async
 - bytestring
 - cardano-api
+- ouroboros-network
+- ouroboros-network-protocols
+- ouroboros-network-framework
+- network-mux
 - casing
 - containers
 - data-default
@@ -39,6 +43,7 @@ dependencies:
 - hasql-pool
 - hasql-transaction
 - ki
+- network
 - network-uri
 - optparse-applicative
 - rel8
@@ -77,6 +82,12 @@ executables:
   hoard-exe:
     main:                Main.hs
     source-dirs:         app/hoard
+    dependencies:
+    - hoard
+
+  test-connection:
+    main:                Main.hs
+    source-dirs:         app/test-connection
     dependencies:
     - hoard
 
