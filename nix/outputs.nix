@@ -22,6 +22,9 @@ let
       fourmolu.package = pkgs.haskellPackages.fourmolu;
     };
   };
+
+  # Import custom app modules
+  secretsApps = import ./secrets.nix { inherit pkgs; };
 in
 {
   # Expose packages built by haskell.nix
@@ -62,59 +65,11 @@ in
         echo "Hlint refactoring complete!"
       ''}";
     };
-
-    # PostgreSQL: local dev database
-    postgres = {
-      type = "app";
-      program = "${pkgs.writeShellScript "postgres-app" ''
-        set -e
-        PGDATA="$PWD/postgres-data"
-        PGHOST="$PWD/postgres-data"
-
-        # Initialize database if it doesn't exist
-        if [ ! -d "$PGDATA" ]; then
-          echo "Initializing PostgreSQL database in $PGDATA..."
-          ${pkgs.postgresql}/bin/initdb -D "$PGDATA" --no-locale --encoding=UTF8
-
-          # Configure for local socket-only access
-          cat >> "$PGDATA/postgresql.conf" <<EOF
-        unix_socket_directories = '$PGHOST'
-        listen_addresses = '''
-        port = 5432
-        EOF
-
-          echo "Database initialized!"
-
-          # Start postgres temporarily to create roles and databases
-          ${pkgs.postgresql}/bin/pg_ctl -D "$PGDATA" -o "-k $PGHOST" -w start
-
-          # Create postgres role (superuser for dev convenience)
-          ${pkgs.postgresql}/bin/createuser -h "$PGHOST" -s postgres
-
-          # Create hoard_dev database
-          ${pkgs.postgresql}/bin/createdb -h "$PGHOST" -U postgres hoard_dev
-
-          # Stop postgres
-          ${pkgs.postgresql}/bin/pg_ctl -D "$PGDATA" stop
-
-          echo "Created postgres role and hoard_dev database!"
-        fi
-
-        echo "Starting PostgreSQL..."
-        echo "Connection info:"
-        echo "  Socket: $PGHOST/.s.PGSQL.5432"
-        echo "  Database: hoard_dev"
-        echo "  User: postgres (no password needed)"
-        echo ""
-        echo "To connect: psql -h $PGHOST -U postgres hoard_dev"
-        echo "Press Ctrl+C to stop"
-        echo ""
-
-        # Start postgres
-        ${pkgs.postgresql}/bin/postgres -D "$PGDATA" -k "$PGHOST"
-      ''}";
-    };
-  };
+  }
+  # Merge in secrets management apps
+  // secretsApps
+  # Import postgres app from separate module
+  // (import ./postgres.nix { inherit pkgs; });
 
   # Checks
   checks = projectFlake.checks // {
