@@ -9,18 +9,38 @@ let
   # Get the project flake for packages
   projectFlake = project.flake { };
 
+  # Tools and binaries used by git-hooks and in the dev shell
+  tools = {
+    inherit (pkgs)
+      age
+      cabal-install
+      fourmolu
+      hlint
+      hpack
+      postgresql
+      pre-commit
+      sops
+      sqitchPg
+      nixfmt-rfc-style
+      ;
+  };
+  hpack-dir = pkgs.callPackage "${inputs.git-hooks}/nix/hpack-dir" { inherit (tools) hpack; };
+
+  inherit (pkgs) lib;
+
   # Git hooks check (defined once, used in both checks and shell)
   gitHooks = inputs.git-hooks.lib.${system}.run {
     src = ../.;
-    hooks = {
-      hlint.enable = true;
-      hlint.package = pkgs.haskellPackages.hlint;
-      hpack.enable = true;
-      nixfmt-rfc-style.enable = true;
-      nixfmt-rfc-style.package = pkgs.nixfmt-rfc-style;
-      fourmolu.enable = true;
-      fourmolu.package = pkgs.haskellPackages.fourmolu;
-    };
+    hooks = lib.pipe tools [
+      (x: x // { hpack = hpack-dir; })
+      (lib.mapAttrs (_: package: { inherit package; }))
+      (lib.recursiveUpdate {
+        hlint.enable = true;
+        hpack.enable = true;
+        nixfmt-rfc-style.enable = true;
+        fourmolu.enable = true;
+      })
+    ];
   };
 
   # Import custom app modules
@@ -35,11 +55,9 @@ in
   # Development shell
   devShells.default = import ./shell.nix {
     inherit
-      inputs
-      pkgs
       project
-      system
       gitHooks
+      tools
       ;
   };
 
