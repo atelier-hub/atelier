@@ -1,23 +1,13 @@
 {
-  inputs,
-  pkgs,
   project,
-  system,
   gitHooks,
+  tools,
 }:
 let
   inherit (project.args) compiler-nix-name;
 
   # System tools not tied to GHC version
-  systemTools = with pkgs; [
-    hpack
-    nixfmt-rfc-style
-    postgresql
-    pre-commit
-    sqitchPg
-    sops # secret encryption/decryption
-    age # encryption tool for sops
-  ];
+  systemTools = builtins.attrValues tools;
 in
 project.shellFor {
   name = "hoard-shell-${compiler-nix-name}";
@@ -27,17 +17,6 @@ project.shellFor {
 
   # Enable Hoogle documentation
   withHoogle = true;
-
-  # All tools for the shell
-  tools = {
-    cabal = "latest";
-    fourmolu = "latest";
-    ghcid = "latest";
-    haskell-language-server = "latest";
-    hlint = "latest";
-    tasty-discover = "latest";
-    weeder = "latest";
-  };
 
   buildInputs = systemTools;
 
