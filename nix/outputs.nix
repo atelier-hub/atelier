@@ -12,15 +12,9 @@ let
   # Tools and binaries used by git-hooks and in the dev shell
   tools = {
     inherit (pkgs)
-      age
-      cabal-install
       fourmolu
       hlint
       hpack
-      postgresql
-      pre-commit
-      sops
-      sqitchPg
       nixfmt-rfc-style
       ;
   };
@@ -33,13 +27,12 @@ let
     src = ../.;
     hooks = lib.pipe tools [
       (x: x // { hpack = hpack-dir; })
-      (lib.mapAttrs (_: package: { inherit package; }))
-      (lib.recursiveUpdate {
-        hlint.enable = true;
-        hpack.enable = true;
-        nixfmt-rfc-style.enable = true;
-        fourmolu.enable = true;
-      })
+      (lib.mapAttrs (
+        _: package: {
+          inherit package;
+          enable = true;
+        }
+      ))
     ];
   };
 
@@ -55,6 +48,7 @@ in
   # Development shell
   devShells.default = import ./shell.nix {
     inherit
+      pkgs
       project
       gitHooks
       tools
