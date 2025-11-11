@@ -13,6 +13,7 @@ let
     ++ (with pkgs; [
       nixfmt-rfc-style
       postgresql
+      pre-commit
       sqitchPg
       sops
       age
