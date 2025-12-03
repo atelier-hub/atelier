@@ -99,7 +99,7 @@ in
         echo "Building project with HIE files..."
         ${pkgs.cabal-install}/bin/cabal build --ghc-options=-fwrite-ide-info
         echo "Running weeder to detect unused code..."
-        ${pkgs.haskellPackages.weeder}/bin/weeder
+        ${pkgs.haskell-nix.tool "ghc966" "weeder" "latest"}/bin/weeder
       ''}";
     };
 
@@ -108,7 +108,10 @@ in
       type = "app";
       program = "${pkgs.writeShellScript "hlint-fix-app" ''
         echo "Running hlint --refactor on all Haskell files..."
-        find src app test -name "*.hs" -exec ${pkgs.haskellPackages.hlint}/bin/hlint --refactor {} \;
+        export PATH="${pkgs.haskell-nix.tool "ghc966" "apply-refact" "latest"}/bin:$PATH"
+        find src app test -name "*.hs" -exec ${
+          pkgs.haskell-nix.tool "ghc966" "hlint" "latest"
+        }/bin/hlint --refactor --refactor-options="-i" {} \;
         echo "Hlint refactoring complete!"
       ''}";
     };
