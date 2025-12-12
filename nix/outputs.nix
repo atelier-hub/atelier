@@ -32,7 +32,7 @@ let
       if ! nix eval --no-warn-dirty .#checks.${system}.git-hooks --apply 'x: "ok"' 2>/dev/null >/dev/null; then
         echo "⚠️  WARNING: haskell.nix materialization may be out of date!"
         echo "If you changed dependencies or flake inputs, please run:"
-        echo "  nix build --no-link 2>&1 | grep generateMaterialized | sh"
+        echo "  nix build --no-link 2>&1 | grep -o '/[/[:alnum:]]\+-generateMaterialized [/_[:alnum:]]\+$' | sh"
         echo ""
         echo "Press Enter to continue anyway, or Ctrl-C to abort and regenerate."
         read -r
