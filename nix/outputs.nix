@@ -150,5 +150,7 @@ in
   # Checks
   checks = projectFlake.checks // {
     git-hooks = gitHooks;
+    # Ensure the executable builds in CI
+    hoard-exe = projectFlake.packages."hoard:exe:hoard-exe";
   };
 }
