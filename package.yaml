@@ -81,6 +81,7 @@ dependencies:
 - warp
 - yaml
 - typed-process
+- unix
 
 default-extensions:
 - BlockArguments
