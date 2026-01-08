@@ -73,12 +73,17 @@ let
 
   # Import custom app modules
   secretsApps = import ./secrets.nix { inherit pkgs; };
+  cardanoNode = import ./cardano-node.nix { inherit pkgs inputs system; };
 in
 {
   # Expose packages built by haskell.nix
-  packages = projectFlake.packages // {
-    default = projectFlake.packages."hoard:exe:hoard-exe";
-  };
+  packages =
+    projectFlake.packages
+    // {
+      default = projectFlake.packages."hoard:exe:hoard-exe";
+    }
+    # Merge in cardano-node packages (mithril-client-cli, etc.)
+    // cardanoNode.packages;
 
   # Development shell
   devShells.default = import ./shell.nix {
@@ -116,36 +121,13 @@ in
       ''}";
     };
 
-    # Run cardano-node with preprod configuration
-    cardano-node-preprod = {
-      type = "app";
-      program = "${pkgs.writeShellScript "cardano-node-preprod" ''
-        set -euo pipefail
-
-        # Ensure node-db directory exists
-        mkdir -p ./node-db/preprod
-
-        echo "Starting cardano-node with preprod configuration..."
-        echo "Config: ./config/preprod/config.json"
-        echo "Database: ./node-db/preprod"
-        echo "Socket: ./node-db/preprod/node.socket"
-        echo "Tracer socket: /tmp/cardano-tracer.sock"
-        echo ""
-
-        # Run cardano-node with preprod config
-        exec ${pkgs.nix}/bin/nix run github:IntersectMBO/cardano-node#cardano-node -- run \
-          --config ./config/preprod/config.json \
-          --topology ./config/preprod/topology.json \
-          --database-path ./node-db/preprod \
-          --socket-path ./node-db/preprod/node.socket \
-          --tracer-socket-path-accept /tmp/cardano-tracer.sock
-      ''}";
-    };
   }
   # Merge in secrets management apps
   // secretsApps
   # Import postgres app from separate module
-  // (import ./postgres.nix { inherit pkgs; });
+  // (import ./postgres.nix { inherit pkgs; })
+  # Import cardano-node and Mithril apps from separate module
+  // cardanoNode.apps;
 
   # Checks
   checks = projectFlake.checks // {

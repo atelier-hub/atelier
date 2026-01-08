@@ -53,6 +53,11 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    mithril = {
+      url = "github:input-output-hk/mithril";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
