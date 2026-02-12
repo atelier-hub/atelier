@@ -9,5 +9,6 @@ build.log
 postgres-data/
 grafana-data/
 prometheus-data/
+tempo-data/
 node-db/
 .env.local

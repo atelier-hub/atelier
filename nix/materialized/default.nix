@@ -106,6 +106,7 @@
         ouroboros-network-protocols.revision = import ./cabal-files/ouroboros-network-protocols.nix;
         ouroboros-network-protocols.flags.asserts = false;
         ouroboros-network-protocols.flags.cddl = true;
+        vector-builder.revision = import ./cabal-files/vector-builder.nix;
         monoid-subclasses.revision = import ./cabal-files/monoid-subclasses.nix;
         case-insensitive.revision = import ./cabal-files/case-insensitive.nix;
         infinite-list.revision = import ./cabal-files/infinite-list.nix;
@@ -144,6 +145,7 @@
         cardano-ledger-shelley.flags.asserts = false;
         uuid-types.revision = import ./cabal-files/uuid-types.nix;
         quickcheck-io.revision = import ./cabal-files/quickcheck-io.nix;
+        lens-family-core.revision = import ./cabal-files/lens-family-core.nix;
         hdaemonize.revision = import ./cabal-files/hdaemonize.nix;
         vector-stream.revision = import ./cabal-files/vector-stream.nix;
         kes-agent.revision = import ./cabal-files/kes-agent.nix;
@@ -158,6 +160,7 @@
         effectful.flags.benchmark-foreign-libraries = false;
         cardano-ledger-conway.revision = import ./cabal-files/cardano-ledger-conway.nix;
         cardano-ledger-conway.flags.asserts = false;
+        proto-lens.revision = import ./cabal-files/proto-lens.nix;
         ki.revision = import ./cabal-files/ki.nix;
         tasty-smallcheck.revision = import ./cabal-files/tasty-smallcheck.nix;
         stm.revision = hackage.stm."2.5.1.0".revisions.default;
@@ -188,6 +191,7 @@
         terminfo.revision = hackage.terminfo."0.4.1.6".revisions.default;
         hourglass.revision = import ./cabal-files/hourglass.nix;
         transformers-except.revision = import ./cabal-files/transformers-except.nix;
+        lens-family.revision = import ./cabal-files/lens-family.nix;
         crypton-x509.revision = import ./cabal-files/crypton-x509.nix;
         lifted-async.revision = import ./cabal-files/lifted-async.nix;
         wai-logger.revision = import ./cabal-files/wai-logger.nix;
@@ -210,6 +214,7 @@
         optparse-applicative.flags.process = true;
         streaming-commons.revision = import ./cabal-files/streaming-commons.nix;
         streaming-commons.flags.use-bytestring-builder = false;
+        hs-opentelemetry-api.revision = import ./cabal-files/hs-opentelemetry-api.nix;
         split.revision = import ./cabal-files/split.nix;
         old-time.revision = import ./cabal-files/old-time.nix;
         resource-registry.revision = import ./cabal-files/resource-registry.nix;
@@ -250,6 +255,8 @@
         effectful-plugin.flags.timing = false;
         postgresql-libpq.revision = import ./cabal-files/postgresql-libpq.nix;
         postgresql-libpq.flags.use-pkg-config = false;
+        thread-utils-context.revision = import ./cabal-files/thread-utils-context.nix;
+        thread-utils-context.flags.debug = false;
         microlens-th.revision = import ./cabal-files/microlens-th.nix;
         cardano-ledger-babbage.revision = import ./cabal-files/cardano-ledger-babbage.nix;
         newtype.revision = import ./cabal-files/newtype.nix;
@@ -261,6 +268,7 @@
         ral.flags.adjunctions = true;
         parsec.revision = hackage.parsec."3.1.16.1".revisions.default;
         Cabal.revision = hackage.Cabal."3.10.3.0".revisions.default;
+        proto-lens-runtime.revision = import ./cabal-files/proto-lens-runtime.nix;
         uri-bytestring.revision = import ./cabal-files/uri-bytestring.nix;
         uri-bytestring.flags.lib-werror = false;
         crypton-x509-validation.revision = import ./cabal-files/crypton-x509-validation.nix;
@@ -339,6 +347,7 @@
         base-orphans.revision = import ./cabal-files/base-orphans.nix;
         lazy-search.revision = import ./cabal-files/lazy-search.nix;
         cardano-lmdb.revision = import ./cabal-files/cardano-lmdb.nix;
+        hs-opentelemetry-otlp.revision = import ./cabal-files/hs-opentelemetry-otlp.nix;
         system-cxx-std-lib.revision = hackage.system-cxx-std-lib."1.0".revisions.default;
         composition-prelude.revision = import ./cabal-files/composition-prelude.nix;
         composition-prelude.flags.development = false;
@@ -346,6 +355,7 @@
         vector-map.revision = import ./cabal-files/vector-map.nix;
         graphviz.revision = import ./cabal-files/graphviz.nix;
         graphviz.flags.test-parsing = false;
+        thread-utils-finalizers.revision = import ./cabal-files/thread-utils-finalizers.nix;
         cardano-crypto-class.revision = import ./cabal-files/cardano-crypto-class.nix;
         cardano-crypto-class.flags.secp256k1-support = true;
         indexed-profunctors.revision = import ./cabal-files/indexed-profunctors.nix;
@@ -362,6 +372,7 @@
         nonempty-containers.revision = import ./cabal-files/nonempty-containers.nix;
         constraints-extras.revision = import ./cabal-files/constraints-extras.nix;
         constraints-extras.flags.build-readme = true;
+        hs-opentelemetry-propagator-b3.revision = import ./cabal-files/hs-opentelemetry-propagator-b3.nix;
         hspec.revision = import ./cabal-files/hspec.nix;
         cardano-addresses.revision = import ./cabal-files/cardano-addresses.nix;
         cardano-addresses.flags.release = false;
@@ -377,6 +388,7 @@
         crypton-socks.flags.network-3-0-0-0 = true;
         crypton-socks.flags.example = false;
         dom-lt.revision = import ./cabal-files/dom-lt.nix;
+        network-bsd.revision = import ./cabal-files/network-bsd.nix;
         bitvec.revision = import ./cabal-files/bitvec.nix;
         bitvec.flags.simd = true;
         these.revision = import ./cabal-files/these.nix;
@@ -475,6 +487,7 @@
         polyparse.revision = import ./cabal-files/polyparse.nix;
         cuddle.revision = import ./cabal-files/cuddle.nix;
         cuddle.flags.example = false;
+        hs-opentelemetry-propagator-datadog.revision = import ./cabal-files/hs-opentelemetry-propagator-datadog.nix;
         bytestring-trie.revision = import ./cabal-files/bytestring-trie.nix;
         entropy.revision = import ./cabal-files/entropy.nix;
         entropy.flags.donotgetentropy = false;
@@ -506,6 +519,7 @@
         math-functions.flags.system-erf = true;
         StateVar.revision = import ./cabal-files/StateVar.nix;
         cardano-ledger-shelley-test.revision = import ./cabal-files/cardano-ledger-shelley-test.nix;
+        hs-opentelemetry-exporter-otlp.revision = import ./cabal-files/hs-opentelemetry-exporter-otlp.nix;
         pvar.revision = import ./cabal-files/pvar.nix;
         network.revision = import ./cabal-files/network.nix;
         network.flags.devel = false;
@@ -688,6 +702,7 @@
         happy-lib.revision = import ./cabal-files/happy-lib.nix;
         th-expand-syns.revision = import ./cabal-files/th-expand-syns.nix;
         flat.revision = import ./cabal-files/flat.nix;
+        hs-opentelemetry-propagator-w3c.revision = import ./cabal-files/hs-opentelemetry-propagator-w3c.nix;
         cardano-crypto-test.revision = import ./cabal-files/cardano-crypto-test.nix;
         clock.revision = import ./cabal-files/clock.nix;
         clock.flags.llvm = false;
@@ -717,6 +732,7 @@
         easy-file.revision = import ./cabal-files/easy-file.nix;
         scientific.revision = import ./cabal-files/scientific.nix;
         scientific.flags.integer-simple = false;
+        hs-opentelemetry-sdk.revision = import ./cabal-files/hs-opentelemetry-sdk.nix;
         vector.revision = import ./cabal-files/vector.nix;
         vector.flags.internalchecks = false;
         vector.flags.boundschecks = true;
@@ -865,7 +881,9 @@
           "hoard".components.library.planned = lib.mkOverride 900 true;
           "foldl".components.library.planned = lib.mkOverride 900 true;
           "cardano-slotting".components.sublibs."testlib".planned = lib.mkOverride 900 true;
+          "lens-family-core".components.library.planned = lib.mkOverride 900 true;
           "th-utilities".components.library.planned = lib.mkOverride 900 true;
+          "hs-opentelemetry-propagator-datadog".components.library.planned = lib.mkOverride 900 true;
           "data-fix".components.library.planned = lib.mkOverride 900 true;
           "dependent-map".components.library.planned = lib.mkOverride 900 true;
           "tomland".components.library.planned = lib.mkOverride 900 true;
@@ -885,6 +903,7 @@
           "compact".components.library.planned = lib.mkOverride 900 true;
           "monoid-subclasses".components.library.planned = lib.mkOverride 900 true;
           "quickcheck-io".components.library.planned = lib.mkOverride 900 true;
+          "thread-utils-context".components.library.planned = lib.mkOverride 900 true;
           "cardano-prelude-test".components.library.planned = lib.mkOverride 900 true;
           "strict-list".components.library.planned = lib.mkOverride 900 true;
           "cardano-crypto".components.library.planned = lib.mkOverride 900 true;
@@ -955,6 +974,7 @@
           "cardano-api".components.library.planned = lib.mkOverride 900 true;
           "case-insensitive".components.library.planned = lib.mkOverride 900 true;
           "effectful-th".components.library.planned = lib.mkOverride 900 true;
+          "lens-family".components.library.planned = lib.mkOverride 900 true;
           "unliftio-core".components.library.planned = lib.mkOverride 900 true;
           "profunctors".components.library.planned = lib.mkOverride 900 true;
           "io-classes".components.sublibs."mtl".planned = lib.mkOverride 900 true;
@@ -972,6 +992,7 @@
           "effectful-core".components.library.planned = lib.mkOverride 900 true;
           "quickcheck-monoids".components.library.planned = lib.mkOverride 900 true;
           "ouroboros-consensus".components.library.planned = lib.mkOverride 900 true;
+          "hs-opentelemetry-exporter-otlp".components.library.planned = lib.mkOverride 900 true;
           "array".components.library.planned = lib.mkOverride 900 true;
           "tmp-postgres".components.exes."soak-test".planned = lib.mkOverride 900 true;
           "strict-sop-core".components.library.planned = lib.mkOverride 900 true;
@@ -1002,6 +1023,7 @@
           "mempack".components.library.planned = lib.mkOverride 900 true;
           "dependent-sum".components.library.planned = lib.mkOverride 900 true;
           "asn1-encoding".components.library.planned = lib.mkOverride 900 true;
+          "network-bsd".components.library.planned = lib.mkOverride 900 true;
           "psqueues".components.library.planned = lib.mkOverride 900 true;
           "foundation".components.library.planned = lib.mkOverride 900 true;
           "pem".components.library.planned = lib.mkOverride 900 true;
@@ -1166,6 +1188,7 @@
           "dns".components.library.planned = lib.mkOverride 900 true;
           "lazy-search".components.library.planned = lib.mkOverride 900 true;
           "time-compat".components.library.planned = lib.mkOverride 900 true;
+          "thread-utils-finalizers".components.library.planned = lib.mkOverride 900 true;
           "Win32-network".components.library.planned = lib.mkOverride 900 true;
           "microlens-th".components.library.planned = lib.mkOverride 900 true;
           "int-supply".components.library.planned = lib.mkOverride 900 true;
@@ -1243,6 +1266,7 @@
           "free".components.library.planned = lib.mkOverride 900 true;
           "text-zipper".components.library.planned = lib.mkOverride 900 true;
           "plutus-core".components.sublibs."plutus-core-testlib".planned = lib.mkOverride 900 true;
+          "hs-opentelemetry-otlp".components.library.planned = lib.mkOverride 900 true;
           "deepseq".components.library.planned = lib.mkOverride 900 true;
           "pretty-show".components.exes."ppsh".planned = lib.mkOverride 900 true;
           "js-chart".components.library.planned = lib.mkOverride 900 true;
@@ -1258,6 +1282,7 @@
           "contra-tracer".components.library.planned = lib.mkOverride 900 true;
           "zlib".components.library.planned = lib.mkOverride 900 true;
           "pretty-simple".components.exes."pretty-simple".planned = lib.mkOverride 900 true;
+          "hs-opentelemetry-api".components.library.planned = lib.mkOverride 900 true;
           "sop-core".components.library.planned = lib.mkOverride 900 true;
           "nonempty-containers".components.library.planned = lib.mkOverride 900 true;
           "filepath".components.library.planned = lib.mkOverride 900 true;
@@ -1310,6 +1335,7 @@
           "blaze-html".components.library.planned = lib.mkOverride 900 true;
           "base-deriving-via".components.library.planned = lib.mkOverride 900 true;
           "cardano-ledger-alonzo".components.sublibs."testlib".planned = lib.mkOverride 900 true;
+          "proto-lens".components.library.planned = lib.mkOverride 900 true;
           "pretty".components.library.planned = lib.mkOverride 900 true;
           "plutus-tx".components.library.planned = lib.mkOverride 900 true;
           "recv".components.library.planned = lib.mkOverride 900 true;
@@ -1334,6 +1360,7 @@
           "character-ps".components.library.planned = lib.mkOverride 900 true;
           "io-classes".components.library.planned = lib.mkOverride 900 true;
           "reflection".components.library.planned = lib.mkOverride 900 true;
+          "proto-lens-runtime".components.library.planned = lib.mkOverride 900 true;
           "cardano-ledger-mary".components.sublibs."testlib".planned = lib.mkOverride 900 true;
           "ech-config".components.library.planned = lib.mkOverride 900 true;
           "os-string".components.library.planned = lib.mkOverride 900 true;
@@ -1352,6 +1379,7 @@
           "cardano-ledger-binary".components.sublibs."testlib".planned = lib.mkOverride 900 true;
           "hourglass".components.library.planned = lib.mkOverride 900 true;
           "cardano-git-rev".components.library.planned = lib.mkOverride 900 true;
+          "hs-opentelemetry-sdk".components.library.planned = lib.mkOverride 900 true;
           "prettyprinter-compat-ansi-wl-pprint".components.library.planned = lib.mkOverride 900 true;
           "cardano-ledger-byron".components.sublibs."testlib".planned = lib.mkOverride 900 true;
           "crypton-x509".components.library.planned = lib.mkOverride 900 true;
@@ -1378,6 +1406,7 @@
           "uuid-types".components.library.planned = lib.mkOverride 900 true;
           "validity".components.library.planned = lib.mkOverride 900 true;
           "streaming-bytestring".components.library.planned = lib.mkOverride 900 true;
+          "hs-opentelemetry-propagator-w3c".components.library.planned = lib.mkOverride 900 true;
           "vector".components.sublibs."benchmarks-O2".planned = lib.mkOverride 900 true;
           "testcontainers".components.library.planned = lib.mkOverride 900 true;
           "validation-selective".components.library.planned = lib.mkOverride 900 true;
@@ -1426,6 +1455,7 @@
           "relude".components.library.planned = lib.mkOverride 900 true;
           "tasty-expected-failure".components.library.planned = lib.mkOverride 900 true;
           "nothunks".components.library.planned = lib.mkOverride 900 true;
+          "vector-builder".components.library.planned = lib.mkOverride 900 true;
           "libyaml-clib".components.library.planned = lib.mkOverride 900 true;
           "barbies".components.library.planned = lib.mkOverride 900 true;
           "primes".components.library.planned = lib.mkOverride 900 true;
@@ -1450,6 +1480,7 @@
           "th-desugar".components.library.planned = lib.mkOverride 900 true;
           "cardano-addresses".components.library.planned = lib.mkOverride 900 true;
           "http-media".components.library.planned = lib.mkOverride 900 true;
+          "hs-opentelemetry-propagator-b3".components.library.planned = lib.mkOverride 900 true;
           "ouroboros-network-framework".components.library.planned = lib.mkOverride 900 true;
           "aeson-pretty".components.library.planned = lib.mkOverride 900 true;
           "cardano-strict-containers".components.library.planned = lib.mkOverride 900 true;

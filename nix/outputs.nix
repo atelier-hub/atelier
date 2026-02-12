@@ -74,7 +74,7 @@ let
   # Import custom app modules
   secretsApps = import ./secrets.nix { inherit pkgs; };
   cardanoNode = import ./cardano-node.nix { inherit pkgs inputs system; };
-  monitoringApps = import ./monitoring.nix { inherit pkgs; };
+  monitoringApps = import ./monitoring.nix { inherit pkgs lib; };
 in
 {
   # Expose packages built by haskell.nix
