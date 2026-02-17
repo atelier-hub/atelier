@@ -84,6 +84,8 @@ dependencies:
 - time
 - transformers
 - unagi-chan
+- list-t
+- stm-containers
 - unordered-containers
 - uuid
 - warp

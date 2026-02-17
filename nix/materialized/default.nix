@@ -42,6 +42,7 @@
         network-mux.flags.ipv6 = false;
         network-mux.flags.tracetcpinfo = false;
         githash.revision = import ./cabal-files/githash.nix;
+        primitive-extras.revision = import ./cabal-files/primitive-extras.nix;
         groups.revision = import ./cabal-files/groups.nix;
         binary-parser.revision = import ./cabal-files/binary-parser.nix;
         dependent-sum.revision = import ./cabal-files/dependent-sum.nix;
@@ -86,6 +87,7 @@
         ouroboros-network.revision = import ./cabal-files/ouroboros-network.nix;
         ouroboros-network.flags.txsubmission-delay = true;
         ouroboros-network.flags.asserts = false;
+        stm-containers.revision = import ./cabal-files/stm-containers.nix;
         iproute.revision = import ./cabal-files/iproute.nix;
         bytestring-strict-builder.revision = import ./cabal-files/bytestring-strict-builder.nix;
         mempack.revision = import ./cabal-files/mempack.nix;
@@ -128,6 +130,7 @@
         plutus-core.revision = import ./cabal-files/plutus-core.nix;
         plutus-core.flags.with-cert = false;
         plutus-core.flags.with-inline-r = false;
+        stm-hamt.revision = import ./cabal-files/stm-hamt.nix;
         HUnit.revision = import ./cabal-files/HUnit.nix;
         strict-list.revision = import ./cabal-files/strict-list.nix;
         ghc.revision = hackage.ghc."9.6.6".revisions.default;
@@ -279,6 +282,7 @@
         psqueues.revision = import ./cabal-files/psqueues.nix;
         wherefrom-compat.revision = import ./cabal-files/wherefrom-compat.nix;
         cryptohash-sha1.revision = import ./cabal-files/cryptohash-sha1.nix;
+        deferred-folds.revision = import ./cabal-files/deferred-folds.nix;
         generic-lens.revision = import ./cabal-files/generic-lens.nix;
         th-abstraction.revision = import ./cabal-files/th-abstraction.nix;
         cookie.revision = import ./cabal-files/cookie.nix;
@@ -355,6 +359,7 @@
         vector-map.revision = import ./cabal-files/vector-map.nix;
         graphviz.revision = import ./cabal-files/graphviz.nix;
         graphviz.flags.test-parsing = false;
+        primitive-unlifted.revision = import ./cabal-files/primitive-unlifted.nix;
         thread-utils-finalizers.revision = import ./cabal-files/thread-utils-finalizers.nix;
         cardano-crypto-class.revision = import ./cabal-files/cardano-crypto-class.nix;
         cardano-crypto-class.flags.secp256k1-support = true;
@@ -695,6 +700,7 @@
         prettyprinter.flags.text = true;
         lazysmallcheck.revision = import ./cabal-files/lazysmallcheck.nix;
         postgresql-libpq-configure.revision = import ./cabal-files/postgresql-libpq-configure.nix;
+        focus.revision = import ./cabal-files/focus.nix;
         assoc.revision = import ./cabal-files/assoc.nix;
         assoc.flags.tagged = false;
         ghc-prim.revision = hackage.ghc-prim."0.10.0".revisions.default;
@@ -953,6 +959,7 @@
           "vty".components.library.planned = lib.mkOverride 900 true;
           "parser-combinators".components.library.planned = lib.mkOverride 900 true;
           "vault".components.library.planned = lib.mkOverride 900 true;
+          "primitive-extras".components.library.planned = lib.mkOverride 900 true;
           "prometheus-metrics-ghc".components.library.planned = lib.mkOverride 900 true;
           "unordered-containers".components.library.planned = lib.mkOverride 900 true;
           "criterion-measurement".components.library.planned = lib.mkOverride 900 true;
@@ -1027,6 +1034,7 @@
           "psqueues".components.library.planned = lib.mkOverride 900 true;
           "foundation".components.library.planned = lib.mkOverride 900 true;
           "pem".components.library.planned = lib.mkOverride 900 true;
+          "stm-hamt".components.library.planned = lib.mkOverride 900 true;
           "cardano-crypto-wrapper".components.library.planned = lib.mkOverride 900 true;
           "data-default-class".components.library.planned = lib.mkOverride 900 true;
           "binary-parser".components.library.planned = lib.mkOverride 900 true;
@@ -1062,6 +1070,7 @@
           "some".components.library.planned = lib.mkOverride 900 true;
           "ouroboros-network-framework".components.sublibs."testlib".planned = lib.mkOverride 900 true;
           "containers".components.library.planned = lib.mkOverride 900 true;
+          "primitive-unlifted".components.library.planned = lib.mkOverride 900 true;
           "hedgehog-extras".components.library.planned = lib.mkOverride 900 true;
           "utf8-string".components.library.planned = lib.mkOverride 900 true;
           "wl-pprint-text".components.library.planned = lib.mkOverride 900 true;
@@ -1130,6 +1139,7 @@
           "cryptohash-md5".components.library.planned = lib.mkOverride 900 true;
           "bytestring-tree-builder".components.library.planned = lib.mkOverride 900 true;
           "concurrent-output".components.library.planned = lib.mkOverride 900 true;
+          "stm-containers".components.library.planned = lib.mkOverride 900 true;
           "cardano-ledger-babbage".components.exes."gen-golden".planned = lib.mkOverride 900 true;
           "kes-agent".components.library.planned = lib.mkOverride 900 true;
           "wai-app-static".components.exes."warp".planned = lib.mkOverride 900 true;
@@ -1195,6 +1205,7 @@
           "ouroboros-consensus-cardano".components.exes."db-analyser".planned = lib.mkOverride 900 true;
           "hspec".components.library.planned = lib.mkOverride 900 true;
           "cardano-api".components.sublibs."gen".planned = lib.mkOverride 900 true;
+          "focus".components.library.planned = lib.mkOverride 900 true;
           "tasty-smallcheck".components.library.planned = lib.mkOverride 900 true;
           "conduit-extra".components.library.planned = lib.mkOverride 900 true;
           "atomic-primops".components.library.planned = lib.mkOverride 900 true;
@@ -1485,6 +1496,7 @@
           "aeson-pretty".components.library.planned = lib.mkOverride 900 true;
           "cardano-strict-containers".components.library.planned = lib.mkOverride 900 true;
           "io-classes".components.sublibs."si-timers".planned = lib.mkOverride 900 true;
+          "deferred-folds".components.library.planned = lib.mkOverride 900 true;
           "cardano-addresses".components.exes."cardano-address".planned = lib.mkOverride 900 true;
           "microlens-ghc".components.library.planned = lib.mkOverride 900 true;
           "warp".components.library.planned = lib.mkOverride 900 true;
