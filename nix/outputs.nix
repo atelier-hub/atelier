@@ -98,6 +98,19 @@ in
 
   # Custom apps
   apps = {
+    # ghcid with multi-repl for all packages and tests
+    ghcid-multi = {
+      type = "app";
+      program = "${pkgs.writeShellScript "ghcid-multi" ''
+        exec ${pkgs.haskell-nix.tool "ghc966" "ghcid" "latest"}/bin/ghcid \
+          -c 'cabal repl --enable-multi-repl all hoard-test' \
+          --restart=hoard.cabal \
+          --clear \
+          --outputfile=build.log \
+          "$@"
+      ''}";
+    };
+
     # Weeder: detects unused code
     weeder = {
       type = "app";
