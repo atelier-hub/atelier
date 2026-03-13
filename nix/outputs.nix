@@ -84,7 +84,22 @@ in
       default = projectFlake.packages."hoard:exe:hoard-exe";
     }
     # Merge in cardano-node packages (mithril-client-cli, etc.)
-    // cardanoNode.packages;
+    // cardanoNode.packages
+    // (lib.listToAttrs (
+      map
+        (deployment: {
+          name = "docker-${deployment}";
+          value = import ./docker.nix {
+            inherit pkgs deployment;
+            hoardExe = projectFlake.packages."hoard:exe:hoard-exe";
+          };
+        })
+        [
+          "dev"
+          "staging"
+          "prod"
+        ]
+    ));
 
   # Development shell
   devShells.default = import ./shell.nix {
