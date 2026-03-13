@@ -157,6 +157,7 @@ tests:
     - QuickCheck
     - async
     - cardano-api
+    - aeson
     - data-default
     - directory
     - effectful
