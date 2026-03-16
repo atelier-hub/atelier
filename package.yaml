@@ -170,6 +170,7 @@ tests:
     - ouroboros-consensus
     - ouroboros-consensus-cardano
     - ouroboros-network-api
+    - ouroboros-network-protocols
     - postgres-options
     - process
     - rel8
