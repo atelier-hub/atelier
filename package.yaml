@@ -156,9 +156,10 @@ tests:
     - "ouroboros-consensus-cardano:unstable-shelley-testlib"
     - "ouroboros-consensus:unstable-consensus-testlib"
     - QuickCheck
+    - aeson
     - async
     - cardano-api
-    - aeson
+    - cardano-ledger-core
     - containers
     - data-default
     - directory
@@ -166,11 +167,13 @@ tests:
     - hasql
     - hasql-pool
     - hasql-transaction
+    - hs-opentelemetry-api
     - hspec
     - http-client
     - network
     - ouroboros-consensus
     - ouroboros-consensus-cardano
+    - ouroboros-consensus-protocol
     - ouroboros-network-api
     - ouroboros-network-protocols
     - postgres-options
@@ -191,4 +194,3 @@ tests:
     - uuid
     - wai
     - warp
-    - hs-opentelemetry-api
