@@ -1384,6 +1384,7 @@
           "kan-extensions".components.library.planned = lib.mkOverride 900 true;
           "hsyslog".components.library.planned = lib.mkOverride 900 true;
           "th-abstraction".components.library.planned = lib.mkOverride 900 true;
+          "hoard".components.tests."atelier-test".planned = lib.mkOverride 900 true;
           "ouroboros-consensus".components.sublibs."unstable-mock-block".planned = lib.mkOverride 900 true;
           "cardano-ledger-alonzo".components.library.planned = lib.mkOverride 900 true;
           "cardano-ledger-allegra".components.exes."huddle-cddl".planned = lib.mkOverride 900 true;
@@ -1410,6 +1411,7 @@
           "fast-logger".components.library.planned = lib.mkOverride 900 true;
           "th-lift".components.library.planned = lib.mkOverride 900 true;
           "mtl".components.library.planned = lib.mkOverride 900 true;
+          "hoard".components.sublibs."atelier".planned = lib.mkOverride 900 true;
           "logict".components.library.planned = lib.mkOverride 900 true;
           "statistics-linreg".components.library.planned = lib.mkOverride 900 true;
           "nonempty-vector".components.library.planned = lib.mkOverride 900 true;

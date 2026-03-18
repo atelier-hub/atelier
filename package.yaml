@@ -51,6 +51,7 @@ library:
       mixin:
         - hiding (Prelude)
     - hoard-prelude
+    - atelier
     - aeson
     - async
     - base16-bytestring
@@ -123,6 +124,35 @@ internal-libraries:
     - relude
     - effectful
 
+  atelier:
+    source-dirs: atelier/src
+    dependencies:
+    - name: base
+      mixin:
+        - hiding (Prelude)
+    - hoard-prelude
+    - aeson
+    - bytestring
+    - casing
+    - containers
+    - contra-tracer
+    - data-default
+    - effectful
+    - effectful-th
+    - hs-opentelemetry-api
+    - hs-opentelemetry-exporter-otlp
+    - hs-opentelemetry-sdk
+    - ki
+    - list-t
+    - prometheus-client
+    - prometheus-metrics-ghc
+    - stm-containers
+    - text
+    - time
+    - unagi-chan
+    - unordered-containers
+    - uuid
+
 executables:
   hoard-exe:
     main:                Main.hs
@@ -135,10 +165,31 @@ executables:
         - hiding (Prelude)
     - hoard-prelude
     - hoard
+    - atelier
     - data-default
     - effectful
 
 tests:
+  atelier-test:
+    main:                Driver.hs
+    source-dirs:         atelier/test
+    ghc-options:
+    - -threaded
+    build-tools:
+    - tasty-discover:tasty-discover
+    dependencies:
+    - name: base
+      mixin:
+        - hiding (Prelude)
+    - hoard-prelude
+    - atelier
+    - async
+    - effectful
+    - hs-opentelemetry-api
+    - hspec
+    - tasty
+    - tasty-hspec
+
   hoard-test:
     main:                Driver.hs
     source-dirs:         test
@@ -152,6 +203,7 @@ tests:
         - hiding (Prelude)
     - hoard-prelude
     - hoard
+    - atelier
     - "ouroboros-consensus-cardano:unstable-byron-testlib"
     - "ouroboros-consensus-cardano:unstable-shelley-testlib"
     - "ouroboros-consensus:unstable-consensus-testlib"
