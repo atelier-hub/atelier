@@ -43,7 +43,7 @@ project.shellFor {
     ${gitHooks.shellHook}
 
     # PostgreSQL configuration
-    export PGHOST="$PWD/postgres-data"
+    export PGHOST="$PWD/data/postgres"
     echo "PostgreSQL socket directory: $PGHOST"
   '';
 }
