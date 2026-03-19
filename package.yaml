@@ -157,6 +157,7 @@ internal-libraries:
     - stm-containers
     - text
     - time
+    - time-units
     - unagi-chan
     - unordered-containers
     - uuid
