@@ -144,6 +144,7 @@
         parsers.flags.parsec = true;
         parsers.flags.attoparsec = true;
         parsers.flags.binary = true;
+        time-units.revision = import ./cabal-files/time-units.nix;
         cardano-ledger-shelley.revision = import ./cabal-files/cardano-ledger-shelley.nix;
         cardano-ledger-shelley.flags.asserts = false;
         uuid-types.revision = import ./cabal-files/uuid-types.nix;
@@ -1525,6 +1526,7 @@
           "hasql".components.library.planned = lib.mkOverride 900 true;
           "text".components.library.planned = lib.mkOverride 900 true;
           "typed-protocols".components.library.planned = lib.mkOverride 900 true;
+          "time-units".components.library.planned = lib.mkOverride 900 true;
           "generic-random".components.library.planned = lib.mkOverride 900 true;
           "plutus-core".components.exes."traceToStacks".planned = lib.mkOverride 900 true;
           "generic-monoid".components.library.planned = lib.mkOverride 900 true;
