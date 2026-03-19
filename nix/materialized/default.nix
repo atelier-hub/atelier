@@ -1345,6 +1345,7 @@
           "fs-sim".components.library.planned = lib.mkOverride 900 true;
           "ouroboros-network-api".components.library.planned = lib.mkOverride 900 true;
           "tree-diff".components.library.planned = lib.mkOverride 900 true;
+          "hoard".components.sublibs."atelier-testing".planned = lib.mkOverride 900 true;
           "blaze-html".components.library.planned = lib.mkOverride 900 true;
           "base-deriving-via".components.library.planned = lib.mkOverride 900 true;
           "cardano-ledger-alonzo".components.sublibs."testlib".planned = lib.mkOverride 900 true;

@@ -162,6 +162,24 @@ internal-libraries:
     - unordered-containers
     - uuid
 
+  atelier-testing:
+    source-dirs: atelier/testing
+    dependencies:
+    - name: base
+      mixin:
+        - hiding (Prelude)
+    - hoard-prelude
+    - atelier
+    - hasql
+    - hasql-pool
+    - hspec
+    - postgres-options
+    - string-conversions
+    - text
+    - tmp-postgres
+    - unix
+    - uuid
+
 executables:
   hoard-exe:
     main:                Main.hs
@@ -219,6 +237,7 @@ tests:
     - hoard-prelude
     - hoard
     - atelier
+    - atelier-testing
     - "ouroboros-consensus-cardano:unstable-byron-testlib"
     - "ouroboros-consensus-cardano:unstable-shelley-testlib"
     - "ouroboros-consensus:unstable-consensus-testlib"
@@ -240,7 +259,6 @@ tests:
     - ouroboros-consensus-protocol
     - ouroboros-network-api
     - ouroboros-network-protocols
-    - postgres-options
     - process
     - rel8
     - servant-client
@@ -252,8 +270,6 @@ tests:
     - tasty-hspec
     - text
     - time
-    - tmp-postgres
     - transformers
-    - unix
     - uuid
     - warp
