@@ -778,6 +778,7 @@
         mwc-random.revision = import ./cabal-files/mwc-random.nix;
         mwc-random.flags.benchpapi = false;
         concurrent-output.revision = import ./cabal-files/concurrent-output.nix;
+        hspec-hedgehog.revision = import ./cabal-files/hspec-hedgehog.nix;
         http-semantics.revision = import ./cabal-files/http-semantics.nix;
         byron-spec-chain.revision = import ./cabal-files/byron-spec-chain.nix;
         hasql-pool.revision = import ./cabal-files/hasql-pool.nix;
@@ -979,6 +980,7 @@
           "transformers".components.library.planned = lib.mkOverride 900 true;
           "plutus-core".components.sublibs."plutus-ir-cert".planned = lib.mkOverride 900 true;
           "hspec-core".components.library.planned = lib.mkOverride 900 true;
+          "hspec-hedgehog".components.library.planned = lib.mkOverride 900 true;
           "cardano-api".components.library.planned = lib.mkOverride 900 true;
           "case-insensitive".components.library.planned = lib.mkOverride 900 true;
           "effectful-th".components.library.planned = lib.mkOverride 900 true;
