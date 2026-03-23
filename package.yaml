@@ -214,11 +214,16 @@ tests:
     - hoard-prelude
     - atelier
     - async
+    - containers
     - effectful
     - hs-opentelemetry-api
+    - hedgehog
     - hspec
+    - hspec-hedgehog
+    - stm
     - tasty
     - tasty-hspec
+    - time
 
   hoard-test:
     main:                Driver.hs

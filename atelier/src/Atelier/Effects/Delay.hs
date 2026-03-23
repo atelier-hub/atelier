@@ -2,11 +2,6 @@ module Atelier.Effects.Delay
     ( Delay
     , wait
     , every
-    , Microsecond
-    , Second
-    , seconds
-    , micros
-    , nominalDiffTime
     , runDelay
 
       -- * Mock delays and give control to the callsite
@@ -19,8 +14,7 @@ module Atelier.Effects.Delay
     , tickNext
     ) where
 
-import Data.Time (NominalDiffTime)
-import Data.Time.Units (Microsecond, Second, TimeUnit, convertUnit, fromMicroseconds, toMicroseconds)
+import Data.Time.Units (TimeUnit, convertUnit, toMicroseconds)
 import Effectful (Effect, IOE)
 import Effectful.Concurrent (Concurrent, threadDelay)
 import Effectful.Concurrent.MVar (newEmptyMVar, takeMVar)
@@ -30,6 +24,8 @@ import Effectful.TH (makeEffect)
 
 import Control.Concurrent.MVar qualified as IO
 
+import Atelier.Time (Microsecond)
+
 
 data Delay :: Effect where
     -- | Halt the thread and wait for the passed duration before continuing.
@@ -37,18 +33,6 @@ data Delay :: Effect where
 
 
 makeEffect ''Delay
-
-
-seconds :: (Integral i) => i -> Second
-seconds = fromIntegral
-
-
-micros :: (Integral i) => i -> Microsecond
-micros = fromIntegral
-
-
-nominalDiffTime :: (TimeUnit t) => NominalDiffTime -> t
-nominalDiffTime = fromMicroseconds . round @Double . (* 1_000_000) . realToFrac
 
 
 -- | Runs an action repeatedly, waiting the given duration in between each

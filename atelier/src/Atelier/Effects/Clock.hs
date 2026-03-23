@@ -3,11 +3,13 @@ module Atelier.Effects.Clock
     , currentTime
     , runClock
     , runClockConst
+    , runClockState
     ) where
 
 import Data.Time (UTCTime, getCurrentTime)
 import Effectful (Effect, IOE)
 import Effectful.Dispatch.Dynamic (interpret_)
+import Effectful.State.Static.Shared (State, get)
 import Effectful.TH (makeEffect)
 
 
@@ -24,3 +26,7 @@ runClock = interpret_ $ \(CurrentTime) -> liftIO getCurrentTime
 
 runClockConst :: UTCTime -> Eff (Clock : es) a -> Eff es a
 runClockConst time = interpret_ $ \CurrentTime -> pure time
+
+
+runClockState :: (State UTCTime :> es) => Eff (Clock : es) a -> Eff es a
+runClockState = interpret_ $ \CurrentTime -> get

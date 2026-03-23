@@ -41,7 +41,7 @@ data Singleflight key value :: Effect where
 makeEffect ''Singleflight
 
 
-type Cache key value = Map key (TMVar (Either SomeException value))
+type InFlightMap key value = Map key (TMVar (Either SomeException value))
 
 
 -- | Run the Singleflight effect with an in-memory cache
@@ -52,7 +52,7 @@ runSingleflight
     -> Eff es a
 runSingleflight action = do
     -- Initialize the cache
-    cache :: Cache key value <- STM.atomically Map.new
+    cache :: InFlightMap key value <- STM.atomically Map.new
 
     -- Run with the cache in Reader context, interpreting Singleflight operations
     interpretWith action $ \env -> \case

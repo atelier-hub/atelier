@@ -22,6 +22,7 @@ module Atelier.Effects.Chan
     ) where
 
 import Control.Concurrent.Chan.Unagi (InChan, OutChan)
+import Data.Time.Units (TimeUnit, toMicroseconds)
 import Effectful (Dispatch (..), DispatchOf, Effect, IOE)
 import Effectful.Dispatch.Static (SideEffects (..), StaticRep, evalStaticRep, unsafeEff_)
 import Effectful.State.Static.Shared (evalState, get, modify)
@@ -68,22 +69,23 @@ dupChan inChan =
 -- up to @batchSize@ items total within the given timeout. Always returns
 -- at least one item.
 readChanBatched
-    :: forall a es
+    :: forall t a es
      . ( Chan :> es
+       , TimeUnit t
        , Timeout :> es
        )
-    => Int
-    -- ^ Timeout in microseconds for reading additional items after the first
+    => t
+    -- ^ Timeout for reading additional items after the first
     -> Int
     -- ^ Maximum number of items to read (batch size)
     -> OutChan a
     -- ^ Channel to read from
     -> Eff es (NonEmpty a)
     -- ^ Non-empty batch of items (at least one, up to batch size)
-readChanBatched timeoutMicroseconds batchSize outChan = do
+readChanBatched timeoutDuration batchSize outChan = do
     evalState @[a] [] $ do
         h <- readChan outChan -- blocking, get first item
-        _ <- timeout timeoutMicroseconds
+        _ <- timeout (fromIntegral (toMicroseconds timeoutDuration))
             $ replicateM_ (batchSize - 1)
             $ do
                 x <- readChan outChan

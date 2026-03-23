@@ -10,6 +10,7 @@ import Test.Hspec
 import Effectful.Prim.IORef qualified as IORef
 
 import Atelier.Effects.Delay (mkTimers, runDelayWithControls)
+import Atelier.Time (Microsecond)
 
 import Atelier.Effects.Conc qualified as Conc
 import Atelier.Effects.Delay qualified as Delay
@@ -39,7 +40,7 @@ testRunDelayWithControls = do
                     ref <- newRef
                     _ <- Conc.fork do
                         incRef ref
-                        Delay.wait $ Delay.micros @Int 10
+                        Delay.wait (10 :: Microsecond)
                         incRef ref
                     Delay.settle
                     count <- IORef.readIORef ref
@@ -51,9 +52,9 @@ testRunDelayWithControls = do
                     ref <- newRef
                     _ <- Conc.fork do
                         incRef ref
-                        Delay.wait $ Delay.micros @Int 10
+                        Delay.wait (10 :: Microsecond)
                         incRef ref
-                    Delay.tick $ Delay.micros @Int 9
+                    Delay.tick (9 :: Microsecond)
                     count <- readIORef ref
                     liftIO $ count `shouldBe` 1
 
@@ -63,9 +64,9 @@ testRunDelayWithControls = do
                     ref <- newRef
                     _ <- Conc.fork do
                         incRef ref
-                        Delay.wait $ Delay.micros @Int 10
+                        Delay.wait (10 :: Microsecond)
                         incRef ref
-                    Delay.tick $ Delay.micros @Int 20
+                    Delay.tick (20 :: Microsecond)
                     count <- readIORef ref
                     liftIO $ count `shouldBe` 2
 
@@ -75,20 +76,20 @@ testRunDelayWithControls = do
                     ref <- newRef
                     _ <- Conc.fork do
                         incRef ref
-                        Delay.wait $ Delay.micros @Int 10
+                        Delay.wait (10 :: Microsecond)
                         incRef ref
-                    Delay.tick $ Delay.micros @Int 5
+                    Delay.tick (5 :: Microsecond)
                     c1 <- readIORef ref
                     liftIO $ c1 `shouldBe` 1
-                    Delay.tick $ Delay.micros @Int 5
+                    Delay.tick (5 :: Microsecond)
                     c2 <- readIORef ref
                     liftIO $ c2 `shouldBe` 2
 
         describe "with multiple concurrent Wait calls" do
             it "creates a timer for each" do
                 runTest do
-                    _ <- Conc.fork $ Delay.wait $ Delay.micros @Int 10
-                    _ <- Conc.fork $ Delay.wait $ Delay.micros @Int 20
+                    _ <- Conc.fork $ Delay.wait (10 :: Microsecond)
+                    _ <- Conc.fork $ Delay.wait (20 :: Microsecond)
                     Delay.settle
                     tc <- gets length
                     liftIO $ tc `shouldBe` 2
@@ -98,17 +99,17 @@ testRunDelayWithControls = do
                     ref1 <- newRef
                     ref2 <- newRef
                     _ <- Conc.fork do
-                        Delay.wait $ Delay.micros @Int 10
+                        Delay.wait (10 :: Microsecond)
                         incRef ref1
                     _ <- Conc.fork do
-                        Delay.wait $ Delay.micros @Int 20
+                        Delay.wait (20 :: Microsecond)
                         incRef ref2
-                    Delay.tick $ Delay.micros @Int 10
+                    Delay.tick (10 :: Microsecond)
                     c1 <- readIORef ref1
                     c2 <- readIORef ref2
                     liftIO $ c1 `shouldBe` 1
                     liftIO $ c2 `shouldBe` 0
-                    Delay.tick $ Delay.micros @Int 10
+                    Delay.tick (10 :: Microsecond)
                     c1' <- readIORef ref1
                     c2' <- readIORef ref2
                     liftIO $ c1' `shouldBe` 1
@@ -127,7 +128,7 @@ testRunDelayWithControls = do
                 runTest do
                     ref <- newRef
                     _ <- Conc.fork do
-                        Delay.wait $ Delay.micros @Int 100
+                        Delay.wait (100 :: Microsecond)
                         incRef ref
                     Delay.tickNext
                     count <- readIORef ref
@@ -139,10 +140,10 @@ testRunDelayWithControls = do
                     ref1 <- newRef
                     ref2 <- newRef
                     _ <- Conc.fork do
-                        Delay.wait $ Delay.micros @Int 20
+                        Delay.wait (20 :: Microsecond)
                         incRef ref1
                     _ <- Conc.fork do
-                        Delay.wait $ Delay.micros @Int 10
+                        Delay.wait (10 :: Microsecond)
                         incRef ref2
                     Delay.tickNext
                     c1 <- readIORef ref1
@@ -157,7 +158,7 @@ testRunDelayWithControls = do
                     ref <- newRef
                     _ <-
                         Conc.fork
-                            $ Delay.every (Delay.micros @Int 10)
+                            $ Delay.every (10 :: Microsecond)
                             $ incRef ref
                     Delay.settle
                     count <- readIORef ref
@@ -169,9 +170,9 @@ testRunDelayWithControls = do
                     ref <- newRef
                     _ <-
                         Conc.fork
-                            $ Delay.every (Delay.micros @Int 10)
+                            $ Delay.every (10 :: Microsecond)
                             $ incRef ref
-                    Delay.tick $ Delay.micros @Int 10
+                    Delay.tick (10 :: Microsecond)
                     count <- readIORef ref
                     liftIO $ count `shouldBe` 2
 
@@ -181,11 +182,11 @@ testRunDelayWithControls = do
                     ref <- newRef
                     _ <-
                         Conc.fork
-                            $ Delay.every (Delay.micros @Int 10)
+                            $ Delay.every (10 :: Microsecond)
                             $ incRef ref
-                    Delay.tick $ Delay.micros @Int 10
-                    Delay.tick $ Delay.micros @Int 10
-                    Delay.tick $ Delay.micros @Int 10
+                    Delay.tick (10 :: Microsecond)
+                    Delay.tick (10 :: Microsecond)
+                    Delay.tick (10 :: Microsecond)
                     count <- readIORef ref
                     liftIO $ count `shouldBe` 4
 
@@ -194,12 +195,12 @@ testRunDelayWithControls = do
                 runTest do
                     _ <-
                         Conc.fork
-                            $ Delay.every (Delay.micros @Int 10)
+                            $ Delay.every (10 :: Microsecond)
                             $ pure ()
                     Delay.settle
                     tc1 <- gets length
                     liftIO $ tc1 `shouldBe` 1
-                    Delay.tick $ Delay.micros @Int 10
+                    Delay.tick (10 :: Microsecond)
                     tc2 <- gets length
                     liftIO $ tc2 `shouldBe` 1
   where
