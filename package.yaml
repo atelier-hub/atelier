@@ -101,6 +101,8 @@ library:
     - ouroboros-consensus-cardano
     - ouroboros-consensus-diffusion
     - ouroboros-consensus-protocol
+    - resource-registry
+    - stm
     - ouroboros-network
     - ouroboros-network-api
     - ouroboros-network-framework
