@@ -1,0 +1,99 @@
+module Main (main) where
+
+import Data.Aeson (encode)
+import Options.Applicative
+import System.Directory (getCurrentDirectory)
+
+import Data.ByteString.Lazy qualified as BSL
+
+import Ghcib.Config (loadConfig)
+import Ghcib.Daemon (runDaemon, startDaemon, stopDaemon)
+import Ghcib.Socket.Client
+    ( isDaemonRunning
+    , queryStatus
+    , queryStatusWait
+    , queryWatch
+    , socketPath
+    )
+import Ghcib.Watch (watchDisplay)
+
+
+main :: IO ()
+main = do
+    cmd <- execParser opts
+    run cmd
+  where
+    opts =
+        info (commandParser <**> helper)
+            $ fullDesc
+                <> progDesc "ghcib — daemon-based GHCi build status"
+                <> header "ghcib — robust GHCi daemon with structured querying"
+
+
+data Command
+    = Start
+    | Stop
+    | Status {wait :: Bool}
+    | Watch
+
+
+commandParser :: Parser Command
+commandParser =
+    hsubparser
+        ( command "start" (info (pure Start) (progDesc "Start the daemon (no-op if already running)"))
+            <> command "stop" (info (pure Stop) (progDesc "Stop the daemon"))
+            <> command "status" (info statusParser (progDesc "Print current build state as JSON"))
+            <> command "watch" (info (pure Watch) (progDesc "Auto-refreshing terminal display"))
+        )
+
+
+statusParser :: Parser Command
+statusParser =
+    Status
+        <$> switch
+            ( long "wait"
+                <> help "Block until the current build cycle completes"
+            )
+
+
+run :: Command -> IO ()
+run Start = do
+    projectRoot <- getCurrentDirectory
+    sockPath <- socketPath projectRoot
+    running <- isDaemonRunning sockPath
+    if running then
+        putStrLn "Daemon already running."
+    else do
+        startDaemon projectRoot
+        putStrLn "Daemon started."
+run Stop = do
+    projectRoot <- getCurrentDirectory
+    stopDaemon projectRoot
+    putStrLn "Daemon stopped."
+run (Status waitFlag) = do
+    projectRoot <- getCurrentDirectory
+    sockPath <- socketPath projectRoot
+    running <- isDaemonRunning sockPath
+    unless running $ startDaemon projectRoot >> waitForSocket sockPath
+    result <-
+        if waitFlag then
+            queryStatusWait sockPath
+        else
+            queryStatus sockPath
+    case result of
+        Left err -> putStrLn $ "Error: " <> toString err
+        Right state -> BSL.putStr (encode state) >> putStrLn ""
+run Watch = do
+    projectRoot <- getCurrentDirectory
+    sockPath <- socketPath projectRoot
+    running <- isDaemonRunning sockPath
+    unless running $ startDaemon projectRoot >> waitForSocket sockPath
+    watchDisplay sockPath
+
+
+-- | Poll until the daemon socket becomes connectable.
+waitForSocket :: FilePath -> IO ()
+waitForSocket sockPath = do
+    threadDelay 200_000 -- 200ms
+    running <- isDaemonRunning sockPath
+    unless running $ waitForSocket sockPath

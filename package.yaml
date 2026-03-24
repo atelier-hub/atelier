@@ -188,6 +188,32 @@ internal-libraries:
     - unix
     - uuid
 
+  ghcib:
+    source-dirs: ghcib/src
+    dependencies:
+    - name: base
+      mixin:
+        - hiding (Prelude)
+    - atelier-prelude
+    - atelier
+    - aeson
+    - ansi-terminal
+    - bytestring
+    - data-default
+    - directory
+    - effectful
+    - effectful-th
+    - filepath
+    - fsnotify
+    - ghcid
+    - network
+    - stm
+    - text
+    - time
+    - time-units
+    - toml-reader
+    - unix
+
 executables:
   hoard-exe:
     main:                Main.hs
@@ -203,6 +229,22 @@ executables:
     - atelier
     - data-default
     - effectful
+
+  ghcib-exe:
+    main:                Main.hs
+    source-dirs:         ghcib/app
+    ghc-options:
+    - '"-with-rtsopts=-N"'
+    dependencies:
+    - name: base
+      mixin:
+        - hiding (Prelude)
+    - atelier-prelude
+    - ghcib
+    - atelier
+    - data-default
+    - effectful
+    - optparse-applicative
 
 tests:
   atelier-test:
@@ -232,6 +274,30 @@ tests:
     - tasty
     - tasty-hspec
     - time
+
+  ghcib-test:
+    main:                Driver.hs
+    source-dirs:         ghcib/test
+    ghc-options:
+    - -Wno-prepositive-qualified-module
+    - -threaded
+    build-tools:
+    - tasty-discover:tasty-discover
+    dependencies:
+    - name: base
+      mixin:
+        - hiding (Prelude)
+    - atelier-prelude
+    - ghcib
+    - atelier
+    - data-default
+    - effectful
+    - hspec
+    - stm
+    - tasty
+    - tasty-discover
+    - tasty-hspec
+    - text
 
   hoard-test:
     main:                Driver.hs
