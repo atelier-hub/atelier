@@ -40,6 +40,7 @@ module Atelier.Effects.Log
       -- * Interpreters
     , runLog
     , runLogNoOp
+    , runLogToHandle
     , runLogWriter
     ) where
 
@@ -177,6 +178,20 @@ runLog action = do
                     . formatMessage
                     $ msg
                 hFlush stdout
+        WithNamespace ns act -> localSeqUnlift env $ \unlift ->
+            local (<> ns) $ unlift act
+        GetNamespace -> ask
+
+
+-- | Like 'runLog' but writes to the given 'Handle' instead of stdout.
+-- Useful for daemons that want to write logs to a file.
+runLogToHandle :: (IOE :> es) => Handle -> Severity -> Eff (Log : es) a -> Eff es a
+runLogToHandle handle minSeverity action =
+    reinterpretWith (runReader (Namespace "")) action \env -> \case
+        LogMsg msg ->
+            liftIO $ when (msg.severity >= minSeverity) do
+                B8.hPutStr handle . encodeUtf8 . (<> "\n") . formatMessage $ msg
+                hFlush handle
         WithNamespace ns act -> localSeqUnlift env $ \unlift ->
             local (<> ns) $ unlift act
         GetNamespace -> ask

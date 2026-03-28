@@ -1,41 +1,27 @@
-module Ghcib.Socket.Server
-    ( component
-    , bindSocket
-    ) where
+module Ghcib.Socket.Server (component, socketMonitorTrigger) where
 
+import Control.Concurrent.STM (TVar, atomically, readTVar, retry)
 import Data.Aeson (ToJSON, encode)
 import Data.Aeson.Types (parseMaybe)
 import Effectful (IOE)
-import Effectful.Concurrent (Concurrent)
-import Effectful.Concurrent.STM (TVar, atomically, readTVar, retry)
-import Effectful.Exception (finally, try)
+import Effectful.Exception (finally, throwIO)
 import Effectful.Reader.Static (Reader, ask)
-import Network.Socket
-    ( Family (..)
-    , SockAddr (..)
-    , Socket
-    , SocketType (..)
-    , accept
-    , bind
-    , defaultProtocol
-    , listen
-    , socket
-    , socketToHandle
-    )
-import System.Directory (removeFile)
 import System.IO (hClose, hGetLine, hPutStrLn)
+import System.IO.Error (userError)
 
 import Data.Aeson qualified as Aeson
 import Data.ByteString.Lazy qualified as BSL
 
 import Atelier.Component (Component (..), Trigger, defaultComponent)
 import Atelier.Effects.Conc (Conc)
+import Atelier.Effects.Delay (Delay, wait)
+import Atelier.Time (Millisecond)
 import Ghcib.BuildState
-    ( BuildId (..)
-    , BuildPhase (..)
+    ( BuildPhase (..)
     , BuildState (..)
     , BuildStateRef (..)
     )
+import Ghcib.Effects.UnixSocket (UnixSocket, acceptHandle, bindSocket, removeSocketFile, socketFileExists)
 
 import Atelier.Effects.Conc qualified as Conc
 
@@ -44,9 +30,10 @@ import Atelier.Effects.Conc qualified as Conc
 -- Listens on a Unix socket and responds to status/watch queries.
 component
     :: ( Conc :> es
-       , Concurrent :> es
+       , Delay :> es
        , IOE :> es
        , Reader BuildStateRef :> es
+       , UnixSocket :> es
        )
     => FilePath
     -- ^ Unix socket path
@@ -54,107 +41,93 @@ component
 component sockPath =
     defaultComponent
         { name = "SocketServer"
-        , setup = void $ try @SomeException $ liftIO (removeFile sockPath)
+        , setup = removeSocketFile sockPath
         , triggers = do
             stateRef <- ask @BuildStateRef
-            pure [acceptTrigger sockPath stateRef]
+            pure [acceptTrigger sockPath stateRef, socketMonitorTrigger sockPath]
         }
 
 
 acceptTrigger
     :: ( Conc :> es
-       , Concurrent :> es
        , IOE :> es
+       , UnixSocket :> es
        )
     => FilePath
     -> BuildStateRef
     -> Trigger es
 acceptTrigger sockPath stateRef = do
-    sock <- liftIO $ bindSocket sockPath
+    sock <- bindSocket sockPath
     forever do
-        (conn, _) <- liftIO $ accept sock
-        h <- liftIO $ socketToHandle conn ReadWriteMode
-        liftIO $ hSetBuffering h LineBuffering
-        void $ Conc.fork $ handleConnection h stateRef `finally` liftIO (hClose h)
+        h <- acceptHandle sock
+        void $ Conc.forkTry @SomeException $ liftIO (handleConnection h stateRef) `finally` liftIO (hClose h)
 
 
--- | Create, bind, and listen on a Unix socket at the given path.
-bindSocket :: FilePath -> IO Socket
-bindSocket sockPath = do
-    sock <- socket AF_UNIX Stream defaultProtocol
-    bind sock (SockAddrUnix sockPath)
-    listen sock 5
-    pure sock
+-- | Poll for the socket file's existence every 500ms.
+-- Throws when the file is removed, causing the component system to shut down.
+socketMonitorTrigger :: (Delay :> es, UnixSocket :> es) => FilePath -> Trigger es
+socketMonitorTrigger sockPath = forever do
+    wait (500 :: Millisecond)
+    exists <- socketFileExists sockPath
+    unless exists $ throwIO $ userError "socket file removed, shutting down"
 
 
-handleConnection
-    :: ( Concurrent :> es
-       , IOE :> es
-       )
-    => Handle
-    -> BuildStateRef
-    -> Eff es ()
+handleConnection :: Handle -> BuildStateRef -> IO ()
 handleConnection h (BuildStateRef ref) = do
-    line <- liftIO $ hGetLine h
+    line <- hGetLine h
     case Aeson.decode (BSL.fromStrict (encodeUtf8 (toText line))) of
-        Nothing -> liftIO $ hPutStrLn h "{\"error\":\"invalid request\"}"
+        Nothing -> hPutStrLn h "{\"error\":\"invalid request\"}"
         Just req -> dispatch req h ref
 
 
-dispatch
-    :: (Concurrent :> es, IOE :> es)
-    => Aeson.Value
-    -> Handle
-    -> TVar BuildState
-    -> Eff es ()
+dispatch :: Aeson.Value -> Handle -> TVar BuildState -> IO ()
 dispatch req h ref =
     case parseMaybe parseQuery req of
-        Nothing -> liftIO $ hPutStrLn h "{\"error\":\"unknown query\"}"
+        Nothing -> hPutStrLn h "{\"error\":\"unknown query\"}"
         Just ("status", False) -> respondOnce h ref
         Just ("status", True) -> respondWhenDone h ref
         Just ("watch", _) -> watchStream h ref
-        Just _ -> liftIO $ hPutStrLn h "{\"error\":\"unknown query\"}"
+        Just _ -> hPutStrLn h "{\"error\":\"unknown query\"}"
   where
     parseQuery = Aeson.withObject "request" \o -> do
         q <- o Aeson..: "query"
-        wait <- o Aeson..:? "wait" Aeson..!= False
-        pure (q :: Text, wait :: Bool)
+        w <- o Aeson..:? "wait" Aeson..!= False
+        pure (q :: Text, w :: Bool)
 
 
-respondOnce :: (Concurrent :> es, IOE :> es) => Handle -> TVar BuildState -> Eff es ()
+respondOnce :: Handle -> TVar BuildState -> IO ()
 respondOnce h ref = do
     state <- atomically (readTVar ref)
-    liftIO $ sendJson h state
+    sendJson h state
 
 
-respondWhenDone :: (Concurrent :> es, IOE :> es) => Handle -> TVar BuildState -> Eff es ()
+respondWhenDone :: Handle -> TVar BuildState -> IO ()
 respondWhenDone h ref = do
     state <- atomically do
         s <- readTVar ref
         case s.phase of
             Building -> retry
-            Done {} -> pure s
-    liftIO $ sendJson h state
+            Done _ _ -> pure s
+    sendJson h state
 
 
 -- | Stream a JSON object after each completed build (blocks until handle closes or error).
-watchStream :: (Concurrent :> es, IOE :> es) => Handle -> TVar BuildState -> Eff es ()
+watchStream :: Handle -> TVar BuildState -> IO ()
 watchStream h ref = do
     state0 <- atomically (readTVar ref)
-    liftIO $ sendJson h state0
+    sendJson h state0
     loop state0.buildId
   where
-    loop (BuildId lastId) = do
+    loop bid = do
         newState <- atomically do
             s <- readTVar ref
-            let BuildId newId = s.buildId
-            if newId == lastId || isBuilding s then retry else pure s
-        liftIO $ sendJson h newState
+            if s.buildId == bid || isBuilding s then retry else pure s
+        sendJson h newState
         loop newState.buildId
 
     isBuilding s = case s.phase of
         Building -> True
-        Done {} -> False
+        Done _ _ -> False
 
 
 sendJson :: (ToJSON a) => Handle -> a -> IO ()

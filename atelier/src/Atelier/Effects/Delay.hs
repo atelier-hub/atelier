@@ -3,6 +3,7 @@ module Atelier.Effects.Delay
     , wait
     , every
     , runDelay
+    , runDelayNoOp
 
       -- * Mock delays and give control to the callsite
     , runDelayWithControls
@@ -47,6 +48,11 @@ every delay action = forever do
 runDelay :: (Concurrent :> es) => Eff (Delay : es) a -> Eff es a
 runDelay = interpret_ \(Wait delay) ->
     threadDelay $ fromIntegral (toMicroseconds delay)
+
+
+-- | Delay interpreter that makes every 'wait' a no-op — useful in unit tests.
+runDelayNoOp :: Eff (Delay : es) a -> Eff es a
+runDelayNoOp = interpret_ \(Wait _) -> pure ()
 
 
 runDelayWithControls

@@ -1,18 +1,17 @@
 module Main (main) where
 
+import Control.Concurrent (threadDelay)
 import Data.Aeson (encode)
 import Options.Applicative
 import System.Directory (getCurrentDirectory)
 
 import Data.ByteString.Lazy qualified as BSL
 
-import Ghcib.Config (loadConfig)
-import Ghcib.Daemon (runDaemon, startDaemon, stopDaemon)
+import Ghcib.Daemon (startDaemon, stopDaemon)
 import Ghcib.Socket.Client
     ( isDaemonRunning
     , queryStatus
     , queryStatusWait
-    , queryWatch
     , socketPath
     )
 import Ghcib.Watch (watchDisplay)
@@ -33,7 +32,7 @@ main = do
 data Command
     = Start
     | Stop
-    | Status {wait :: Bool}
+    | Status Bool
     | Watch
 
 

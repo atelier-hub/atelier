@@ -17,10 +17,15 @@ import Atelier.Effects.Chan (runChan)
 import Atelier.Effects.Clock (runClock)
 import Atelier.Effects.Conc (runConc)
 import Atelier.Effects.Delay (runDelay)
-import Atelier.Effects.Log (runLogNoOp)
+import Atelier.Effects.Log (Severity (..), runLogNoOp, runLogToHandle)
 import Atelier.Effects.Monitoring.Tracing (runTracingNoOp)
+import Atelier.Effects.Publishing (runPubSub)
 import Ghcib.BuildState (runBuildStateRef)
 import Ghcib.Config (Config (..), loadConfig)
+import Ghcib.Effects.FileWatcher (runFileWatcherIO)
+import Ghcib.Effects.GhciSession (runGhciSessionIO)
+import Ghcib.Effects.UnixSocket (runUnixSocketIO)
+import Ghcib.Events.FileChanged (FileChanged)
 import Ghcib.Socket.Client (socketPath)
 import Ghcib.Watcher (ReloadRequest)
 
@@ -36,25 +41,36 @@ import Ghcib.Watcher qualified as Watcher
 runDaemon :: FilePath -> Config -> IO ()
 runDaemon projectRoot cfg = do
     sockPath <- socketPath projectRoot
-    runEff
-        . runConcurrent
-        . runTracingNoOp
-        . runLogNoOp
-        . runClock
-        . runDelay
-        . runTimeout
-        . runChan
-        . runConc
-        . runReader cfg
-        $ do
-            runBuildStateRef do
-                (reloadIn, reloadOut) <- Chan.newChan @ReloadRequest
-                runSystem
-                    [ Watcher.component reloadIn
-                    , GhciSession.component reloadOut
-                    , SocketServer.component sockPath
-                    ]
-                Conc.awaitAll
+    case cfg.logFile of
+        Nothing -> runWith runLogNoOp sockPath
+        Just path -> withFile path AppendMode $ \h -> do
+            hSetBuffering h LineBuffering
+            runWith (runLogToHandle h INFO) sockPath
+  where
+    runWith runLogger sockPath =
+        runEff
+            . runConcurrent
+            . runTracingNoOp
+            . runLogger
+            . runClock
+            . runDelay
+            . runTimeout
+            . runChan
+            . runPubSub @FileChanged
+            . runConc
+            . runFileWatcherIO
+            . runGhciSessionIO
+            . runUnixSocketIO
+            . runReader cfg
+            $ do
+                runBuildStateRef do
+                    (reloadIn, reloadOut) <- Chan.newChan @ReloadRequest
+                    runSystem
+                        [ Watcher.component reloadIn
+                        , GhciSession.component reloadOut
+                        , SocketServer.component sockPath
+                        ]
+                    Conc.awaitAll
 
 
 -- | Fork the daemon as a background process and return immediately.

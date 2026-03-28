@@ -1,5 +1,3 @@
-{-# OPTIONS_GHC -Wno-partial-fields #-}
-
 module Ghcib.BuildState
     ( BuildId (..)
     , BuildState (..)
@@ -32,14 +30,13 @@ data BuildState = BuildState
     { buildId :: BuildId
     , phase :: BuildPhase
     }
+    deriving stock (Eq, Show)
 
 
 data BuildPhase
     = Building
-    | Done
-        { duration :: Millisecond
-        , messages :: [Message]
-        }
+    | Done Millisecond [Message]
+    deriving stock (Eq, Show)
 
 
 data Message = Message
@@ -51,6 +48,7 @@ data Message = Message
     , endCol :: Int
     , text :: Text
     }
+    deriving stock (Eq, Show)
 
 
 data Severity = SError | SWarning

@@ -1,0 +1,2 @@
+targets = ["lib:atelier", "lib:atelier-testing", "test:atelier-test"]
+log_file = "/tmp/ghcib.log"

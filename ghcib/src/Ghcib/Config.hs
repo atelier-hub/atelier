@@ -4,13 +4,32 @@ module Ghcib.Config
     ( Config (..)
     , loadConfig
     , resolveCommand
+    , resolveWatchDirs
     ) where
 
 import Data.Aeson (FromJSON)
 import Data.Default (Default (..))
+import Data.List (nub)
+import Distribution.PackageDescription.Parsec (parseGenericPackageDescriptionMaybe)
+import Distribution.Types.BuildInfo (hsSourceDirs)
+import Distribution.Types.CondTree (condTreeData)
+import Distribution.Types.Executable (buildInfo)
+import Distribution.Types.GenericPackageDescription
+    ( GenericPackageDescription
+    , condExecutables
+    , condLibrary
+    , condSubLibraries
+    , condTestSuites
+    )
+import Distribution.Types.Library (libBuildInfo)
+import Distribution.Types.TestSuite (testBuildInfo)
+import Distribution.Types.UnqualComponentName (mkUnqualComponentName)
+import Distribution.Utils.Path (getSymbolicPath)
 import System.Directory (doesFileExist, listDirectory)
 import System.FilePath (takeExtension, (</>))
 import TOML (DecodeTOML (..), decode, getFieldOpt, getFieldOr)
+
+import Data.Text qualified as T
 
 import Atelier.Time (Millisecond)
 import Atelier.Types.QuietSnake (QuietSnake (..))
@@ -18,6 +37,7 @@ import Atelier.Types.QuietSnake (QuietSnake (..))
 
 data Config = Config
     { command :: Maybe Text
+    , targets :: [Text]
     , debounceMs :: Millisecond
     , outputFile :: Maybe FilePath
     , logFile :: Maybe FilePath
@@ -30,6 +50,7 @@ instance Default Config where
     def =
         Config
             { command = Nothing
+            , targets = []
             , debounceMs = 100
             , outputFile = Just "build.json"
             , logFile = Nothing
@@ -44,12 +65,14 @@ instance DecodeTOML Millisecond where
 instance DecodeTOML Config where
     tomlDecoder = do
         command <- getFieldOpt "command"
+        targets <- getFieldOr [] "targets"
         debounceMs <- getFieldOr 100 "debounce_ms"
         outputFile <- getFieldOr (Just "build.json") "output_file"
         logFile <- getFieldOpt "log_file"
         pure
             Config
                 { command = command
+                , targets = targets
                 , debounceMs = debounceMs
                 , outputFile = outputFile
                 , logFile = logFile
@@ -76,17 +99,57 @@ resolveCommand :: Config -> FilePath -> IO Text
 resolveCommand cfg projectRoot =
     case cfg.command of
         Just cmd -> pure cmd
-        Nothing -> detectCommand projectRoot
+        Nothing -> detectCommand cfg.targets projectRoot
 
 
-detectCommand :: FilePath -> IO Text
-detectCommand projectRoot = do
+detectCommand :: [Text] -> FilePath -> IO Text
+detectCommand targets projectRoot = do
     hasCabalProject <- doesFileExist (projectRoot </> "cabal.project")
     cabalFiles <- filter (\f -> takeExtension f == ".cabal") <$> listDirectory projectRoot
     hasStack <- doesFileExist (projectRoot </> "stack.yaml")
+    let targetStr = if null targets then "all" else unwords targets
     pure
         $ if
-            | hasCabalProject -> "cabal repl --enable-multi-repl all"
-            | not (null cabalFiles) -> "cabal repl --enable-multi-repl all"
-            | hasStack -> "stack ghci"
-            | otherwise -> "cabal repl"
+            | hasCabalProject -> "cabal repl --enable-multi-repl " <> targetStr
+            | not (null cabalFiles) -> "cabal repl --enable-multi-repl " <> targetStr
+            | hasStack -> "stack ghci " <> targetStr
+            | otherwise -> "cabal repl " <> targetStr
+
+
+-- | Resolve the directories to watch based on the configured targets.
+-- Parses the .cabal file and extracts hs-source-dirs for each target.
+-- Falls back to ["."] if targets is empty or the cabal file can't be parsed.
+resolveWatchDirs :: [Text] -> FilePath -> IO [FilePath]
+resolveWatchDirs [] _ = pure ["."]
+resolveWatchDirs targets projectRoot = do
+    cabalFiles <- filter (\f -> takeExtension f == ".cabal") <$> listDirectory projectRoot
+    case cabalFiles of
+        [] -> pure ["."]
+        (cabalFile : _) -> do
+            contents <- readFileBS (projectRoot </> cabalFile)
+            case parseGenericPackageDescriptionMaybe contents of
+                Nothing -> pure ["."]
+                Just gpd ->
+                    let dirs = nub $ concatMap (sourceDirsForTarget gpd) targets
+                    in  pure $ if null dirs then ["."] else map (projectRoot </>) dirs
+
+
+sourceDirsForTarget :: GenericPackageDescription -> Text -> [FilePath]
+sourceDirsForTarget gpd target =
+    map getSymbolicPath $ case T.splitOn ":" target of
+        ["lib", ""] ->
+            maybe [] (libDirs . condTreeData) (condLibrary gpd)
+        ["lib", name] ->
+            let ucn = mkUnqualComponentName (toString name)
+            in  concatMap (libDirs . condTreeData . snd) $ filter ((== ucn) . fst) (condSubLibraries gpd)
+        ["test", name] ->
+            let ucn = mkUnqualComponentName (toString name)
+            in  concatMap (testDirs . condTreeData . snd) $ filter ((== ucn) . fst) (condTestSuites gpd)
+        ["exe", name] ->
+            let ucn = mkUnqualComponentName (toString name)
+            in  concatMap (exeDirs . condTreeData . snd) $ filter ((== ucn) . fst) (condExecutables gpd)
+        _ -> []
+  where
+    libDirs = hsSourceDirs . libBuildInfo
+    testDirs = hsSourceDirs . testBuildInfo
+    exeDirs = hsSourceDirs . buildInfo
