@@ -35,7 +35,7 @@ import Network.Socket
     , socketToHandle
     )
 import System.Directory (doesPathExist, removeFile)
-import System.IO (hClose, hGetLine, hPutStrLn)
+import System.IO (hClose, hGetLine, hPutStrLn, hSetEncoding, utf8)
 
 import Network.Socket qualified as Net
 
@@ -74,6 +74,7 @@ runUnixSocketIO eff = interpretWith eff \env -> \case
     AcceptHandle sock -> liftIO do
         (conn, _) <- accept sock
         h <- socketToHandle conn ReadWriteMode
+        hSetEncoding h utf8
         hSetBuffering h LineBuffering
         pure h
     WithConnection sockPath callback ->
@@ -82,6 +83,7 @@ runUnixSocketIO eff = interpretWith eff \env -> \case
                 sock <- socket AF_UNIX Stream defaultProtocol
                 Net.connect sock (SockAddrUnix sockPath)
                 h <- socketToHandle sock ReadWriteMode
+                hSetEncoding h utf8
                 hSetBuffering h LineBuffering
                 pure h
             unlift (callback h) `finally` liftIO (hClose h)

@@ -1,15 +1,15 @@
 module Unit.Ghcib.WatchSpec (spec_Watch) where
 
 import Data.Time (UTCTime (..), fromGregorian)
-import Data.Time.Units (fromMicroseconds)
+import Data.Time.LocalTime (utc)
 import Prettyprinter (Doc, defaultLayoutOptions, layoutPretty)
 import Prettyprinter.Render.Text (renderStrict)
 import Test.Hspec
 
-import Atelier.Time (Millisecond)
 import Ghcib.BuildState
     ( BuildId (..)
     , BuildPhase (..)
+    , BuildResult (..)
     , BuildState (..)
     , DaemonInfo (..)
     , Message (..)
@@ -24,37 +24,37 @@ spec_Watch = do
     describe "buildStateDoc" do
         describe "Building" do
             it "shows 'Building...'" do
-                render (buildStateDoc buildingState) `shouldContain` "Building..."
+                render (buildStateDoc utc buildingState) `shouldContain` "Building..."
 
         describe "Done, no messages" do
             it "shows 'All good.'" do
-                render (buildStateDoc (doneState [])) `shouldContain` "All good."
+                render (buildStateDoc utc (doneState [])) `shouldContain` "All good."
 
             it "shows duration" do
-                render (buildStateDoc (doneState [])) `shouldContain` "500ms"
+                render (buildStateDoc utc (doneState [])) `shouldContain` "500ms"
 
             it "includes daemon info" do
-                render (buildStateDoc (doneState [])) `shouldContain` "Targets:"
+                render (buildStateDoc utc (doneState [])) `shouldContain` "Targets:"
 
         describe "Done, errors only" do
             it "shows error count" do
-                render (buildStateDoc (doneState [errMsg])) `shouldContain` "1 error(s)"
+                render (buildStateDoc utc (doneState [errMsg])) `shouldContain` "1 error(s)"
 
             it "shows zero warnings" do
-                render (buildStateDoc (doneState [errMsg])) `shouldContain` "0 warning(s)"
+                render (buildStateDoc utc (doneState [errMsg])) `shouldContain` "0 warning(s)"
 
             it "includes the message location" do
-                render (buildStateDoc (doneState [errMsg])) `shouldContain` "Foo.hs:10:1"
+                render (buildStateDoc utc (doneState [errMsg])) `shouldContain` "Foo.hs:10:1"
 
         describe "Done, warnings only" do
             it "shows warning count without error count" do
-                let rendered = render (buildStateDoc (doneState [warnMsg]))
+                let rendered = render (buildStateDoc utc (doneState [warnMsg]))
                 rendered `shouldContain` "1 warning(s)"
                 rendered `shouldNotContain` "error(s)"
 
         describe "Done, mixed" do
             it "shows both counts" do
-                let rendered = render (buildStateDoc (doneState [errMsg, warnMsg]))
+                let rendered = render (buildStateDoc utc (doneState [errMsg, warnMsg]))
                 rendered `shouldContain` "1 error(s)"
                 rendered `shouldContain` "1 warning(s)"
 
@@ -105,10 +105,6 @@ render :: Doc Style -> String
 render = toString . renderStrict . layoutPretty defaultLayoutOptions
 
 
-halfSecond :: Millisecond
-halfSecond = fromMicroseconds 500_000
-
-
 emptyDaemonInfo :: DaemonInfo
 emptyDaemonInfo = DaemonInfo {targets = [], watchDirs = [], sockPath = "", logFile = Nothing}
 
@@ -118,7 +114,7 @@ buildingState = BuildState (BuildId 1) Building emptyDaemonInfo
 
 
 doneState :: [Message] -> BuildState
-doneState msgs = BuildState (BuildId 1) (Done epoch halfSecond msgs) emptyDaemonInfo
+doneState msgs = BuildState (BuildId 1) (Done (BuildResult {completedAt = epoch, durationMs = 500, moduleCount = 0, messages = msgs})) emptyDaemonInfo
 
 
 epoch :: UTCTime

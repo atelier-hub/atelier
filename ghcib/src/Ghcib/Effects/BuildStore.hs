@@ -5,16 +5,18 @@ module Ghcib.Effects.BuildStore
     , putState
     , waitUntilDone
     , waitForNext
+    , setPhase
 
       -- * Interpreters
     , runBuildStoreSTM
     , runBuildStoreRef
     , runBuildStoreScripted
+    , runBuildStore
     ) where
 
 import Effectful (Effect)
 import Effectful.Concurrent (Concurrent)
-import Effectful.Concurrent.STM (TVar, atomically, newTVar, readTVar, writeTVar)
+import Effectful.Concurrent.STM (TVar, atomically, modifyTVar, newTVar, readTVar, writeTVar)
 import Effectful.Dispatch.Dynamic (interpret_, reinterpret)
 import Effectful.State.Static.Shared (State, evalState, get, modify, put)
 import Effectful.TH (makeEffect)
@@ -33,6 +35,8 @@ data BuildStore :: Effect where
     WaitUntilDone :: BuildStore m BuildState
     -- | Block until a completed build with a different 'BuildId' is available.
     WaitForNext :: BuildId -> BuildStore m BuildState
+    -- | Update the build id and phase without touching other fields (e.g. daemonInfo).
+    SetPhase :: BuildId -> BuildPhase -> BuildStore m ()
 
 
 makeEffect ''BuildStore
@@ -53,6 +57,7 @@ runBuildStoreSTM eff = do
             PutState s -> atomically (writeTVar ref s)
             WaitUntilDone -> poll ref (not . isBuilding)
             WaitForNext bid -> poll ref \s -> not (isBuilding s) && s.buildId /= bid
+            SetPhase bid phase -> atomically $ modifyTVar ref \bs -> bs {buildId = bid, phase = phase}
         )
         eff
   where
@@ -66,7 +71,7 @@ runBuildStoreSTM eff = do
     isBuilding :: BuildState -> Bool
     isBuilding s = case s.phase of
         Building -> True
-        Done _ _ _ -> False
+        Done _ -> False
 
     emptyDaemonInfo = DaemonInfo {targets = [], watchDirs = [], sockPath = "", logFile = Nothing}
 
@@ -81,12 +86,13 @@ runBuildStoreRef (BuildStateRef ref) =
             PutState s -> atomically (writeTVar ref s)
             WaitUntilDone -> pollRef ref (not . isBuilding)
             WaitForNext bid -> pollRef ref \s -> not (isBuilding s) && s.buildId /= bid
+            SetPhase bid phase -> atomically $ modifyTVar ref \bs -> bs {buildId = bid, phase = phase}
         )
   where
     isBuilding :: BuildState -> Bool
     isBuilding s = case s.phase of
         Building -> True
-        Done _ _ _ -> False
+        Done _ -> False
 
 
 pollRef :: (Concurrent :> es, Delay :> es) => TVar BuildState -> (BuildState -> Bool) -> Eff es BuildState
@@ -117,11 +123,15 @@ runBuildStoreScripted states = reinterpret (evalState states) $ \_ -> \case
     PutState s -> modify (s :)
     WaitUntilDone -> advance (not . isBuilding)
     WaitForNext bid -> advance \s -> not (isBuilding s) && s.buildId /= bid
+    SetPhase bid phase ->
+        get >>= \case
+            [] -> pure ()
+            s : rest -> put (s {buildId = bid, phase = phase} : rest)
   where
     isBuilding :: BuildState -> Bool
     isBuilding s = case s.phase of
         Building -> True
-        Done _ _ _ -> False
+        Done _ -> False
 
     advance :: (BuildState -> Bool) -> Eff (State [BuildState] : es) BuildState
     advance predicate =
@@ -130,3 +140,13 @@ runBuildStoreScripted states = reinterpret (evalState states) $ \_ -> \case
             s : rest
                 | predicate s -> put rest >> pure s
                 | otherwise -> put rest >> advance predicate
+
+
+-- | Production interpreter for use in the daemon.
+--
+-- Creates a 'TVar' initialised with 'initialBuildState' for the given
+-- 'DaemonInfo' and runs the supplied action under 'runBuildStoreRef'.
+runBuildStore :: (Concurrent :> es, Delay :> es) => DaemonInfo -> Eff (BuildStore : es) a -> Eff es a
+runBuildStore di eff = do
+    ref <- atomically (newTVar (initialBuildState di))
+    runBuildStoreRef (BuildStateRef ref) eff

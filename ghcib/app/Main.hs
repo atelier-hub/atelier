@@ -8,6 +8,7 @@ import System.Directory (getCurrentDirectory)
 
 import Data.ByteString.Lazy qualified as BSL
 
+import Atelier.Effects.Clock (runClock)
 import Ghcib.Daemon (startDaemon, stopDaemon)
 import Ghcib.Effects.Display (runDisplayIO)
 import Ghcib.Effects.UnixSocket (runUnixSocketIO)
@@ -89,7 +90,7 @@ run (Status waitFlag) = do
 run Watch = do
     projectRoot <- getCurrentDirectory
     sockPath <- socketPath projectRoot
-    runEff $ runUnixSocketIO $ runDisplayIO $ do
+    runEff $ runClock $ runUnixSocketIO $ runDisplayIO $ do
         running <- isDaemonRunning sockPath
         unless running $ liftIO $ startDaemon projectRoot >> waitForSocket sockPath
         watchDisplay sockPath

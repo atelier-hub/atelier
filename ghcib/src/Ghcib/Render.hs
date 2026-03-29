@@ -15,13 +15,13 @@ module Ghcib.Render
 
 import Data.Time (UTCTime)
 import Data.Time.Format (defaultTimeLocale, formatTime)
-import Data.Time.Units (toMicroseconds)
+import Data.Time.LocalTime (TimeZone, utc, utcToLocalTime)
 import Prettyprinter
 import System.FilePath (isAbsolute)
 
-import Atelier.Time (Millisecond)
 import Ghcib.BuildState
     ( BuildPhase (..)
+    , BuildResult (..)
     , BuildState (..)
     , DaemonInfo (..)
     , Message (..)
@@ -36,8 +36,8 @@ severityStyle SError = Err
 severityStyle SWarning = Warn
 
 
-buildStateDoc :: BuildState -> Doc Style
-buildStateDoc bs =
+buildStateDoc :: TimeZone -> BuildState -> Doc Style
+buildStateDoc tz bs =
     statusDoc
         <> hardline
         <> hardline
@@ -46,12 +46,14 @@ buildStateDoc bs =
     statusDoc = case bs.phase of
         Building ->
             annotate Warn "Building..."
-        Done completedAt dur [] ->
-            annotate Ok "All good."
-                <+> durationDoc dur
-                <+> timestampDoc completedAt
-        Done completedAt dur msgs ->
-            let errCount = length $ filter (\m -> m.severity == SError) msgs
+        Done result
+            | null result.messages ->
+                annotate Ok "All good."
+                    <+> buildSummaryDoc result.moduleCount result.durationMs
+                    <+> timestampDoc tz result.completedAt
+        Done result ->
+            let msgs = result.messages
+                errCount = length $ filter (\m -> m.severity == SError) msgs
                 warnCount = length $ filter (\m -> m.severity == SWarning) msgs
                 header =
                     if errCount > 0 then
@@ -59,28 +61,31 @@ buildStateDoc bs =
                     else
                         annotate Warn (pretty warnCount <> " warning(s)")
             in  header
-                    <+> durationDoc dur
-                    <+> timestampDoc completedAt
+                    <+> durationDoc result.durationMs
+                    <+> timestampDoc tz result.completedAt
                     <> hardline
                     <> hardline
                     <> vsep (map messageDoc msgs)
 
 
-durationDoc :: Millisecond -> Doc ann
-durationDoc dur = "(" <> pretty (formatDuration dur) <> ")"
+buildSummaryDoc :: Int -> Int -> Doc ann
+buildSummaryDoc mods ms = "(" <> pretty mods <+> "modules," <+> pretty (formatDuration ms) <> ")"
 
 
-timestampDoc :: UTCTime -> Doc ann
-timestampDoc t = pretty ("— " <> formatTime defaultTimeLocale "%H:%M:%S" t)
+durationDoc :: Int -> Doc ann
+durationDoc ms = "(" <> pretty (formatDuration ms) <> ")"
 
 
-formatDuration :: Millisecond -> String
-formatDuration dur =
-    let ms = toMicroseconds dur `div` 1000
-    in  if ms < 1000 then
-            show ms <> "ms"
-        else
-            show (ms `div` 1000) <> "." <> show ((ms `mod` 1000) `div` 100) <> "s"
+timestampDoc :: TimeZone -> UTCTime -> Doc ann
+timestampDoc tz t = pretty ("— " <> formatTime defaultTimeLocale "%H:%M:%S" (utcToLocalTime tz t))
+
+
+formatDuration :: Int -> String
+formatDuration ms =
+    if ms < 1000 then
+        show ms <> "ms"
+    else
+        show (ms `div` 1000) <> "." <> show ((ms `mod` 1000) `div` 100) <> "s"
 
 
 watchDirDoc :: FilePath -> Doc ann
@@ -131,4 +136,4 @@ instance Pretty DaemonInfo where
 
 
 instance Pretty BuildState where
-    pretty bs = unAnnotate (buildStateDoc bs)
+    pretty bs = unAnnotate (buildStateDoc utc bs)

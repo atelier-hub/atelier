@@ -2,7 +2,6 @@ module Ghcib.GhciSession (component) where
 
 import Data.Time (diffUTCTime)
 import Effectful (IOE)
-import Effectful.Concurrent (Concurrent)
 import Effectful.Exception (throwIO, try)
 import Effectful.Reader.Static (Reader, ask)
 import System.Directory (getCurrentDirectory)
@@ -13,14 +12,10 @@ import Atelier.Effects.Clock (Clock)
 import Atelier.Effects.Delay (Delay, wait)
 import Atelier.Effects.Log (Log)
 import Atelier.Exception (isGracefulShutdown)
-import Atelier.Time (Millisecond, nominalDiffTime)
-import Ghcib.BuildState
-    ( BuildId (..)
-    , BuildPhase (..)
-    , BuildStateRef (..)
-    , updateBuildPhase
-    )
+import Atelier.Time (Millisecond)
+import Ghcib.BuildState (BuildId (..), BuildPhase (..), BuildResult (..))
 import Ghcib.Config (Config (..), resolveCommand)
+import Ghcib.Effects.BuildStore (BuildStore, setPhase)
 import Ghcib.Effects.GhciSession (GhciSession)
 import Ghcib.Watcher (ReloadRequest (..))
 
@@ -35,14 +30,13 @@ import Ghcib.Effects.GhciSession qualified as GhciSession
 -- requests from the watcher. Catches UnexpectedExit and restarts the session
 -- rather than propagating (the fix for ghcid's file-removal crash).
 component
-    :: ( Chan :> es
+    :: ( BuildStore :> es
+       , Chan :> es
        , Clock :> es
-       , Concurrent :> es
        , Delay :> es
        , GhciSession :> es
        , IOE :> es
        , Log :> es
-       , Reader BuildStateRef :> es
        , Reader Config :> es
        )
     => OutChan ReloadRequest
@@ -52,29 +46,27 @@ component reloadOut =
         { name = "GhciSession"
         , listeners = do
             cfg <- ask @Config
-            stateRef <- ask @BuildStateRef
             projectRoot <- liftIO getCurrentDirectory
             cmd <- liftIO $ resolveCommand cfg projectRoot
             Log.debug $ "GhciSession.component: resolved command = " <> cmd
             Log.debug $ "GhciSession.component: projectRoot = " <> toText projectRoot
-            pure [sessionListener cmd projectRoot stateRef reloadOut]
+            pure [sessionListener cmd projectRoot reloadOut]
         }
 
 
 sessionListener
-    :: ( Chan :> es
+    :: ( BuildStore :> es
+       , Chan :> es
        , Clock :> es
-       , Concurrent :> es
        , Delay :> es
        , GhciSession :> es
        , Log :> es
        )
     => Text
     -> FilePath
-    -> BuildStateRef
     -> OutChan ReloadRequest
     -> Listener es
-sessionListener cmd projectRoot stateRef reloadOut = startSession (BuildId 1)
+sessionListener cmd projectRoot reloadOut = startSession (BuildId 1)
   where
     startSession (BuildId n) = do
         Log.info $ "Starting GHCi session #" <> show n <> ": " <> cmd
@@ -87,11 +79,11 @@ sessionListener cmd projectRoot stateRef reloadOut = startSession (BuildId 1)
                 -- Brief pause before retry to avoid tight restart loop
                 wait (2_000 :: Millisecond)
                 startSession (BuildId n)
-            Right msgs -> do
+            Right (moduleCount, msgs) -> do
                 Log.info $ "GHCi started (session #" <> show n <> "): " <> show (length msgs) <> " messages"
                 t0 <- Clock.currentTime
-                let dur = nominalDiffTime @Millisecond (diffUTCTime t0 t0)
-                updateBuildPhase stateRef (BuildId n) (Done t0 dur msgs)
+                let buildResult = BuildResult {completedAt = t0, durationMs = 0, moduleCount, messages = msgs}
+                setPhase (BuildId n) (Done buildResult)
                 Log.debug $ "Build state updated to Done (session #" <> show n <> ")"
                 listenLoop (BuildId (n + 1))
 
@@ -100,21 +92,22 @@ sessionListener cmd projectRoot stateRef reloadOut = startSession (BuildId 1)
         request <- Chan.readChan reloadOut
         let nextId = BuildId (n + 1)
         Log.debug $ "Reload requested: " <> show request
-        updateBuildPhase stateRef (BuildId n) Building
+        setPhase (BuildId n) Building
         t0 <- Clock.currentTime
         result <- try @SomeException $ case request of
             Reload -> GhciSession.reloadGhci
-            Restart -> GhciSession.stopGhci >> pure []
+            Restart -> GhciSession.stopGhci >> pure (0, [])
         case result of
             Left ex -> do
                 when (isGracefulShutdown ex) $ throwIO ex
                 Log.warn "GHCi session died; restarting"
                 void $ try @SomeException GhciSession.stopGhci
                 startSession nextId
-            Right msgs -> do
+            Right (moduleCount, msgs) -> do
                 t1 <- Clock.currentTime
-                let dur = nominalDiffTime (diffUTCTime t1 t0)
-                updateBuildPhase stateRef (BuildId n) (Done t1 dur msgs)
+                let durationMs = round (realToFrac (diffUTCTime t1 t0) * 1000 :: Double) :: Int
+                    buildResult = BuildResult {completedAt = t1, durationMs, moduleCount, messages = msgs}
+                setPhase (BuildId n) (Done buildResult)
                 if request == Restart then
                     startSession nextId
                 else

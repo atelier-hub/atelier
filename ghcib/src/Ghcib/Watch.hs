@@ -4,6 +4,7 @@ module Ghcib.Watch
 
 import Effectful (IOE)
 
+import Atelier.Effects.Clock (Clock, currentTimeZone)
 import Ghcib.BuildState (BuildState)
 import Ghcib.Effects.Display (Display, putDocLn, resetScreen)
 import Ghcib.Effects.UnixSocket (UnixSocket)
@@ -12,14 +13,15 @@ import Ghcib.Socket.Client (queryWatch)
 
 
 -- | Connect to the daemon and render a live-updating build status display.
-watchDisplay :: (Display :> es, IOE :> es, UnixSocket :> es) => FilePath -> Eff es ()
+watchDisplay :: (Clock :> es, Display :> es, IOE :> es, UnixSocket :> es) => FilePath -> Eff es ()
 watchDisplay sockPath = do
     resetScreen
     putDocLn "Waiting for build..."
     queryWatch sockPath renderState
 
 
-renderState :: (Display :> es) => BuildState -> Eff es ()
+renderState :: (Clock :> es, Display :> es) => BuildState -> Eff es ()
 renderState bs = do
+    tz <- currentTimeZone
     resetScreen
-    putDocLn (buildStateDoc bs)
+    putDocLn (buildStateDoc tz bs)

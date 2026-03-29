@@ -6,7 +6,7 @@ module Ghcib.Socket.Client
     , isDaemonRunning
     ) where
 
-import Data.Aeson (decode, encode)
+import Data.Aeson (decode, eitherDecode, encode)
 import Effectful (IOE)
 import Effectful.Exception (try)
 import Numeric (showHex)
@@ -84,9 +84,9 @@ sendQuery h q = hPutStrLn h (decodeUtf8 (BSL.toStrict (encode q)))
 receiveState :: (IOE :> es) => Handle -> Eff es (Either Text BuildState)
 receiveState h = do
     line <- liftIO $ hGetLine h
-    case decode (BSL.fromStrict (encodeUtf8 (toText line))) of
-        Nothing -> pure $ Left "failed to parse response"
-        Just state -> pure $ Right state
+    case eitherDecode (BSL.fromStrict (encodeUtf8 (toText line))) of
+        Left err -> pure $ Left (toText err)
+        Right state -> pure $ Right state
 
 
 -- | Polynomial hash of a file path, returned as a hex string.

@@ -28,16 +28,16 @@ testScripted :: Spec
 testScripted = do
     describe "startGhci" do
         it "returns scripted messages" do
-            result <-
+            (_, msgs) <-
                 runScripted [Right [errMsg]]
                     $ startGhci "cabal repl" "/"
-            result `shouldBe` [errMsg]
+            msgs `shouldBe` [errMsg]
 
         it "returns empty list when scripted result has no messages" do
-            result <-
+            (_, msgs) <-
                 runScripted [Right []]
                     $ startGhci "cabal repl" "/"
-            result `shouldBe` []
+            msgs `shouldBe` []
 
         it "throws when scripted result is Left" do
             result <-
@@ -48,8 +48,8 @@ testScripted = do
 
     describe "reloadGhci" do
         it "returns scripted messages" do
-            result <- runScripted [Right [warnMsg]] reloadGhci
-            result `shouldBe` [warnMsg]
+            (_, msgs) <- runScripted [Right [warnMsg]] reloadGhci
+            msgs `shouldBe` [warnMsg]
 
         it "throws when scripted result is Left" do
             result <-
@@ -59,16 +59,16 @@ testScripted = do
 
     describe "stopGhci" do
         it "is always a no-op and does not consume from the queue" do
-            result <- runScripted [Right [errMsg]] do
+            (_, msgs) <- runScripted [Right [errMsg]] do
                 stopGhci
                 startGhci "cabal repl" "/"
-            result `shouldBe` [errMsg]
+            msgs `shouldBe` [errMsg]
 
     describe "sequencing" do
         it "consumes results in order across mixed operations" do
             (a, b) <- runScripted [Right [errMsg], Right [warnMsg]] do
-                a <- startGhci "cabal repl" "/"
-                b <- reloadGhci
+                (_, a) <- startGhci "cabal repl" "/"
+                (_, b) <- reloadGhci
                 pure (a, b)
             a `shouldBe` [errMsg]
             b `shouldBe` [warnMsg]
@@ -76,7 +76,7 @@ testScripted = do
         it "recover scenario: error then success" do
             result <- runScripted [Left (toException boom), Right []] do
                 r1 <- try @ErrorCall $ startGhci "cabal repl" "/"
-                r2 <- startGhci "cabal repl" "/"
+                (_, r2) <- startGhci "cabal repl" "/"
                 pure (r1, r2)
             fst result `shouldSatisfy` isLeft
             snd result `shouldBe` []

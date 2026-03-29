@@ -295,6 +295,7 @@ tests:
         - hiding (Prelude)
     - atelier-prelude
     - ghcib
+    - aeson
     - atelier
     - data-default
     - effectful
