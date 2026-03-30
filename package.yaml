@@ -62,12 +62,12 @@ default-extensions:
 - TypeFamilies
 
 library:
-  source-dirs: src
+  source-dirs: hoard/src
   dependencies:
     - name: base
       mixin:
         - hiding (Prelude)
-    - hoard-prelude
+    - atelier-prelude
     - atelier
     - aeson
     - base16-bytestring
@@ -125,8 +125,8 @@ library:
     - yaml
 
 internal-libraries:
-  hoard-prelude:
-    source-dirs: prelude
+  atelier-prelude:
+    source-dirs: atelier/prelude
     dependencies:
     - base
     - relude
@@ -137,7 +137,7 @@ internal-libraries:
     - name: base
       mixin:
         - hiding (Prelude)
-    - hoard-prelude
+    - atelier-prelude
     - aeson
     - base64-bytestring
     - bytestring
@@ -172,7 +172,7 @@ internal-libraries:
     - name: base
       mixin:
         - hiding (Prelude)
-    - hoard-prelude
+    - atelier-prelude
     - atelier
     - hasql
     - hasql-pool
@@ -187,14 +187,14 @@ internal-libraries:
 executables:
   hoard-exe:
     main:                Main.hs
-    source-dirs:         app/hoard
+    source-dirs:         hoard/app
     ghc-options:
     - '"-with-rtsopts=-N -T"'
     dependencies:
     - name: base
       mixin:
         - hiding (Prelude)
-    - hoard-prelude
+    - atelier-prelude
     - hoard
     - atelier
     - data-default
@@ -215,7 +215,7 @@ tests:
     - name: base
       mixin:
         - hiding (Prelude)
-    - hoard-prelude
+    - atelier-prelude
     - atelier
     - async
     - containers
@@ -231,7 +231,7 @@ tests:
 
   hoard-test:
     main:                Driver.hs
-    source-dirs:         test
+    source-dirs:         hoard/test
     ghc-options:
     # Complains about `test/Driver.hs` emitted by tasty-discover, and is handled by
     # our fourmolu config.
@@ -243,7 +243,7 @@ tests:
     - name: base
       mixin:
         - hiding (Prelude)
-    - hoard-prelude
+    - atelier-prelude
     - hoard
     - atelier
     - atelier-testing
