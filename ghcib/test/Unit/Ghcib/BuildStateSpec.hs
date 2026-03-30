@@ -19,6 +19,7 @@ spec_BuildState = do
                         , col = 8
                         , endLine = 2
                         , endCol = 8
+                        , title = "Found \8216qualified\8217 in prepositive position"
                         , text = "Found \8216qualified\8217 in prepositive position\n    Suggested fixes:\n      \8226 Place \8216qualified\8217 after the module name."
                         }
                 bs = mkBuildState [msg]
@@ -33,6 +34,7 @@ spec_BuildState = do
                         , col = 1
                         , endLine = 1
                         , endCol = 1
+                        , title = "text with \CAN control \EM chars and \ESC[1m ANSI \ESC[0m codes"
                         , text = "text with \CAN control \EM chars and \ESC[1m ANSI \ESC[0m codes"
                         }
                 bs = mkBuildState [msg]
@@ -47,6 +49,7 @@ spec_BuildState = do
                         , col = 1
                         , endLine = 1
                         , endCol = 1
+                        , title = "\8220Place qualified after the module name.\8221"
                         , text = "\8220Place qualified after the module name.\8221"
                         }
                 bs = mkBuildState [msg]

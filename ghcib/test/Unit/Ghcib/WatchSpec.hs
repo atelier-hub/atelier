@@ -130,6 +130,7 @@ errMsg =
         , col = 1
         , endLine = 10
         , endCol = 5
+        , title = "type mismatch"
         , text = "type mismatch"
         }
 
@@ -143,5 +144,6 @@ warnMsg =
         , col = 1
         , endLine = 3
         , endCol = 10
+        , title = "unused import"
         , text = "unused import"
         }

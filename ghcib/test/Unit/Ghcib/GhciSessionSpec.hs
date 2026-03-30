@@ -100,6 +100,7 @@ errMsg =
         , col = 1
         , endLine = 1
         , endCol = 5
+        , title = "Variable not in scope: foo"
         , text = "Variable not in scope: foo"
         }
 
@@ -113,6 +114,7 @@ warnMsg =
         , col = 3
         , endLine = 10
         , endCol = 8
+        , title = "Unused import"
         , text = "Unused import"
         }
 

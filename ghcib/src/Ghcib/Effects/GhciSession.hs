@@ -116,6 +116,7 @@ toMessages loads = mapMaybe toMsg loads
                 , col = c
                 , endLine = el
                 , endCol = ec
+                , title = maybe "" toText (listToMaybe msgLines)
                 , text = unlines (map toText msgLines)
                 }
     toMsg _ = Nothing

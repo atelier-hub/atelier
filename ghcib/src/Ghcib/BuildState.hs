@@ -64,6 +64,7 @@ data Message = Message
     , col :: Int
     , endLine :: Int
     , endCol :: Int
+    , title :: Text
     , text :: Text
     }
     deriving stock (Eq, Generic, Show)
