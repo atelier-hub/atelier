@@ -1096,7 +1096,6 @@
           "cardano-ledger-conway".components.exes."gen-golden".planned = lib.mkOverride 900 true;
           "ouroboros-consensus-diffusion".components.sublibs."unstable-mock-testlib".planned = lib.mkOverride 900 true;
           "port-utils".components.library.planned = lib.mkOverride 900 true;
-          "hoard".components.sublibs."hoard-prelude".planned = lib.mkOverride 900 true;
           "optics-extra".components.library.planned = lib.mkOverride 900 true;
           "cardano-ledger-core".components.sublibs."internal".planned = lib.mkOverride 900 true;
           "parsec".components.library.planned = lib.mkOverride 900 true;
@@ -1319,6 +1318,7 @@
           "statistics".components.library.planned = lib.mkOverride 900 true;
           "cardano-ledger-mary".components.exes."huddle-cddl".planned = lib.mkOverride 900 true;
           "ouroboros-consensus-cardano".components.exes."snapshot-converter".planned = lib.mkOverride 900 true;
+          "hoard".components.sublibs."atelier-prelude".planned = lib.mkOverride 900 true;
           "cardano-protocol-tpraos".components.sublibs."testlib".planned = lib.mkOverride 900 true;
           "cryptohash-sha1".components.library.planned = lib.mkOverride 900 true;
           "network-control".components.library.planned = lib.mkOverride 900 true;
