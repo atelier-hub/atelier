@@ -11,7 +11,7 @@
     flags = {};
     package = {
       specVersion = "1.10";
-      identifier = { name = "crypton-x509"; version = "1.7.7"; };
+      identifier = { name = "crypton-x509"; version = "1.8.0"; };
       license = "BSD-3-Clause";
       copyright = "Vincent Hanquez <vincent@snarc.org>";
       maintainer = "Kazu Yamamoto <kazu@iij.ad.jp>";
@@ -27,15 +27,15 @@
         depends = [
           (hsPkgs."base" or (errorHandler.buildDepError "base"))
           (hsPkgs."bytestring" or (errorHandler.buildDepError "bytestring"))
-          (hsPkgs."memory" or (errorHandler.buildDepError "memory"))
-          (hsPkgs."transformers" or (errorHandler.buildDepError "transformers"))
           (hsPkgs."containers" or (errorHandler.buildDepError "containers"))
-          (hsPkgs."hourglass" or (errorHandler.buildDepError "hourglass"))
-          (hsPkgs."pem" or (errorHandler.buildDepError "pem"))
-          (hsPkgs."asn1-types" or (errorHandler.buildDepError "asn1-types"))
-          (hsPkgs."asn1-encoding" or (errorHandler.buildDepError "asn1-encoding"))
-          (hsPkgs."asn1-parse" or (errorHandler.buildDepError "asn1-parse"))
           (hsPkgs."crypton" or (errorHandler.buildDepError "crypton"))
+          (hsPkgs."crypton-asn1-encoding" or (errorHandler.buildDepError "crypton-asn1-encoding"))
+          (hsPkgs."crypton-asn1-parse" or (errorHandler.buildDepError "crypton-asn1-parse"))
+          (hsPkgs."crypton-asn1-types" or (errorHandler.buildDepError "crypton-asn1-types"))
+          (hsPkgs."crypton-pem" or (errorHandler.buildDepError "crypton-pem"))
+          (hsPkgs."memory" or (errorHandler.buildDepError "memory"))
+          (hsPkgs."time-hourglass" or (errorHandler.buildDepError "time-hourglass"))
+          (hsPkgs."transformers" or (errorHandler.buildDepError "transformers"))
         ];
         buildable = true;
       };
@@ -44,13 +44,13 @@
           depends = [
             (hsPkgs."base" or (errorHandler.buildDepError "base"))
             (hsPkgs."bytestring" or (errorHandler.buildDepError "bytestring"))
+            (hsPkgs."crypton" or (errorHandler.buildDepError "crypton"))
+            (hsPkgs."crypton-x509" or (errorHandler.buildDepError "crypton-x509"))
+            (hsPkgs."crypton-asn1-types" or (errorHandler.buildDepError "crypton-asn1-types"))
             (hsPkgs."mtl" or (errorHandler.buildDepError "mtl"))
             (hsPkgs."tasty" or (errorHandler.buildDepError "tasty"))
             (hsPkgs."tasty-quickcheck" or (errorHandler.buildDepError "tasty-quickcheck"))
-            (hsPkgs."hourglass" or (errorHandler.buildDepError "hourglass"))
-            (hsPkgs."asn1-types" or (errorHandler.buildDepError "asn1-types"))
-            (hsPkgs."crypton-x509" or (errorHandler.buildDepError "crypton-x509"))
-            (hsPkgs."crypton" or (errorHandler.buildDepError "crypton"))
+            (hsPkgs."time-hourglass" or (errorHandler.buildDepError "time-hourglass"))
           ];
           buildable = true;
         };
@@ -58,9 +58,9 @@
     };
   } // {
     src = pkgs.lib.mkDefault (pkgs.fetchurl {
-      url = "http://hackage.haskell.org/package/crypton-x509-1.7.7.tar.gz";
-      sha256 = "efece48c8c4adfee209979c2967037d90e6ba1b7b4e7bb1081d1d4cd93daf382";
+      url = "http://hackage.haskell.org/package/crypton-x509-1.8.0.tar.gz";
+      sha256 = "7ce8c6d12c1dea1096895ca02d0b27dd8f6e0389de2956e9fe11cc22a8f1c2cd";
     });
   }) // {
-    package-description-override = "Name:                crypton-x509\nversion:             1.7.7\nDescription:         X509 reader and writer. please see README\nLicense:             BSD3\nLicense-file:        LICENSE\nCopyright:           Vincent Hanquez <vincent@snarc.org>\nAuthor:              Vincent Hanquez <vincent@snarc.org>\nMaintainer:          Kazu Yamamoto <kazu@iij.ad.jp>\nSynopsis:            X509 reader and writer\nBuild-Type:          Simple\nCategory:            Data\nstability:           experimental\nHomepage:            https://github.com/kazu-yamamoto/crypton-certificate\nCabal-Version:       >= 1.10\n\nLibrary\n  Default-Language:  Haskell2010\n  Build-Depends:     base >= 4.7 && < 5\n                   , bytestring\n                   , memory\n                   , transformers >= 0.4\n                   , containers\n                   , hourglass\n                   , pem >= 0.1\n                   , asn1-types >= 0.3.1 && < 0.4\n                   , asn1-encoding >= 0.9 && < 0.10\n                   , asn1-parse >= 0.9.3 && < 0.10\n                   , crypton >= 0.24\n  Exposed-modules:   Data.X509\n                     Data.X509.EC\n  Other-modules:     Data.X509.Internal\n                     Data.X509.CertificateChain\n                     Data.X509.AlgorithmIdentifier\n                     Data.X509.DistinguishedName\n                     Data.X509.Cert\n                     Data.X509.PublicKey\n                     Data.X509.PrivateKey\n                     Data.X509.Ext\n                     Data.X509.ExtensionRaw\n                     Data.X509.CRL\n                     Data.X509.OID\n                     Data.X509.Signed\n  ghc-options:       -Wall\n\nTest-Suite test-x509\n  Default-Language:  Haskell2010\n  type:              exitcode-stdio-1.0\n  hs-source-dirs:    Tests\n  Main-is:           Tests.hs\n  Build-Depends:     base >= 3 && < 5\n                   , bytestring\n                   , mtl\n                   , tasty\n                   , tasty-quickcheck\n                   , hourglass\n                   , asn1-types\n                   , crypton-x509\n                   , crypton\n  ghc-options:       -Wall -fno-warn-orphans -fno-warn-missing-signatures\n\nsource-repository head\n  type:     git\n  location: https://github.com/kazu-yamamoto/crypton-certificate\n  subdir:   x509\n";
+    package-description-override = "cabal-version:      >=1.10\r\nname:               crypton-x509\r\nversion:            1.8.0\r\nx-revision: 1\r\nlicense:            BSD3\r\nlicense-file:       LICENSE\r\ncopyright:          Vincent Hanquez <vincent@snarc.org>\r\nmaintainer:         Kazu Yamamoto <kazu@iij.ad.jp>\r\nauthor:             Vincent Hanquez <vincent@snarc.org>\r\nstability:          experimental\r\nhomepage:           https://github.com/kazu-yamamoto/crypton-certificate\r\nsynopsis:           X509 reader and writer\r\ndescription:        X509 reader and writer. please see README\r\ncategory:           Data\r\nbuild-type:         Simple\r\nextra-source-files: ChangeLog.md\r\n\r\nsource-repository head\r\n    type:     git\r\n    location: https://github.com/kazu-yamamoto/crypton-certificate\r\n    subdir:   x509\r\n\r\nlibrary\r\n    exposed-modules:\r\n        Data.X509\r\n        Data.X509.EC\r\n\r\n    other-modules:\r\n        Data.X509.Internal\r\n        Data.X509.CertificateChain\r\n        Data.X509.AlgorithmIdentifier\r\n        Data.X509.DistinguishedName\r\n        Data.X509.Cert\r\n        Data.X509.PublicKey\r\n        Data.X509.PrivateKey\r\n        Data.X509.Ext\r\n        Data.X509.ExtensionRaw\r\n        Data.X509.CRL\r\n        Data.X509.OID\r\n        Data.X509.Signed\r\n\r\n    default-language: Haskell2010\r\n    ghc-options:      -Wall\r\n    build-depends:\r\n        base >=4.7 && <5,\r\n        bytestring,\r\n        containers,\r\n        crypton >=0.24 && <1.1,\r\n        crypton-asn1-encoding >=0.10.0 && <0.11,\r\n        crypton-asn1-parse >=0.10.0 && <0.11,\r\n        crypton-asn1-types >=0.4.1 && <0.5,\r\n        crypton-pem >=0.2.4 && <0.4,\r\n        memory,\r\n        time-hourglass,\r\n        transformers >=0.4\r\n\r\ntest-suite test-x509\r\n    type:             exitcode-stdio-1.0\r\n    main-is:          Tests.hs\r\n    hs-source-dirs:   Tests\r\n    default-language: Haskell2010\r\n    ghc-options:      -Wall -fno-warn-orphans -fno-warn-missing-signatures\r\n    build-depends:\r\n        base >=3 && <5,\r\n        bytestring,\r\n        crypton,\r\n        crypton-x509,\r\n        crypton-asn1-types,\r\n        mtl,\r\n        tasty,\r\n        tasty-quickcheck,\r\n        time-hourglass\r\n";
   }

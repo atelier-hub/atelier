@@ -11,7 +11,7 @@
     flags = {};
     package = {
       specVersion = "1.10";
-      identifier = { name = "crypton-x509-system"; version = "1.6.7"; };
+      identifier = { name = "crypton-x509-system"; version = "1.8.0"; };
       license = "BSD-3-Clause";
       copyright = "Vincent Hanquez <vincent@snarc.org>";
       maintainer = "Kazu Yamamoto <kazu@iij.ad.jp>";
@@ -32,12 +32,12 @@
           (hsPkgs."directory" or (errorHandler.buildDepError "directory"))
           (hsPkgs."filepath" or (errorHandler.buildDepError "filepath"))
           (hsPkgs."process" or (errorHandler.buildDepError "process"))
-          (hsPkgs."pem" or (errorHandler.buildDepError "pem"))
+          (hsPkgs."crypton-pem" or (errorHandler.buildDepError "crypton-pem"))
           (hsPkgs."crypton-x509" or (errorHandler.buildDepError "crypton-x509"))
           (hsPkgs."crypton-x509-store" or (errorHandler.buildDepError "crypton-x509-store"))
         ] ++ pkgs.lib.optionals (system.isWindows) [
           (hsPkgs."Win32" or (errorHandler.buildDepError "Win32"))
-          (hsPkgs."asn1-encoding" or (errorHandler.buildDepError "asn1-encoding"))
+          (hsPkgs."crypton-asn1-encoding" or (errorHandler.buildDepError "crypton-asn1-encoding"))
         ];
         libs = pkgs.lib.optional (system.isWindows) (pkgs."Crypt32" or (errorHandler.sysDepError "Crypt32"));
         buildable = true;
@@ -45,9 +45,9 @@
     };
   } // {
     src = pkgs.lib.mkDefault (pkgs.fetchurl {
-      url = "http://hackage.haskell.org/package/crypton-x509-system-1.6.7.tar.gz";
-      sha256 = "a436261e5f5e83d85080f57a5509c8224c9e75a6e56d0c43a7d2967052b634ca";
+      url = "http://hackage.haskell.org/package/crypton-x509-system-1.8.0.tar.gz";
+      sha256 = "bc7f23dc3bc286fa812d1ce351d36a2c39fe31324c40637b2d9cd1d575506363";
     });
   }) // {
-    package-description-override = "Name:                crypton-x509-system\nversion:             1.6.7\nSynopsis:            Handle per-operating-system X.509 accessors and storage\nDescription:         System X.509 handling for accessing operating system dependents store and other storage methods\nLicense:             BSD3\nLicense-file:        LICENSE\nCopyright:           Vincent Hanquez <vincent@snarc.org>\nAuthor:              Vincent Hanquez <vincent@snarc.org>\nMaintainer:          Kazu Yamamoto <kazu@iij.ad.jp>\nBuild-Type:          Simple\nCategory:            Data\nstability:           experimental\nHomepage:            https://github.com/kazu-yamamoto/crypton-certificate\nCabal-Version:       >= 1.10\n\nLibrary\n  Default-Language:  Haskell2010\n  Build-Depends:     base >= 3 && < 5\n                   , bytestring\n                   , mtl\n                   , containers\n                   , directory\n                   , filepath\n                   , process\n                   , pem >= 0.1 && < 0.3\n                   , crypton-x509 >= 1.6\n                   , crypton-x509-store >= 1.6.2\n  Exposed-modules:   System.X509\n                     System.X509.Unix\n                     System.X509.MacOS\n  ghc-options:       -Wall\n  if os(windows)\n     cpp-options:     -DWINDOWS\n     Build-Depends:   Win32, asn1-encoding\n     extra-libraries: Crypt32\n     Exposed-modules: System.X509.Win32\n  if os(OSX)\n     cpp-options: -DMACOSX\n\nsource-repository head\n  type:     git\n  location: https://github.com/kazu-yamamoto/crypton-certificate\n  subdir:   x509-system\n";
+    package-description-override = "cabal-version:      >=1.10\nname:               crypton-x509-system\nversion:            1.8.0\nlicense:            BSD3\nlicense-file:       LICENSE\ncopyright:          Vincent Hanquez <vincent@snarc.org>\nmaintainer:         Kazu Yamamoto <kazu@iij.ad.jp>\nauthor:             Vincent Hanquez <vincent@snarc.org>\nstability:          experimental\nhomepage:           https://github.com/kazu-yamamoto/crypton-certificate\nsynopsis:           Handle per-operating-system X.509 accessors and storage\ndescription:\n    System X.509 handling for accessing operating system dependents store and other storage methods\n\ncategory:           Data\nbuild-type:         Simple\nextra-source-files: ChangeLog.md\n\nsource-repository head\n    type:     git\n    location: https://github.com/kazu-yamamoto/crypton-certificate\n    subdir:   x509-system\n\nlibrary\n    exposed-modules:\n        System.X509\n        System.X509.Common\n        System.X509.Unix\n        System.X509.MacOS\n\n    default-language: Haskell2010\n    ghc-options:      -Wall\n    build-depends:\n        base >=3 && <5,\n        bytestring,\n        mtl,\n        containers,\n        directory,\n        filepath,\n        process,\n        crypton-pem >=0.2.4 && <0.4,\n        crypton-x509 >=1.8.0,\n        crypton-x509-store >=1.8.0\n\n    if os(windows)\n        exposed-modules: System.X509.Win32\n        cpp-options:     -DWINDOWS\n        extra-libraries: Crypt32\n        build-depends:\n            Win32,\n            crypton-asn1-encoding\n\n    if os(osx)\n        cpp-options: -DMACOSX\n";
   }

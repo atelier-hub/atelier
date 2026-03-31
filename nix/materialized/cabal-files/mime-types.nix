@@ -11,7 +11,7 @@
     flags = {};
     package = {
       specVersion = "1.10";
-      identifier = { name = "mime-types"; version = "0.1.2.0"; };
+      identifier = { name = "mime-types"; version = "0.1.2.2"; };
       license = "MIT";
       copyright = "";
       maintainer = "michael@snoyman.com";
@@ -35,9 +35,9 @@
     };
   } // {
     src = pkgs.lib.mkDefault (pkgs.fetchurl {
-      url = "http://hackage.haskell.org/package/mime-types-0.1.2.0.tar.gz";
-      sha256 = "013ae48a4c1726a4f91a64e882f3fe1fb903a7d4b8c14da51286fe5e4b974f61";
+      url = "http://hackage.haskell.org/package/mime-types-0.1.2.2.tar.gz";
+      sha256 = "e56e474778d72c387039d3514b52a9af3485f4abe31e62096f381485af494940";
     });
   }) // {
-    package-description-override = "name:                mime-types\nversion:             0.1.2.0\nsynopsis:            Basic mime-type handling types and functions\ndescription:         API docs and the README are available at <http://www.stackage.org/package/mime-types>.\nhomepage:            https://github.com/yesodweb/wai\nlicense:             MIT\nlicense-file:        LICENSE\nauthor:              Michael Snoyman\nmaintainer:          michael@snoyman.com\ncategory:            Web\nbuild-type:          Simple\ncabal-version:       >=1.10\nextra-source-files:  README.md ChangeLog.md\n\nlibrary\n  exposed-modules:     Network.Mime\n  default-language:    Haskell2010\n  build-depends:       base           >= 4.12   && < 5\n                     , containers\n                     , text\n                     , bytestring\n\nsource-repository head\n  type:     git\n  location: git://github.com/yesodweb/wai.git\n";
+    package-description-override = "name:                mime-types\nversion:             0.1.2.2\nsynopsis:            Basic mime-type handling types and functions\ndescription:         API docs and the README are available at <http://www.stackage.org/package/mime-types>.\nhomepage:            https://github.com/yesodweb/wai\nlicense:             MIT\nlicense-file:        LICENSE\nauthor:              Michael Snoyman\nmaintainer:          michael@snoyman.com\ncategory:            Web\nbuild-type:          Simple\ncabal-version:       >=1.10\nextra-source-files:  README.md ChangeLog.md\n\nlibrary\n  exposed-modules:     Network.Mime\n  default-language:    Haskell2010\n  build-depends:       base           >= 4.12   && < 5\n                     , containers\n                     , text\n                     , bytestring\n\nsource-repository head\n  type:     git\n  location: https://github.com/yesodweb/wai.git\n  subdir:   mime-types\n";
   }

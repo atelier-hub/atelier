@@ -8,17 +8,6 @@
         terminal-progress-bar.revision = import ./cabal-files/terminal-progress-bar.nix;
         validation.revision = import ./cabal-files/validation.nix;
         semigroups.revision = import ./cabal-files/semigroups.nix;
-        semigroups.flags.unordered-containers = true;
-        semigroups.flags.template-haskell = true;
-        semigroups.flags.containers = true;
-        semigroups.flags.transformers = true;
-        semigroups.flags.tagged = true;
-        semigroups.flags.bytestring = true;
-        semigroups.flags.text = true;
-        semigroups.flags.binary = true;
-        semigroups.flags.bytestring-builder = false;
-        semigroups.flags.hashable = true;
-        semigroups.flags.deepseq = true;
         base64-bytestring-type.revision = import ./cabal-files/base64-bytestring-type.nix;
         base64-bytestring-type.flags.cereal = true;
         base64-bytestring-type.flags.http-api-data = true;
@@ -28,7 +17,7 @@
         charset.revision = import ./cabal-files/charset.nix;
         generics-sop.revision = import ./cabal-files/generics-sop.nix;
         casing.revision = import ./cabal-files/casing.nix;
-        ghc-boot.revision = hackage.ghc-boot."9.6.6".revisions.default;
+        ghc-boot.revision = hackage.ghc-boot."9.10.2".revisions.default;
         th-desugar.revision = import ./cabal-files/th-desugar.nix;
         code-page.revision = import ./cabal-files/code-page.nix;
         small-steps.revision = import ./cabal-files/small-steps.nix;
@@ -46,16 +35,14 @@
         groups.revision = import ./cabal-files/groups.nix;
         binary-parser.revision = import ./cabal-files/binary-parser.nix;
         dependent-sum.revision = import ./cabal-files/dependent-sum.nix;
-        testcontainers.revision = import ./cabal-files/testcontainers.nix;
         erf.revision = import ./cabal-files/erf.nix;
         cardano-strict-containers.revision = import ./cabal-files/cardano-strict-containers.nix;
         prometheus-client.revision = import ./cabal-files/prometheus-client.nix;
         integer-gmp.revision = hackage.integer-gmp."1.1".revisions.default;
-        pem.revision = import ./cabal-files/pem.nix;
         http2.revision = import ./cabal-files/http2.nix;
         http2.flags.h2spec = false;
         http2.flags.devel = false;
-        filepath.revision = hackage.filepath."1.4.300.1".revisions.default;
+        filepath.revision = hackage.filepath."1.5.4.0".revisions.default;
         bytestring-tree-builder.revision = import ./cabal-files/bytestring-tree-builder.nix;
         statistics-linreg.revision = import ./cabal-files/statistics-linreg.nix;
         attoparsec.revision = import ./cabal-files/attoparsec.nix;
@@ -68,6 +55,7 @@
         formatting.flags.no-double-conversion = false;
         th-lift-instances.revision = import ./cabal-files/th-lift-instances.nix;
         generically.revision = import ./cabal-files/generically.nix;
+        semaphore-compat.revision = hackage.semaphore-compat."1.0.0".revisions.default;
         Win32-network.revision = import ./cabal-files/Win32-network.nix;
         Win32-network.flags.demo = false;
         invariant.revision = import ./cabal-files/invariant.nix;
@@ -80,6 +68,7 @@
         base16.revision = import ./cabal-files/base16.nix;
         deriving-compat.revision = import ./cabal-files/deriving-compat.nix;
         binary-orphans.revision = import ./cabal-files/binary-orphans.nix;
+        crypton-asn1-parse.revision = import ./cabal-files/crypton-asn1-parse.nix;
         validation-selective.revision = import ./cabal-files/validation-selective.nix;
         crypton-connection.revision = import ./cabal-files/crypton-connection.nix;
         base64-bytestring.revision = import ./cabal-files/base64-bytestring.nix;
@@ -133,13 +122,13 @@
         stm-hamt.revision = import ./cabal-files/stm-hamt.nix;
         HUnit.revision = import ./cabal-files/HUnit.nix;
         strict-list.revision = import ./cabal-files/strict-list.nix;
-        ghc.revision = hackage.ghc."9.6.6".revisions.default;
+        ghc.revision = hackage.ghc."9.10.2".revisions.default;
         appar.revision = import ./cabal-files/appar.nix;
         optics-core.revision = import ./cabal-files/optics-core.nix;
         optics-core.flags.explicit-generic-labels = false;
         haskell-lexer.revision = import ./cabal-files/haskell-lexer.nix;
         heapwords.revision = import ./cabal-files/heapwords.nix;
-        ghc-heap.revision = hackage.ghc-heap."9.6.6".revisions.default;
+        ghc-heap.revision = hackage.ghc-heap."9.10.2".revisions.default;
         parsers.revision = import ./cabal-files/parsers.nix;
         parsers.flags.parsec = true;
         parsers.flags.attoparsec = true;
@@ -147,6 +136,7 @@
         time-units.revision = import ./cabal-files/time-units.nix;
         cardano-ledger-shelley.revision = import ./cabal-files/cardano-ledger-shelley.nix;
         cardano-ledger-shelley.flags.asserts = false;
+        crypton-pem.revision = import ./cabal-files/crypton-pem.nix;
         uuid-types.revision = import ./cabal-files/uuid-types.nix;
         quickcheck-io.revision = import ./cabal-files/quickcheck-io.nix;
         lens-family-core.revision = import ./cabal-files/lens-family-core.nix;
@@ -167,7 +157,7 @@
         proto-lens.revision = import ./cabal-files/proto-lens.nix;
         ki.revision = import ./cabal-files/ki.nix;
         tasty-smallcheck.revision = import ./cabal-files/tasty-smallcheck.nix;
-        stm.revision = hackage.stm."2.5.1.0".revisions.default;
+        stm.revision = hackage.stm."2.5.3.1".revisions.default;
         blaze-builder.revision = import ./cabal-files/blaze-builder.nix;
         foldable1-classes-compat.revision = import ./cabal-files/foldable1-classes-compat.nix;
         foldable1-classes-compat.flags.tagged = true;
@@ -181,9 +171,8 @@
         typed-process.revision = import ./cabal-files/typed-process.nix;
         wai-app-static.revision = import ./cabal-files/wai-app-static.nix;
         wai-app-static.flags.print = false;
-        wai-app-static.flags.crypton = true;
         product-profunctors.revision = import ./cabal-files/product-profunctors.nix;
-        transformers.revision = hackage.transformers."0.6.1.0".revisions.default;
+        transformers.revision = hackage.transformers."0.6.1.1".revisions.default;
         http-conduit.revision = import ./cabal-files/http-conduit.nix;
         http-conduit.flags.aeson = true;
         microlens.revision = import ./cabal-files/microlens.nix;
@@ -192,7 +181,7 @@
         ansi-wl-pprint.revision = import ./cabal-files/ansi-wl-pprint.nix;
         ansi-wl-pprint.flags.example = false;
         constraints.revision = import ./cabal-files/constraints.nix;
-        terminfo.revision = hackage.terminfo."0.4.1.6".revisions.default;
+        terminfo.revision = hackage.terminfo."0.4.1.7".revisions.default;
         hourglass.revision = import ./cabal-files/hourglass.nix;
         transformers-except.revision = import ./cabal-files/transformers-except.nix;
         lens-family.revision = import ./cabal-files/lens-family.nix;
@@ -204,12 +193,10 @@
         ImpSpec.revision = import ./cabal-files/ImpSpec.nix;
         heredoc.revision = import ./cabal-files/heredoc.nix;
         fin.revision = import ./cabal-files/fin.nix;
-        asn1-encoding.revision = import ./cabal-files/asn1-encoding.nix;
         generic-monoid.revision = import ./cabal-files/generic-monoid.nix;
         distributive.revision = import ./cabal-files/distributive.nix;
-        distributive.flags.semigroups = true;
         distributive.flags.tagged = true;
-        deepseq.revision = hackage.deepseq."1.4.8.1".revisions.default;
+        deepseq.revision = hackage.deepseq."1.5.0.0".revisions.default;
         ouroboros-network-mock.revision = import ./cabal-files/ouroboros-network-mock.nix;
         ouroboros-network-mock.flags.asserts = false;
         network-control.revision = import ./cabal-files/network-control.nix;
@@ -226,18 +213,19 @@
         time-locale-compat.revision = import ./cabal-files/time-locale-compat.nix;
         time-locale-compat.flags.old-locale = false;
         dense-linear-algebra.revision = import ./cabal-files/dense-linear-algebra.nix;
-        ghci.revision = hackage.ghci."9.6.6".revisions.default;
+        ghci.revision = hackage.ghci."9.10.2".revisions.default;
         serialise.revision = import ./cabal-files/serialise.nix;
         serialise.flags.newtime15 = true;
         text-builder-core.revision = import ./cabal-files/text-builder-core.nix;
         ouroboros-network-framework.revision = import ./cabal-files/ouroboros-network-framework.nix;
         ouroboros-network-framework.flags.ipv6 = false;
         file-io.revision = import ./cabal-files/file-io.nix;
-        file-io.flags.os-string = false;
+        file-io.flags.os-string = true;
+        file-io.flags.long-paths = true;
         testing-type-modifiers.revision = import ./cabal-files/testing-type-modifiers.nix;
         rel8.revision = import ./cabal-files/rel8.nix;
         partial-order.revision = import ./cabal-files/partial-order.nix;
-        partial-order.flags.extra-instances = true;
+        partial-order.flags.extra-instances = false;
         unagi-chan.revision = import ./cabal-files/unagi-chan.nix;
         unagi-chan.flags.compare-benchmarks = false;
         generic-optics.revision = import ./cabal-files/generic-optics.nix;
@@ -270,8 +258,8 @@
         ral.flags.distributive = true;
         ral.flags.semigroupoids = true;
         ral.flags.adjunctions = true;
-        parsec.revision = hackage.parsec."3.1.16.1".revisions.default;
-        Cabal.revision = hackage.Cabal."3.10.3.0".revisions.default;
+        parsec.revision = hackage.parsec."3.1.18.0".revisions.default;
+        Cabal.revision = hackage.Cabal."3.12.1.0".revisions.default;
         proto-lens-runtime.revision = import ./cabal-files/proto-lens-runtime.nix;
         uri-bytestring.revision = import ./cabal-files/uri-bytestring.nix;
         uri-bytestring.flags.lib-werror = false;
@@ -290,6 +278,7 @@
         half.revision = import ./cabal-files/half.nix;
         barbies.revision = import ./cabal-files/barbies.nix;
         bimap.revision = import ./cabal-files/bimap.nix;
+        time-hourglass.revision = import ./cabal-files/time-hourglass.nix;
         unbounded-delays.revision = import ./cabal-files/unbounded-delays.nix;
         quickcheck-transformer.revision = import ./cabal-files/quickcheck-transformer.nix;
         uuid.revision = import ./cabal-files/uuid.nix;
@@ -299,7 +288,6 @@
         strict-checked-vars.flags.checktvarinvariants = false;
         servant-server.revision = import ./cabal-files/servant-server.nix;
         profunctors.revision = import ./cabal-files/profunctors.nix;
-        optics-extra.revision = import ./cabal-files/optics-extra.nix;
         microlens-mtl.revision = import ./cabal-files/microlens-mtl.nix;
         postgresql-simple.revision = import ./cabal-files/postgresql-simple.nix;
         adjunctions.revision = import ./cabal-files/adjunctions.nix;
@@ -320,11 +308,10 @@
         size-based.revision = import ./cabal-files/size-based.nix;
         hasql.revision = import ./cabal-files/hasql.nix;
         ansi-terminal-types.revision = import ./cabal-files/ansi-terminal-types.nix;
-        process.revision = hackage.process."1.6.19.0".revisions.default;
+        process.revision = hackage.process."1.6.25.0".revisions.default;
         ouroboros-consensus.revision = import ./cabal-files/ouroboros-consensus.nix;
         ouroboros-consensus.flags.expensive-invariants = false;
         ouroboros-consensus.flags.asserts = false;
-        aeson-optics.revision = import ./cabal-files/aeson-optics.nix;
         validity.revision = import ./cabal-files/validity.nix;
         atomic-counter.revision = import ./cabal-files/atomic-counter.nix;
         atomic-counter.flags.dev = false;
@@ -333,7 +320,7 @@
         memory.revision = import ./cabal-files/memory.nix;
         memory.flags.support_bytestring = true;
         memory.flags.support_deepseq = true;
-        base.revision = hackage.base."4.18.2.1".revisions.default;
+        base.revision = hackage.base."4.20.1.0".revisions.default;
         cardano-api.revision = import ./cabal-files/cardano-api.nix;
         fast-logger.revision = import ./cabal-files/fast-logger.nix;
         cardano-prelude.revision = import ./cabal-files/cardano-prelude.nix;
@@ -385,7 +372,7 @@
         streaming-bytestring.revision = import ./cabal-files/streaming-bytestring.nix;
         extra.revision = import ./cabal-files/extra.nix;
         hspec-expectations-lifted.revision = import ./cabal-files/hspec-expectations-lifted.nix;
-        Cabal-syntax.revision = hackage.Cabal-syntax."3.10.3.0".revisions.default;
+        Cabal-syntax.revision = hackage.Cabal-syntax."3.12.1.0".revisions.default;
         monad-control.revision = import ./cabal-files/monad-control.nix;
         network-uri.revision = import ./cabal-files/network-uri.nix;
         indexed-traversable-instances.revision = import ./cabal-files/indexed-traversable-instances.nix;
@@ -398,11 +385,11 @@
         bitvec.revision = import ./cabal-files/bitvec.nix;
         bitvec.flags.simd = true;
         these.revision = import ./cabal-files/these.nix;
-        testcontainers-postgresql.revision = import ./cabal-files/testcontainers-postgresql.nix;
         http-client-tls.revision = import ./cabal-files/http-client-tls.nix;
         random.revision = import ./cabal-files/random.nix;
         async.revision = import ./cabal-files/async.nix;
         async.flags.bench = false;
+        async.flags.debug-auto-label = false;
         blaze-html.revision = import ./cabal-files/blaze-html.nix;
         io-sim.revision = import ./cabal-files/io-sim.nix;
         io-sim.flags.asserts = false;
@@ -423,7 +410,7 @@
         cardano-ledger-byron.revision = import ./cabal-files/cardano-ledger-byron.nix;
         cardano-ledger-byron.flags.test-normal-form = false;
         kes-agent-crypto.revision = import ./cabal-files/kes-agent-crypto.nix;
-        text.revision = hackage.text."2.0.2".revisions.default;
+        text.revision = hackage.text."2.1.2".revisions.default;
         tasty-hspec.revision = import ./cabal-files/tasty-hspec.nix;
         blaze-markup.revision = import ./cabal-files/blaze-markup.nix;
         network-byte-order.revision = import ./cabal-files/network-byte-order.nix;
@@ -436,7 +423,7 @@
         bech32-th.flags.release = false;
         time.revision = hackage.time."1.12.2".revisions.default;
         js-chart.revision = import ./cabal-files/js-chart.nix;
-        array.revision = hackage.array."0.5.6.0".revisions.default;
+        array.revision = hackage.array."0.5.8.0".revisions.default;
         data-default-class.revision = import ./cabal-files/data-default-class.nix;
         warp.revision = import ./cabal-files/warp.nix;
         warp.flags.allow-sendfilefd = true;
@@ -445,7 +432,6 @@
         warp.flags.network-bytestring = false;
         warp.flags.x509 = true;
         quickcheck-state-machine.revision = import ./cabal-files/quickcheck-state-machine.nix;
-        tf-random.revision = import ./cabal-files/tf-random.nix;
         terminal-size.revision = import ./cabal-files/terminal-size.nix;
         vector-th-unbox.revision = import ./cabal-files/vector-th-unbox.nix;
         vector-binary-instances.revision = import ./cabal-files/vector-binary-instances.nix;
@@ -477,7 +463,6 @@
         semigroupoids.flags.comonad = true;
         semigroupoids.flags.tagged = true;
         semigroupoids.flags.contravariant = true;
-        semigroupoids.flags.distributive = true;
         byteorder.revision = import ./cabal-files/byteorder.nix;
         prettyprinter-configurable.revision = import ./cabal-files/prettyprinter-configurable.nix;
         prettyprinter-compat-ansi-wl-pprint.revision = import ./cabal-files/prettyprinter-compat-ansi-wl-pprint.nix;
@@ -498,14 +483,13 @@
         entropy.revision = import ./cabal-files/entropy.nix;
         entropy.flags.donotgetentropy = false;
         bsb-http-chunked.revision = import ./cabal-files/bsb-http-chunked.nix;
+        base64.revision = import ./cabal-files/base64.nix;
         hedgehog-quickcheck.revision = import ./cabal-files/hedgehog-quickcheck.nix;
         cardano-ledger-shelley-ma-test.revision = import ./cabal-files/cardano-ledger-shelley-ma-test.nix;
         bin.revision = import ./cabal-files/bin.nix;
         cardano-slotting.revision = import ./cabal-files/cardano-slotting.nix;
         contravariant.revision = import ./cabal-files/contravariant.nix;
-        contravariant.flags.semigroups = true;
         contravariant.flags.statevar = true;
-        contravariant.flags.tagged = true;
         crypton-x509-system.revision = import ./cabal-files/crypton-x509-system.nix;
         capability.revision = import ./cabal-files/capability.nix;
         capability.flags.dev = false;
@@ -561,7 +545,7 @@
         errors.revision = import ./cabal-files/errors.nix;
         utf8-string.revision = import ./cabal-files/utf8-string.nix;
         sop-extras.revision = import ./cabal-files/sop-extras.nix;
-        hpc.revision = hackage.hpc."0.6.2.0".revisions.default;
+        hpc.revision = hackage.hpc."0.7.0.2".revisions.default;
         http-client.revision = import ./cabal-files/http-client.nix;
         http-client.flags.network-uri = true;
         cardano-ledger-alonzo.revision = import ./cabal-files/cardano-ledger-alonzo.nix;
@@ -573,33 +557,34 @@
         int-supply.revision = import ./cabal-files/int-supply.nix;
         mime-types.revision = import ./cabal-files/mime-types.nix;
         fingertree-rm.revision = import ./cabal-files/fingertree-rm.nix;
+        ghc-internal.revision = hackage.ghc-internal."9.1002.0".revisions.default;
         tasty-golden.revision = import ./cabal-files/tasty-golden.nix;
         tasty-golden.flags.build-example = false;
         cassava.revision = import ./cabal-files/cassava.nix;
         old-locale.revision = import ./cabal-files/old-locale.nix;
-        asn1-parse.revision = import ./cabal-files/asn1-parse.nix;
         digest.revision = import ./cabal-files/digest.nix;
-        digest.flags.have_weak_getauxval = false;
-        digest.flags.have_mm_prefetch = false;
-        digest.flags.have_arm64_crc32c = false;
-        digest.flags.have_sse42 = false;
         digest.flags.pkg-config = true;
-        digest.flags.have_strong_getauxval = false;
-        digest.flags.have_builtin_prefetch = false;
         conduit-extra.revision = import ./cabal-files/conduit-extra.nix;
-        binary.revision = hackage.binary."0.8.9.1".revisions.default;
+        binary.revision = hackage.binary."0.8.9.3".revisions.default;
         rawlock.revision = import ./cabal-files/rawlock.nix;
         cardano-protocol-tpraos.revision = import ./cabal-files/cardano-protocol-tpraos.nix;
         servant.revision = import ./cabal-files/servant.nix;
         cardano-ledger-alonzo-test.revision = import ./cabal-files/cardano-ledger-alonzo-test.nix;
         free.revision = import ./cabal-files/free.nix;
         directory-ospath-streaming.revision = import ./cabal-files/directory-ospath-streaming.nix;
-        directory-ospath-streaming.flags.os-string = false;
-        template-haskell.revision = hackage.template-haskell."2.20.0.0".revisions.default;
+        directory-ospath-streaming.flags.os-string = true;
+        template-haskell.revision = hackage.template-haskell."2.22.0.0".revisions.default;
         base-compat-batteries.revision = import ./cabal-files/base-compat-batteries.nix;
         filelock.revision = import ./cabal-files/filelock.nix;
         th-reify-many.revision = import ./cabal-files/th-reify-many.nix;
-        unix.revision = hackage.unix."2.8.4.0".revisions.default;
+        hashtables.revision = import ./cabal-files/hashtables.nix;
+        hashtables.flags.bounds-checking = false;
+        hashtables.flags.debug = false;
+        hashtables.flags.unsafe-tricks = true;
+        hashtables.flags.portable = false;
+        hashtables.flags.sse42 = false;
+        hashtables.flags.detailed-profiling = false;
+        unix.revision = hackage.unix."2.8.6.0".revisions.default;
         primitive.revision = import ./cabal-files/primitive.nix;
         cardano-git-rev.revision = import ./cabal-files/cardano-git-rev.nix;
         aeson.revision = import ./cabal-files/aeson.nix;
@@ -611,13 +596,12 @@
         fingertree.revision = import ./cabal-files/fingertree.nix;
         tasty-rerun.revision = import ./cabal-files/tasty-rerun.nix;
         colour.revision = import ./cabal-files/colour.nix;
-        exceptions.revision = hackage.exceptions."0.10.7".revisions.default;
+        exceptions.revision = hackage.exceptions."0.10.9".revisions.default;
         Stream.revision = import ./cabal-files/Stream.nix;
         dot.revision = import ./cabal-files/dot.nix;
         dot.flags.examples = false;
-        asn1-types.revision = import ./cabal-files/asn1-types.nix;
         servant-client.revision = import ./cabal-files/servant-client.nix;
-        bytestring.revision = hackage.bytestring."0.11.5.3".revisions.default;
+        bytestring.revision = hackage.bytestring."0.12.2.0".revisions.default;
         selective.revision = import ./cabal-files/selective.nix;
         quickcheck-monoids.revision = import ./cabal-files/quickcheck-monoids.nix;
         relude.revision = import ./cabal-files/relude.nix;
@@ -637,6 +621,8 @@
         reflection.revision = import ./cabal-files/reflection.nix;
         reflection.flags.template-haskell = true;
         reflection.flags.slow = false;
+        crypton-asn1-encoding.revision = import ./cabal-files/crypton-asn1-encoding.nix;
+        ghc-platform.revision = hackage.ghc-platform."0.1.0.0".revisions.default;
         unix-bytestring.revision = import ./cabal-files/unix-bytestring.nix;
         list-t.revision = import ./cabal-files/list-t.nix;
         base-compat.revision = import ./cabal-files/base-compat.nix;
@@ -658,7 +644,7 @@
         data-clist.revision = import ./cabal-files/data-clist.nix;
         wai.revision = import ./cabal-files/wai.nix;
         tagged.revision = import ./cabal-files/tagged.nix;
-        tagged.flags.transformers = true;
+        tagged.flags.template-haskell = true;
         tagged.flags.deepseq = true;
         quiet.revision = import ./cabal-files/quiet.nix;
         primes.revision = import ./cabal-files/primes.nix;
@@ -673,7 +659,7 @@
         nothunks.flags.text = true;
         foldl.revision = import ./cabal-files/foldl.nix;
         data-sketches-core.revision = import ./cabal-files/data-sketches-core.nix;
-        ghc-boot-th.revision = hackage.ghc-boot-th."9.6.6".revisions.default;
+        ghc-boot-th.revision = hackage.ghc-boot-th."9.10.2".revisions.default;
         bech32.revision = import ./cabal-files/bech32.nix;
         bech32.flags.static = false;
         bech32.flags.release = false;
@@ -684,7 +670,7 @@
         cardano-prelude-test.revision = import ./cabal-files/cardano-prelude-test.nix;
         cardano-prelude-test.flags.development = false;
         MonadRandom.revision = import ./cabal-files/MonadRandom.nix;
-        os-string.revision = import ./cabal-files/os-string.nix;
+        os-string.revision = hackage.os-string."2.0.4".revisions.default;
         data-default.revision = import ./cabal-files/data-default.nix;
         transformers-compat.revision = import ./cabal-files/transformers-compat.nix;
         transformers-compat.flags.three = false;
@@ -704,11 +690,10 @@
         focus.revision = import ./cabal-files/focus.nix;
         assoc.revision = import ./cabal-files/assoc.nix;
         assoc.flags.tagged = false;
-        ghc-prim.revision = hackage.ghc-prim."0.10.0".revisions.default;
+        ghc-prim.revision = hackage.ghc-prim."0.12.0".revisions.default;
         pretty-show.revision = import ./cabal-files/pretty-show.nix;
         happy-lib.revision = import ./cabal-files/happy-lib.nix;
         th-expand-syns.revision = import ./cabal-files/th-expand-syns.nix;
-        flat.revision = import ./cabal-files/flat.nix;
         hs-opentelemetry-propagator-w3c.revision = import ./cabal-files/hs-opentelemetry-propagator-w3c.nix;
         cardano-crypto-test.revision = import ./cabal-files/cardano-crypto-test.nix;
         clock.revision = import ./cabal-files/clock.nix;
@@ -728,7 +713,7 @@
         splitmix.flags.optimised-mixer = false;
         cereal.revision = import ./cabal-files/cereal.nix;
         cereal.flags.bytestring-builder = false;
-        containers.revision = hackage.containers."0.6.7".revisions.default;
+        containers.revision = hackage.containers."0.7".revisions.default;
         cardano-ledger-allegra.revision = import ./cabal-files/cardano-ledger-allegra.nix;
         th-orphans.revision = import ./cabal-files/th-orphans.nix;
         postgresql-binary.revision = import ./cabal-files/postgresql-binary.nix;
@@ -754,7 +739,9 @@
         tasty-discover.flags.dev = false;
         multiset.revision = import ./cabal-files/multiset.nix;
         unix-compat.revision = import ./cabal-files/unix-compat.nix;
+        crypton-asn1-types.revision = import ./cabal-files/crypton-asn1-types.nix;
         http-types.revision = import ./cabal-files/http-types.nix;
+        rts.revision = hackage.rts."1.0.2".revisions.default;
         memory-pool.revision = import ./cabal-files/memory-pool.nix;
         FailT.revision = import ./cabal-files/FailT.nix;
         ouroboros-network-api.revision = import ./cabal-files/ouroboros-network-api.nix;
@@ -792,41 +779,46 @@
         th-lift.revision = import ./cabal-files/th-lift.nix;
       };
       compiler = {
-        version = "9.6.6";
-        nix-name = "ghc966";
+        version = "9.10.2";
+        nix-name = "ghc9102";
         packages = {
-          "ghc-boot-th" = "9.6.6";
-          "binary" = "0.8.9.1";
+          "ghc-boot-th" = "9.10.2";
+          "binary" = "0.8.9.3";
           "pretty" = "1.1.3.6";
-          "array" = "0.5.6.0";
+          "array" = "0.5.8.0";
           "time" = "1.12.2";
-          "terminfo" = "0.4.1.6";
-          "ghc-prim" = "0.10.0";
-          "bytestring" = "0.11.5.3";
-          "process" = "1.6.19.0";
-          "ghci" = "9.6.6";
+          "terminfo" = "0.4.1.7";
+          "ghc-prim" = "0.12.0";
+          "bytestring" = "0.12.2.0";
+          "process" = "1.6.25.0";
+          "ghci" = "9.10.2";
           "mtl" = "2.3.1";
-          "text" = "2.0.2";
+          "text" = "2.1.2";
           "ghc-compact" = "0.1.0.0";
-          "template-haskell" = "2.20.0.0";
-          "parsec" = "3.1.16.1";
+          "template-haskell" = "2.22.0.0";
+          "semaphore-compat" = "1.0.0";
+          "parsec" = "3.1.18.0";
           "ghc-bignum" = "1.3";
-          "stm" = "2.5.1.0";
-          "Cabal" = "3.10.3.0";
-          "filepath" = "1.4.300.1";
-          "unix" = "2.8.4.0";
-          "ghc" = "9.6.6";
-          "ghc-boot" = "9.6.6";
-          "hpc" = "0.6.2.0";
-          "exceptions" = "0.10.7";
+          "stm" = "2.5.3.1";
+          "Cabal" = "3.12.1.0";
+          "filepath" = "1.5.4.0";
+          "os-string" = "2.0.4";
+          "rts" = "1.0.2";
+          "unix" = "2.8.6.0";
+          "ghc-platform" = "0.1.0.0";
+          "ghc" = "9.10.2";
+          "ghc-boot" = "9.10.2";
+          "hpc" = "0.7.0.2";
+          "exceptions" = "0.10.9";
           "integer-gmp" = "1.1";
-          "deepseq" = "1.4.8.1";
-          "Cabal-syntax" = "3.10.3.0";
-          "transformers" = "0.6.1.0";
+          "deepseq" = "1.5.0.0";
+          "Cabal-syntax" = "3.12.1.0";
+          "transformers" = "0.6.1.1";
           "system-cxx-std-lib" = "1.0";
-          "containers" = "0.6.7";
-          "base" = "4.18.2.1";
-          "ghc-heap" = "9.6.6";
+          "containers" = "0.7";
+          "ghc-internal" = "9.1002.0";
+          "base" = "4.20.1.0";
+          "ghc-heap" = "9.10.2";
           "directory" = "1.3.8.5";
         };
       };
@@ -844,6 +836,7 @@
         "ghc-boot"
         "integer-gmp"
         "filepath"
+        "semaphore-compat"
         "ghc"
         "ghc-heap"
         "ghc-bignum"
@@ -865,15 +858,19 @@
         "array"
         "ghc-compact"
         "hpc"
+        "ghc-internal"
         "binary"
         "template-haskell"
         "unix"
         "exceptions"
         "bytestring"
+        "ghc-platform"
         "ghc-boot-th"
+        "os-string"
         "ghc-prim"
         "pretty"
         "containers"
+        "rts"
       ];
     }
     ({ lib, ... }:
@@ -899,7 +896,7 @@
           "adjunctions".components.library.planned = lib.mkOverride 900 true;
           "criterion".components.exes."criterion-report".planned = lib.mkOverride 900 true;
           "cardano-crypto-tests".components.library.planned = lib.mkOverride 900 true;
-          "tf-random".components.library.planned = lib.mkOverride 900 true;
+          "crypton-asn1-encoding".components.library.planned = lib.mkOverride 900 true;
           "product-profunctors".components.library.planned = lib.mkOverride 900 true;
           "extensible-exceptions".components.library.planned = lib.mkOverride 900 true;
           "ouroboros-consensus-cardano".components.sublibs."unstable-byronspec".planned = lib.mkOverride 900 true;
@@ -916,13 +913,13 @@
           "strict-list".components.library.planned = lib.mkOverride 900 true;
           "cardano-crypto".components.library.planned = lib.mkOverride 900 true;
           "generic-lens".components.library.planned = lib.mkOverride 900 true;
-          "asn1-types".components.library.planned = lib.mkOverride 900 true;
           "generic-lens-core".components.library.planned = lib.mkOverride 900 true;
           "hasql".components.sublibs."testing-kit".planned = lib.mkOverride 900 true;
           "graphviz".components.library.planned = lib.mkOverride 900 true;
           "cardano-ledger-conway".components.exes."huddle-cddl".planned = lib.mkOverride 900 true;
           "groups".components.library.planned = lib.mkOverride 900 true;
           "Stream".components.library.planned = lib.mkOverride 900 true;
+          "semaphore-compat".components.library.planned = lib.mkOverride 900 true;
           "base64-bytestring".components.library.planned = lib.mkOverride 900 true;
           "data-sketches-core".components.library.planned = lib.mkOverride 900 true;
           "file-io".components.library.planned = lib.mkOverride 900 true;
@@ -970,6 +967,7 @@
           "cardano-lmdb".components.sublibs."ffi".planned = lib.mkOverride 900 true;
           "generics-sop".components.library.planned = lib.mkOverride 900 true;
           "ouroboros-consensus-cardano".components.exes."gen-header".planned = lib.mkOverride 900 true;
+          "time-hourglass".components.library.planned = lib.mkOverride 900 true;
           "unagi-chan".components.library.planned = lib.mkOverride 900 true;
           "small-steps".components.sublibs."testlib".planned = lib.mkOverride 900 true;
           "ouroboros-consensus-diffusion".components.sublibs."unstable-diffusion-testlib".planned = lib.mkOverride 900 true;
@@ -1032,11 +1030,9 @@
           "ouroboros-network-protocols".components.library.planned = lib.mkOverride 900 true;
           "mempack".components.library.planned = lib.mkOverride 900 true;
           "dependent-sum".components.library.planned = lib.mkOverride 900 true;
-          "asn1-encoding".components.library.planned = lib.mkOverride 900 true;
           "network-bsd".components.library.planned = lib.mkOverride 900 true;
           "psqueues".components.library.planned = lib.mkOverride 900 true;
           "foundation".components.library.planned = lib.mkOverride 900 true;
-          "pem".components.library.planned = lib.mkOverride 900 true;
           "stm-hamt".components.library.planned = lib.mkOverride 900 true;
           "cardano-crypto-wrapper".components.library.planned = lib.mkOverride 900 true;
           "data-default-class".components.library.planned = lib.mkOverride 900 true;
@@ -1068,6 +1064,7 @@
           "integer-gmp".components.library.planned = lib.mkOverride 900 true;
           "small-steps".components.library.planned = lib.mkOverride 900 true;
           "indexed-profunctors".components.library.planned = lib.mkOverride 900 true;
+          "hashtables".components.library.planned = lib.mkOverride 900 true;
           "lifted-base".components.library.planned = lib.mkOverride 900 true;
           "base-compat-batteries".components.library.planned = lib.mkOverride 900 true;
           "some".components.library.planned = lib.mkOverride 900 true;
@@ -1096,7 +1093,7 @@
           "cardano-ledger-conway".components.exes."gen-golden".planned = lib.mkOverride 900 true;
           "ouroboros-consensus-diffusion".components.sublibs."unstable-mock-testlib".planned = lib.mkOverride 900 true;
           "port-utils".components.library.planned = lib.mkOverride 900 true;
-          "optics-extra".components.library.planned = lib.mkOverride 900 true;
+          "crypton-pem".components.library.planned = lib.mkOverride 900 true;
           "cardano-ledger-core".components.sublibs."internal".planned = lib.mkOverride 900 true;
           "parsec".components.library.planned = lib.mkOverride 900 true;
           "cardano-binary".components.library.planned = lib.mkOverride 900 true;
@@ -1184,6 +1181,7 @@
           "happy-lib".components.library.planned = lib.mkOverride 900 true;
           "generic-optics".components.library.planned = lib.mkOverride 900 true;
           "hspec-discover".components.exes."hspec-discover".planned = lib.mkOverride 900 true;
+          "plutus-core".components.sublibs."flat".planned = lib.mkOverride 900 true;
           "either".components.library.planned = lib.mkOverride 900 true;
           "validation".components.library.planned = lib.mkOverride 900 true;
           "cardano-ledger-babbage".components.exes."huddle-cddl".planned = lib.mkOverride 900 true;
@@ -1244,8 +1242,9 @@
           "partial-order".components.library.planned = lib.mkOverride 900 true;
           "plutus-tx".components.sublibs."plutus-tx-testlib".planned = lib.mkOverride 900 true;
           "cmdargs".components.library.planned = lib.mkOverride 900 true;
+          "crypton-asn1-types".components.library.planned = lib.mkOverride 900 true;
           "plutus-ledger-api".components.exes."analyse-script-events".planned = lib.mkOverride 900 true;
-          "aeson-optics".components.library.planned = lib.mkOverride 900 true;
+          "rts".components.library.planned = lib.mkOverride 900 true;
           "Unique".components.library.planned = lib.mkOverride 900 true;
           "cardano-ledger-shelley-test".components.library.planned = lib.mkOverride 900 true;
           "tar".components.library.planned = lib.mkOverride 900 true;
@@ -1270,10 +1269,10 @@
           "unix-compat".components.library.planned = lib.mkOverride 900 true;
           "attoparsec".components.library.planned = lib.mkOverride 900 true;
           "half".components.library.planned = lib.mkOverride 900 true;
+          "crypton-asn1-parse".components.library.planned = lib.mkOverride 900 true;
           "memory".components.library.planned = lib.mkOverride 900 true;
           "colour".components.library.planned = lib.mkOverride 900 true;
           "integer-logarithms".components.library.planned = lib.mkOverride 900 true;
-          "asn1-parse".components.library.planned = lib.mkOverride 900 true;
           "vector-binary-instances".components.library.planned = lib.mkOverride 900 true;
           "postgresql-simple".components.library.planned = lib.mkOverride 900 true;
           "base-compat".components.library.planned = lib.mkOverride 900 true;
@@ -1289,7 +1288,6 @@
           "entropy".components.setup.planned = lib.mkOverride 900 true;
           "uuid".components.library.planned = lib.mkOverride 900 true;
           "optparse-applicative".components.library.planned = lib.mkOverride 900 true;
-          "testcontainers-postgresql".components.library.planned = lib.mkOverride 900 true;
           "postgres-options".components.library.planned = lib.mkOverride 900 true;
           "tagged".components.library.planned = lib.mkOverride 900 true;
           "vty-unix".components.library.planned = lib.mkOverride 900 true;
@@ -1319,9 +1317,11 @@
           "cardano-ledger-mary".components.exes."huddle-cddl".planned = lib.mkOverride 900 true;
           "ouroboros-consensus-cardano".components.exes."snapshot-converter".planned = lib.mkOverride 900 true;
           "hoard".components.sublibs."atelier-prelude".planned = lib.mkOverride 900 true;
+          "base64".components.library.planned = lib.mkOverride 900 true;
           "cardano-protocol-tpraos".components.sublibs."testlib".planned = lib.mkOverride 900 true;
           "cryptohash-sha1".components.library.planned = lib.mkOverride 900 true;
           "network-control".components.library.planned = lib.mkOverride 900 true;
+          "ghc-internal".components.library.planned = lib.mkOverride 900 true;
           "yaml".components.library.planned = lib.mkOverride 900 true;
           "FailT".components.library.planned = lib.mkOverride 900 true;
           "plutus-core".components.exes."plutus".planned = lib.mkOverride 900 true;
@@ -1397,6 +1397,7 @@
           "hourglass".components.library.planned = lib.mkOverride 900 true;
           "cardano-git-rev".components.library.planned = lib.mkOverride 900 true;
           "hs-opentelemetry-sdk".components.library.planned = lib.mkOverride 900 true;
+          "cardano-strict-containers".components.sublibs."testlib".planned = lib.mkOverride 900 true;
           "prettyprinter-compat-ansi-wl-pprint".components.library.planned = lib.mkOverride 900 true;
           "cardano-ledger-byron".components.sublibs."testlib".planned = lib.mkOverride 900 true;
           "crypton-x509".components.library.planned = lib.mkOverride 900 true;
@@ -1426,7 +1427,6 @@
           "streaming-bytestring".components.library.planned = lib.mkOverride 900 true;
           "hs-opentelemetry-propagator-w3c".components.library.planned = lib.mkOverride 900 true;
           "vector".components.sublibs."benchmarks-O2".planned = lib.mkOverride 900 true;
-          "testcontainers".components.library.planned = lib.mkOverride 900 true;
           "validation-selective".components.library.planned = lib.mkOverride 900 true;
           "servant-server".components.exes."greet".planned = lib.mkOverride 900 true;
           "word8".components.library.planned = lib.mkOverride 900 true;
@@ -1490,6 +1490,7 @@
           "MemoTrie".components.library.planned = lib.mkOverride 900 true;
           "ouroboros-consensus-cardano".components.sublibs."unstable-cardano-testlib".planned = lib.mkOverride 900 true;
           "unix-time".components.library.planned = lib.mkOverride 900 true;
+          "ghc-platform".components.library.planned = lib.mkOverride 900 true;
           "temporary".components.library.planned = lib.mkOverride 900 true;
           "base".components.library.planned = lib.mkOverride 900 true;
           "cardano-data".components.library.planned = lib.mkOverride 900 true;
@@ -1535,7 +1536,6 @@
           "generic-monoid".components.library.planned = lib.mkOverride 900 true;
           "indexed-traversable".components.library.planned = lib.mkOverride 900 true;
           "genvalidity".components.library.planned = lib.mkOverride 900 true;
-          "flat".components.library.planned = lib.mkOverride 900 true;
           "generically".components.library.planned = lib.mkOverride 900 true;
           "hpke".components.library.planned = lib.mkOverride 900 true;
           "splitmix".components.library.planned = lib.mkOverride 900 true;

@@ -1,10 +1,13 @@
 { inputs, system }:
 let
+  # GHC version to use across all tools and the project
+  compiler-nix-name = "ghc9102";
+
   # Initialize package set with haskell.nix
   pkgs = import ./pkgs.nix { inherit inputs system; };
 
   # Configure haskell.nix project
-  project = import ./project.nix { inherit inputs pkgs; };
+  project = import ./project.nix { inherit inputs pkgs compiler-nix-name; };
 
   # Get the project flake for packages
   projectFlake = project.flake { };
@@ -117,7 +120,7 @@ in
     ghcid-multi = {
       type = "app";
       program = "${pkgs.writeShellScript "ghcid-multi" ''
-        exec ${pkgs.haskell-nix.tool "ghc966" "ghcid" "latest"}/bin/ghcid \
+        exec ${pkgs.haskell-nix.tool compiler-nix-name "ghcid" "latest"}/bin/ghcid \
           -c 'cabal repl --enable-multi-repl all hoard-test' \
           --restart=hoard.cabal \
           --clear \
@@ -133,7 +136,7 @@ in
         echo "Building project with HIE files..."
         ${pkgs.cabal-install}/bin/cabal build --ghc-options=-fwrite-ide-info
         echo "Running weeder to detect unused code..."
-        ${pkgs.haskell-nix.tool "ghc966" "weeder" "latest"}/bin/weeder
+        ${pkgs.haskell-nix.tool compiler-nix-name "weeder" "latest"}/bin/weeder
       ''}";
     };
 
@@ -142,9 +145,9 @@ in
       type = "app";
       program = "${pkgs.writeShellScript "hlint-fix-app" ''
         echo "Running hlint --refactor on all Haskell files..."
-        export PATH="${pkgs.haskell-nix.tool "ghc966" "apply-refact" "latest"}/bin:$PATH"
+        export PATH="${pkgs.haskell-nix.tool compiler-nix-name "apply-refact" "latest"}/bin:$PATH"
         find src app test -name "*.hs" -exec ${
-          pkgs.haskell-nix.tool "ghc966" "hlint" "latest"
+          pkgs.haskell-nix.tool compiler-nix-name "hlint" "latest"
         }/bin/hlint --refactor --refactor-options="-i" {} \;
         echo "Hlint refactoring complete!"
       ''}";

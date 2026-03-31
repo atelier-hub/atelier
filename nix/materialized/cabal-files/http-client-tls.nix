@@ -11,7 +11,7 @@
     flags = {};
     package = {
       specVersion = "1.10";
-      identifier = { name = "http-client-tls"; version = "0.3.6.4"; };
+      identifier = { name = "http-client-tls"; version = "0.4.0"; };
       license = "MIT";
       copyright = "";
       maintainer = "michael@snoyman.com";
@@ -26,6 +26,8 @@
       "library" = {
         depends = [
           (hsPkgs."base" or (errorHandler.buildDepError "base"))
+          (hsPkgs."base16" or (errorHandler.buildDepError "base16"))
+          (hsPkgs."cryptohash-md5" or (errorHandler.buildDepError "cryptohash-md5"))
           (hsPkgs."data-default" or (errorHandler.buildDepError "data-default"))
           (hsPkgs."http-client" or (errorHandler.buildDepError "http-client"))
           (hsPkgs."crypton-connection" or (errorHandler.buildDepError "crypton-connection"))
@@ -35,8 +37,6 @@
           (hsPkgs."case-insensitive" or (errorHandler.buildDepError "case-insensitive"))
           (hsPkgs."transformers" or (errorHandler.buildDepError "transformers"))
           (hsPkgs."http-types" or (errorHandler.buildDepError "http-types"))
-          (hsPkgs."crypton" or (errorHandler.buildDepError "crypton"))
-          (hsPkgs."memory" or (errorHandler.buildDepError "memory"))
           (hsPkgs."exceptions" or (errorHandler.buildDepError "exceptions"))
           (hsPkgs."containers" or (errorHandler.buildDepError "containers"))
           (hsPkgs."text" or (errorHandler.buildDepError "text"))
@@ -53,6 +53,8 @@
             (hsPkgs."http-client-tls" or (errorHandler.buildDepError "http-client-tls"))
             (hsPkgs."http-types" or (errorHandler.buildDepError "http-types"))
             (hsPkgs."crypton-connection" or (errorHandler.buildDepError "crypton-connection"))
+            (hsPkgs."data-default" or (errorHandler.buildDepError "data-default"))
+            (hsPkgs."tls" or (errorHandler.buildDepError "tls"))
           ];
           buildable = true;
         };
@@ -71,9 +73,9 @@
     };
   } // {
     src = pkgs.lib.mkDefault (pkgs.fetchurl {
-      url = "http://hackage.haskell.org/package/http-client-tls-0.3.6.4.tar.gz";
-      sha256 = "7756006fee8ab924c521372e0f9d6705579016b9fab0b0312d1b9a335cfc18a3";
+      url = "http://hackage.haskell.org/package/http-client-tls-0.4.0.tar.gz";
+      sha256 = "611cf14cf046657bb1788a4dac09710b4b104c037d42b189148c02e6dd84ae3c";
     });
   }) // {
-    package-description-override = "name:                http-client-tls\r\nversion:             0.3.6.4\r\nx-revision: 2\r\nsynopsis:            http-client backend using the connection package and tls library\r\ndescription:         Hackage documentation generation is not reliable. For up to date documentation, please see: <https://www.stackage.org/package/http-client-tls>.\r\nhomepage:            https://github.com/snoyberg/http-client\r\nlicense:             MIT\r\nlicense-file:        LICENSE\r\nauthor:              Michael Snoyman\r\nmaintainer:          michael@snoyman.com\r\ncategory:            Network\r\nbuild-type:          Simple\r\ncabal-version:       >=1.10\r\nextra-source-files:  README.md\r\n                     ChangeLog.md\r\n\r\nlibrary\r\n  exposed-modules:     Network.HTTP.Client.TLS\r\n  other-extensions:    ScopedTypeVariables\r\n  build-depends:       base >= 4.10 && < 5\r\n                     , data-default\r\n                     , http-client >= 0.7.11\r\n                     , crypton-connection\r\n                     , network\r\n                     , tls (>=1.2 && < 2.1) || >= 2.1.2\r\n                     , bytestring\r\n                     , case-insensitive\r\n                     , transformers\r\n                     , http-types\r\n                     , crypton\r\n                     , memory\r\n                     , exceptions\r\n                     , containers\r\n                     , text\r\n                     , network-uri\r\n  default-language:    Haskell2010\r\n  ghc-options:         -Wall\r\n\r\ntest-suite spec\r\n  main-is:             Spec.hs\r\n  type:                exitcode-stdio-1.0\r\n  hs-source-dirs:      test\r\n  default-language:    Haskell2010\r\n  build-depends:       base\r\n                     , hspec\r\n                     , http-client\r\n                     , http-client-tls\r\n                     , http-types\r\n                     , crypton-connection\r\n\r\nbenchmark benchmark\r\n  main-is:             Bench.hs\r\n  type:                exitcode-stdio-1.0\r\n  hs-source-dirs:      bench\r\n  default-language:    Haskell2010\r\n  build-depends:       base\r\n                     , gauge\r\n                     , http-client\r\n                     , http-client-tls\r\n";
+    package-description-override = "name:                http-client-tls\nversion:             0.4.0\nsynopsis:            http-client backend using the connection package and tls library\ndescription:         Hackage documentation generation is not reliable. For up to date documentation, please see: <https://www.stackage.org/package/http-client-tls>.\nhomepage:            https://github.com/snoyberg/http-client\nlicense:             MIT\nlicense-file:        LICENSE\nauthor:              Michael Snoyman\nmaintainer:          michael@snoyman.com\ncategory:            Network\nbuild-type:          Simple\ncabal-version:       >=1.10\nextra-source-files:  README.md\n                     ChangeLog.md\n\nlibrary\n  exposed-modules:     Network.HTTP.Client.TLS\n  other-extensions:    ScopedTypeVariables\n  build-depends:       base >= 4.10 && < 5\n                     , base16 >= 1.0\n                     , cryptohash-md5\n                     , data-default\n                     , http-client >= 0.7.11\n                     , crypton-connection\n                     , network\n                     , tls >= 2.1.2\n                     , bytestring\n                     , case-insensitive\n                     , transformers\n                     , http-types\n                     , exceptions\n                     , containers\n                     , text\n                     , network-uri\n  default-language:    Haskell2010\n  ghc-options:         -Wall\n\ntest-suite spec\n  main-is:             Spec.hs\n  type:                exitcode-stdio-1.0\n  hs-source-dirs:      test\n  default-language:    Haskell2010\n  build-depends:       base\n                     , hspec\n                     , http-client\n                     , http-client-tls\n                     , http-types\n                     , crypton-connection\n                     , data-default\n                     , tls\n\nbenchmark benchmark\n  main-is:             Bench.hs\n  type:                exitcode-stdio-1.0\n  hs-source-dirs:      bench\n  default-language:    Haskell2010\n  build-depends:       base\n                     , gauge\n                     , http-client\n                     , http-client-tls\n";
   }

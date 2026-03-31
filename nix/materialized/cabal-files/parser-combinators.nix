@@ -10,8 +10,8 @@
   ({
     flags = { dev = false; };
     package = {
-      specVersion = "1.18";
-      identifier = { name = "parser-combinators"; version = "1.3.0"; };
+      specVersion = "2.4";
+      identifier = { name = "parser-combinators"; version = "1.3.1"; };
       license = "BSD-3-Clause";
       copyright = "";
       maintainer = "Mark Karpov <markkarpov92@gmail.com>";
@@ -30,9 +30,9 @@
     };
   } // {
     src = pkgs.lib.mkDefault (pkgs.fetchurl {
-      url = "http://hackage.haskell.org/package/parser-combinators-1.3.0.tar.gz";
-      sha256 = "9310ef0d49f8a8922acda10b1cded9854cbee04dea717effc6ee5983072e4447";
+      url = "http://hackage.haskell.org/package/parser-combinators-1.3.1.tar.gz";
+      sha256 = "9c506cc38f9df0fc23a942e739ed1f0799fc6c54515d770de044168ecff740bf";
     });
   }) // {
-    package-description-override = "cabal-version:   1.18\r\nname:            parser-combinators\r\nversion:         1.3.0\r\nx-revision: 1\r\nlicense:         BSD3\r\nlicense-file:    LICENSE.md\r\nmaintainer:      Mark Karpov <markkarpov92@gmail.com>\r\nauthor:\r\n    Mark Karpov <markkarpov92@gmail.com>\r\n    Alex Washburn <github@recursion.ninja>\r\n\r\ntested-with:     ghc ==8.6.5 ghc ==8.8.4 ghc ==8.10.3\r\nhomepage:        https://github.com/mrkkrp/parser-combinators\r\nbug-reports:     https://github.com/mrkkrp/parser-combinators/issues\r\nsynopsis:\r\n    Lightweight package providing commonly useful parser combinators\r\n\r\ndescription:\r\n    Lightweight package providing commonly useful parser combinators.\r\n\r\ncategory:        Parsing\r\nbuild-type:      Simple\r\nextra-doc-files:\r\n    CHANGELOG.md\r\n    README.md\r\n\r\nsource-repository head\r\n    type:     git\r\n    location: https://github.com/mrkkrp/parser-combinators.git\r\n\r\nflag dev\r\n    description: Turn on development settings.\r\n    default:     False\r\n    manual:      True\r\n\r\nlibrary\r\n    exposed-modules:\r\n        Control.Applicative.Combinators\r\n        Control.Applicative.Combinators.NonEmpty\r\n        Control.Applicative.Permutations\r\n        Control.Monad.Combinators\r\n        Control.Monad.Combinators.Expr\r\n        Control.Monad.Combinators.NonEmpty\r\n        Control.Monad.Permutations\r\n\r\n    default-language: Haskell2010\r\n    build-depends:    base >=4.12 && <5\r\n\r\n    if flag(dev)\r\n        ghc-options: -Wall -Werror\r\n\r\n    else\r\n        ghc-options: -O2 -Wall\r\n\r\n    if flag(dev)\r\n        ghc-options:\r\n            -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns\r\n            -Wnoncanonical-monad-instances\r\n";
+    package-description-override = "cabal-version:   2.4\nname:            parser-combinators\nversion:         1.3.1\nlicense:         BSD-3-Clause\nlicense-file:    LICENSE.md\nmaintainer:      Mark Karpov <markkarpov92@gmail.com>\nauthor:\n    Mark Karpov <markkarpov92@gmail.com>\n    Alex Washburn <github@recursion.ninja>\n\ntested-with:     ghc ==9.8.4 ghc ==9.10.3 ghc ==9.12.1\nhomepage:        https://github.com/mrkkrp/parser-combinators\nbug-reports:     https://github.com/mrkkrp/parser-combinators/issues\nsynopsis:\n    Lightweight package providing commonly useful parser combinators\n\ndescription:\n    Lightweight package providing commonly useful parser combinators.\n\ncategory:        Parsing\nbuild-type:      Simple\nextra-doc-files:\n    CHANGELOG.md\n    README.md\n\nsource-repository head\n    type:     git\n    location: https://github.com/mrkkrp/parser-combinators.git\n\nflag dev\n    description: Turn on development settings.\n    default:     False\n    manual:      True\n\nlibrary\n    exposed-modules:\n        Control.Applicative.Combinators\n        Control.Applicative.Combinators.NonEmpty\n        Control.Applicative.Permutations\n        Control.Monad.Combinators\n        Control.Monad.Combinators.Expr\n        Control.Monad.Combinators.NonEmpty\n        Control.Monad.Permutations\n\n    default-language: Haskell2010\n    build-depends:    base >=4.15 && <5\n\n    if flag(dev)\n        ghc-options:\n            -Wall -Werror -Wredundant-constraints -Wpartial-fields\n            -Wunused-packages\n\n    else\n        ghc-options: -O2 -Wall\n";
   }
