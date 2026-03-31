@@ -12,7 +12,6 @@ import Data.Default (Default (..))
 import Effectful.Exception (throwIO)
 import Effectful.Reader.Static (Reader, ask, runReader)
 import GHC.TypeLits (KnownSymbol, Symbol, symbolVal)
-import System.Environment (getEnvironment)
 import System.IO.Error (userError)
 
 import Data.Aeson qualified as Aeson
@@ -20,11 +19,13 @@ import Data.Aeson.KeyMap qualified as KM
 import Data.Text qualified as T
 import Data.Text.Encoding qualified as TE
 
+import Atelier.Effects.Env (Env, getEnvironment)
+
 
 -- | Build a nested JSON Object from environment variables with the given prefix.
 -- Variables are expected in the form PREFIX__SEG1__SEG2=value.
 -- Double underscore is the path separator; single underscore is preserved within segments.
-envOverrides :: Text -> IO Value
+envOverrides :: (Env :> es) => Text -> Eff es Value
 envOverrides prefix = do
     allEnv <- getEnvironment
     let prefixStr = toString prefix <> "__"

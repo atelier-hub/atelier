@@ -240,6 +240,8 @@ tests:
     # Complains about `test/Driver.hs` emitted by tasty-discover, and is handled by
     # our fourmolu config.
     - -Wno-prepositive-qualified-module
+    # Partial functions like `List.head` are acceptable in tests.
+    - -Wno-x-partial
     - -threaded
     build-tools:
     - tasty-discover:tasty-discover

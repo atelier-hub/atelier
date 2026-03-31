@@ -4,7 +4,7 @@ module Atelier.Testing.Database
     )
 where
 
-import Control.Concurrent (MVar, forkIO, modifyMVar, newEmptyMVar, newMVar, putMVar, takeMVar, threadDelay, tryPutMVar)
+import Control.Concurrent (MVar, forkIO, modifyMVar, newEmptyMVar, newMVar, putMVar, takeMVar, threadDelay, tryPutMVar, withMVar)
 import Control.Exception (try)
 import Data.String.Conversions (cs)
 import Database.PostgreSQL.Simple.Options (Options (..))
@@ -128,7 +128,8 @@ startSharedServer cfg = do
 withCleanTestDatabase :: TmpDbConfig -> SpecWith DBPools -> Spec
 withCleanTestDatabase cfg spec = do
     pools <- runIO $ setupTestDatabase cfg
-    around (\action -> cleanDatabase cfg pools >> action pools) spec
+    lock <- runIO $ newMVar ()
+    around (\action -> withMVar lock $ \_ -> cleanDatabase cfg pools >> action pools) spec
 
 
 -- | Create a database from the shared template and acquire connection pools.
