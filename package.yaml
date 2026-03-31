@@ -17,6 +17,9 @@ ghc-options:
 - -Wno-monomorphism-restriction
 # Most of the time completely unnecessary
 - -Wno-missing-kind-signatures
+- -Wno-missing-poly-kind-signatures
+# Mechanical noise — roles on simple newtypes are obvious
+- -Wno-missing-role-annotations
 # Very tedious to enforce for _all_ local bindings
 - -Wno-missing-local-signatures
 # Tedious because it also enforces an explicit import list on records

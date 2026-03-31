@@ -1,8 +1,8 @@
-{ inputs, pkgs }:
-let
-  # GHC version to use
-  compiler-nix-name = "ghc966";
-in
+{
+  inputs,
+  pkgs,
+  compiler-nix-name,
+}:
 pkgs.haskell-nix.cabalProject' {
   src = ../.;
   inherit compiler-nix-name;

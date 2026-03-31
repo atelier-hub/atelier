@@ -66,7 +66,7 @@
     };
   } // {
     src = pkgs.lib.mkDefault (pkgs.fetchurl {
-      url = "http://hackage.haskell.org/package/vector-algorithms-0.9.1.0.tar.gz";
+      url = "https://chap.intersectmbo.org/package/vector-algorithms-0.9.1.0.tar.gz";
       sha256 = "d2b674676802670d8a682b357da6b6b5741b4a33b191f0ffe5f2b2bc40558eb2";
     });
   }) // {

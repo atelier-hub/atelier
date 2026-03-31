@@ -13,7 +13,7 @@
       specVersion = "1.12";
       identifier = {
         name = "hs-opentelemetry-exporter-otlp";
-        version = "0.1.0.1";
+        version = "0.1.1.0";
       };
       license = "BSD-3-Clause";
       copyright = "2021 Ian Duncan";
@@ -49,9 +49,9 @@
     };
   } // {
     src = pkgs.lib.mkDefault (pkgs.fetchurl {
-      url = "http://hackage.haskell.org/package/hs-opentelemetry-exporter-otlp-0.1.0.1.tar.gz";
-      sha256 = "0a5fc3aa595833557f5e1dea9602f44cd2d5550d75903b8ca1502fdf837f0fd0";
+      url = "http://hackage.haskell.org/package/hs-opentelemetry-exporter-otlp-0.1.1.0.tar.gz";
+      sha256 = "c545dd32c0ffc4e5a6b759788af0cd4797c33cbafeb04817cc1cc90a1f4ef194";
     });
   }) // {
-    package-description-override = "cabal-version: 1.12\n\n-- This file has been generated from package.yaml by hpack version 0.37.0.\n--\n-- see: https://github.com/sol/hpack\n\nname:           hs-opentelemetry-exporter-otlp\nversion:        0.1.0.1\nsynopsis:       OpenTelemetry exporter supporting the standard OTLP protocol\ndescription:    Please see the README on GitHub at <https://github.com/iand675/hs-opentelemetry/tree/main/exporters/otlp#readme>\ncategory:       OpenTelemetry, Telemetry, Monitoring, Observability, Metrics\nhomepage:       https://github.com/iand675/hs-opentelemetry#readme\nbug-reports:    https://github.com/iand675/hs-opentelemetry/issues\nauthor:         Ian Duncan\nmaintainer:     ian@iankduncan.com\ncopyright:      2021 Ian Duncan\nlicense:        BSD3\nlicense-file:   LICENSE\nbuild-type:     Simple\nextra-source-files:\n    README.md\n    ChangeLog.md\n\nsource-repository head\n  type: git\n  location: https://github.com/iand675/hs-opentelemetry\n\nlibrary\n  exposed-modules:\n      OpenTelemetry.Exporter.OTLP\n      OpenTelemetry.Exporter.OTLP.LogRecord\n      OpenTelemetry.Exporter.OTLP.Span\n  other-modules:\n      Paths_hs_opentelemetry_exporter_otlp\n  hs-source-dirs:\n      src\n  ghc-options: -Wall\n  build-depends:\n      base >=4.7 && <5\n    , bytestring\n    , case-insensitive\n    , hs-opentelemetry-api ==0.3.*\n    , hs-opentelemetry-otlp ==0.1.*\n    , hs-opentelemetry-propagator-w3c\n    , http-client\n    , http-conduit\n    , http-types\n    , microlens\n    , proto-lens >=0.7.1.0\n    , text\n    , unordered-containers\n    , vector\n    , zlib\n  default-language: Haskell2010\n";
+    package-description-override = "cabal-version: 1.12\n\n-- This file has been generated from package.yaml by hpack version 0.37.0.\n--\n-- see: https://github.com/sol/hpack\n\nname:           hs-opentelemetry-exporter-otlp\nversion:        0.1.1.0\nsynopsis:       OpenTelemetry exporter supporting the standard OTLP protocol\ndescription:    Please see the README on GitHub at <https://github.com/iand675/hs-opentelemetry/tree/main/exporters/otlp#readme>\ncategory:       OpenTelemetry, Telemetry, Monitoring, Observability, Metrics\nhomepage:       https://github.com/iand675/hs-opentelemetry#readme\nbug-reports:    https://github.com/iand675/hs-opentelemetry/issues\nauthor:         Ian Duncan\nmaintainer:     ian@iankduncan.com\ncopyright:      2021 Ian Duncan\nlicense:        BSD3\nlicense-file:   LICENSE\nbuild-type:     Simple\nextra-source-files:\n    README.md\n    ChangeLog.md\n\nsource-repository head\n  type: git\n  location: https://github.com/iand675/hs-opentelemetry\n\nlibrary\n  exposed-modules:\n      OpenTelemetry.Exporter.OTLP\n      OpenTelemetry.Exporter.OTLP.LogRecord\n      OpenTelemetry.Exporter.OTLP.Span\n  other-modules:\n      Paths_hs_opentelemetry_exporter_otlp\n  hs-source-dirs:\n      src\n  ghc-options: -Wall\n  build-depends:\n      base >=4.7 && <5\n    , bytestring\n    , case-insensitive\n    , hs-opentelemetry-api ==0.3.*\n    , hs-opentelemetry-otlp ==0.2.*\n    , hs-opentelemetry-propagator-w3c\n    , http-client\n    , http-conduit\n    , http-types\n    , microlens\n    , proto-lens >=0.7.1.0\n    , text\n    , unordered-containers\n    , vector\n    , zlib\n  default-language: Haskell2010\n";
   }

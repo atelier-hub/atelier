@@ -11,7 +11,7 @@
     flags = { optimised-mixer = false; };
     package = {
       specVersion = "2.4";
-      identifier = { name = "splitmix"; version = "0.1.3.1"; };
+      identifier = { name = "splitmix"; version = "0.1.3.2"; };
       license = "BSD-3-Clause";
       copyright = "";
       maintainer = "Oleg Grenrus <oleg.grenrus@iki.fi>";
@@ -32,64 +32,7 @@
         buildable = true;
       };
       tests = {
-        "examples" = {
-          depends = [
-            (hsPkgs."base" or (errorHandler.buildDepError "base"))
-            (hsPkgs."HUnit" or (errorHandler.buildDepError "HUnit"))
-            (hsPkgs."splitmix" or (errorHandler.buildDepError "splitmix"))
-          ];
-          buildable = true;
-        };
-        "splitmix-tests" = {
-          depends = [
-            (hsPkgs."base" or (errorHandler.buildDepError "base"))
-            (hsPkgs."containers" or (errorHandler.buildDepError "containers"))
-            (hsPkgs."HUnit" or (errorHandler.buildDepError "HUnit"))
-            (hsPkgs."math-functions" or (errorHandler.buildDepError "math-functions"))
-            (hsPkgs."splitmix" or (errorHandler.buildDepError "splitmix"))
-            (hsPkgs."test-framework" or (errorHandler.buildDepError "test-framework"))
-            (hsPkgs."test-framework-hunit" or (errorHandler.buildDepError "test-framework-hunit"))
-          ];
-          buildable = true;
-        };
-        "montecarlo-pi" = {
-          depends = [
-            (hsPkgs."base" or (errorHandler.buildDepError "base"))
-            (hsPkgs."splitmix" or (errorHandler.buildDepError "splitmix"))
-          ];
-          buildable = true;
-        };
-        "montecarlo-pi-32" = {
-          depends = [
-            (hsPkgs."base" or (errorHandler.buildDepError "base"))
-            (hsPkgs."splitmix" or (errorHandler.buildDepError "splitmix"))
-          ];
-          buildable = true;
-        };
-        "splitmix-dieharder" = {
-          depends = [
-            (hsPkgs."async" or (errorHandler.buildDepError "async"))
-            (hsPkgs."base" or (errorHandler.buildDepError "base"))
-            (hsPkgs."bytestring" or (errorHandler.buildDepError "bytestring"))
-            (hsPkgs."deepseq" or (errorHandler.buildDepError "deepseq"))
-            (hsPkgs."process" or (errorHandler.buildDepError "process"))
-            (hsPkgs."random" or (errorHandler.buildDepError "random"))
-            (hsPkgs."splitmix" or (errorHandler.buildDepError "splitmix"))
-            (hsPkgs."tf-random" or (errorHandler.buildDepError "tf-random"))
-            (hsPkgs."vector" or (errorHandler.buildDepError "vector"))
-          ];
-          buildable = true;
-        };
-        "splitmix-testu01" = {
-          depends = [
-            (hsPkgs."base" or (errorHandler.buildDepError "base"))
-            (hsPkgs."base-compat-batteries" or (errorHandler.buildDepError "base-compat-batteries"))
-            (hsPkgs."splitmix" or (errorHandler.buildDepError "splitmix"))
-          ];
-          libs = [ (pkgs."testu01" or (errorHandler.sysDepError "testu01")) ];
-          buildable = if !system.isLinux then false else true;
-        };
-        "initialization" = {
+        "splitmix-examples" = {
           depends = [
             (hsPkgs."base" or (errorHandler.buildDepError "base"))
             (hsPkgs."HUnit" or (errorHandler.buildDepError "HUnit"))
@@ -106,41 +49,12 @@
           buildable = true;
         };
       };
-      benchmarks = {
-        "comparison" = {
-          depends = [
-            (hsPkgs."base" or (errorHandler.buildDepError "base"))
-            (hsPkgs."containers" or (errorHandler.buildDepError "containers"))
-            (hsPkgs."criterion" or (errorHandler.buildDepError "criterion"))
-            (hsPkgs."random" or (errorHandler.buildDepError "random"))
-            (hsPkgs."splitmix" or (errorHandler.buildDepError "splitmix"))
-            (hsPkgs."tf-random" or (errorHandler.buildDepError "tf-random"))
-          ];
-          buildable = true;
-        };
-        "simple-sum" = {
-          depends = [
-            (hsPkgs."base" or (errorHandler.buildDepError "base"))
-            (hsPkgs."random" or (errorHandler.buildDepError "random"))
-            (hsPkgs."splitmix" or (errorHandler.buildDepError "splitmix"))
-          ];
-          buildable = true;
-        };
-        "range" = {
-          depends = [
-            (hsPkgs."base" or (errorHandler.buildDepError "base"))
-            (hsPkgs."random" or (errorHandler.buildDepError "random"))
-            (hsPkgs."splitmix" or (errorHandler.buildDepError "splitmix"))
-          ];
-          buildable = true;
-        };
-      };
     };
   } // {
     src = pkgs.lib.mkDefault (pkgs.fetchurl {
-      url = "http://hackage.haskell.org/package/splitmix-0.1.3.1.tar.gz";
-      sha256 = "b6bcd0d79bd4fe40975c8ebe803be2f3bfbf6006069a59745a325a0df3f86270";
+      url = "http://hackage.haskell.org/package/splitmix-0.1.3.2.tar.gz";
+      sha256 = "a61d4e8b30f5a16526d7d31171b674ae7924d2207f378060d13363bd8794de8c";
     });
   }) // {
-    package-description-override = "cabal-version:      2.4\nname:               splitmix\nversion:            0.1.3.1\nsynopsis:           Fast Splittable PRNG\ndescription:\n  Pure Haskell implementation of SplitMix described in\n  .\n  Guy L. Steele, Jr., Doug Lea, and Christine H. Flood. 2014.\n  Fast splittable pseudorandom number generators. In Proceedings\n  of the 2014 ACM International Conference on Object Oriented\n  Programming Systems Languages & Applications (OOPSLA '14). ACM,\n  New York, NY, USA, 453-472. DOI:\n  <https://doi.org/10.1145/2660193.2660195>\n  .\n  The paper describes a new algorithm /SplitMix/ for /splittable/\n  pseudorandom number generator that is quite fast: 9 64 bit arithmetic/logical\n  operations per 64 bits generated.\n  .\n  /SplitMix/ is tested with two standard statistical test suites (DieHarder and\n  TestU01, this implementation only using the former) and it appears to be\n  adequate for \"everyday\" use, such as Monte Carlo algorithms and randomized\n  data structures where speed is important.\n  .\n  In particular, it __should not be used for cryptographic or security applications__,\n  because generated sequences of pseudorandom values are too predictable\n  (the mixing functions are easily inverted, and two successive outputs\n  suffice to reconstruct the internal state).\n\nlicense:            BSD-3-Clause\nlicense-file:       LICENSE\nmaintainer:         Oleg Grenrus <oleg.grenrus@iki.fi>\nbug-reports:        https://github.com/haskellari/splitmix/issues\ncategory:           System, Random\nbuild-type:         Simple\ntested-with:\n  GHC ==8.6.5\n   || ==8.8.4\n   || ==8.10.4\n   || ==9.0.2\n   || ==9.2.8\n   || ==9.4.8\n   || ==9.6.7\n   || ==9.8.4\n   || ==9.10.2\n   || ==9.12.2\n\nextra-doc-files:\n  Changelog.md\n  README.md\n\nextra-source-files:\n  make-hugs.sh\n  test-hugs.sh\n\nflag optimised-mixer\n  description: Use JavaScript for mix32\n  manual:      True\n  default:     False\n\nlibrary\n  default-language: Haskell2010\n  ghc-options:      -Wall\n  hs-source-dirs:   src src-compat\n  exposed-modules:\n    System.Random.SplitMix\n    System.Random.SplitMix32\n\n  other-modules:\n    Data.Bits.Compat\n    System.Random.SplitMix.Init\n\n  -- dump-core\n  -- build-depends: dump-core\n  -- ghc-options: -fplugin=DumpCore -fplugin-opt DumpCore:core-html\n\n  build-depends:\n    , base     >=4.12.0.0 && <4.22\n    , deepseq  >=1.4.4.0  && <1.6\n\n  if flag(optimised-mixer)\n    cpp-options: -DOPTIMISED_MIX32=1\n\n  -- We don't want to depend on time, nor unix or Win32 packages\n  -- because it's valuable that splitmix and QuickCheck doesn't\n  -- depend on about anything\n\n  if impl(ghcjs)\n    cpp-options: -DSPLITMIX_INIT_GHCJS=1\n\n  else\n    if impl(ghc)\n      cpp-options: -DSPLITMIX_INIT_C=1\n\n      if os(windows)\n        c-sources: cbits-win/init.c\n\n      elif (os(osx) || os(ios))\n        c-sources:  cbits-apple/init.c\n        frameworks: Security\n\n      else\n        c-sources: cbits-unix/init.c\n\n    else\n      cpp-options:   -DSPLITMIX_INIT_COMPAT=1\n      build-depends: time >=1.2.0.3 && <1.15\n\nsource-repository head\n  type:     git\n  location: https://github.com/haskellari/splitmix.git\n\nbenchmark comparison\n  type:             exitcode-stdio-1.0\n  default-language: Haskell2010\n  ghc-options:      -Wall\n  hs-source-dirs:   bench\n  main-is:          Bench.hs\n  build-depends:\n    , base\n    , containers  >=0.6.0.1 && <0.8\n    , criterion   >=1.6.0.0 && <1.7\n    , random\n    , splitmix\n    , tf-random   >=0.5     && <0.6\n\nbenchmark simple-sum\n  type:             exitcode-stdio-1.0\n  default-language: Haskell2010\n  ghc-options:      -Wall\n  hs-source-dirs:   bench\n  main-is:          SimpleSum.hs\n  build-depends:\n    , base\n    , random\n    , splitmix\n\nbenchmark range\n  type:             exitcode-stdio-1.0\n  default-language: Haskell2010\n  ghc-options:      -Wall\n  hs-source-dirs:   bench src-compat\n  main-is:          Range.hs\n  other-modules:    Data.Bits.Compat\n  build-depends:\n    , base\n    , random\n    , splitmix\n\ntest-suite examples\n  type:             exitcode-stdio-1.0\n  default-language: Haskell2010\n  ghc-options:      -Wall\n  hs-source-dirs:   tests\n  main-is:          Examples.hs\n  build-depends:\n    , base\n    , HUnit     >=1.6.0.0 && <1.7\n    , splitmix\n\ntest-suite splitmix-tests\n  type:             exitcode-stdio-1.0\n  default-language: Haskell2010\n  ghc-options:      -Wall\n  hs-source-dirs:   tests\n  main-is:          Tests.hs\n  other-modules:\n    MiniQC\n    Uniformity\n\n  build-depends:\n    , base\n    , containers            >=0.4.0.0 && <0.8\n    , HUnit                 >=1.6.0.0 && <1.7\n    , math-functions        >=0.3.3.0 && <0.4\n    , splitmix\n    , test-framework        >=0.8.2.0 && <0.9\n    , test-framework-hunit  >=0.3.0.2 && <0.4\n\ntest-suite montecarlo-pi\n  type:             exitcode-stdio-1.0\n  default-language: Haskell2010\n  ghc-options:      -Wall\n  hs-source-dirs:   tests\n  main-is:          SplitMixPi.hs\n  build-depends:\n    , base\n    , splitmix\n\ntest-suite montecarlo-pi-32\n  type:             exitcode-stdio-1.0\n  default-language: Haskell2010\n  ghc-options:      -Wall\n  hs-source-dirs:   tests\n  main-is:          SplitMixPi32.hs\n  build-depends:\n    , base\n    , splitmix\n\ntest-suite splitmix-dieharder\n  default-language: Haskell2010\n  type:             exitcode-stdio-1.0\n  ghc-options:      -Wall -threaded -rtsopts\n  hs-source-dirs:   tests\n  main-is:          Dieharder.hs\n  build-depends:\n    , async       >=2.2.1    && <2.3\n    , base\n    , bytestring  >=0.10.8.2 && <0.13\n    , deepseq\n    , process     >=1.6.0.0  && <1.7\n    , random\n    , splitmix\n    , tf-random   >=0.5      && <0.6\n    , vector      >=0.13.0.0 && <0.14\n\ntest-suite splitmix-testu01\n  if !os(linux)\n    buildable: False\n\n  default-language: Haskell2010\n  type:             exitcode-stdio-1.0\n  ghc-options:      -Wall -threaded -rtsopts\n  hs-source-dirs:   tests\n  main-is:          TestU01.hs\n  c-sources:        tests/cbits/testu01.c\n  extra-libraries:  testu01\n  build-depends:\n    , base\n    , base-compat-batteries  >=0.10.5 && <0.15\n    , splitmix\n\ntest-suite initialization\n  default-language: Haskell2010\n  type:             exitcode-stdio-1.0\n  ghc-options:      -Wall -threaded -rtsopts\n  hs-source-dirs:   tests\n  main-is:          Initialization.hs\n  build-depends:\n    , base\n    , HUnit     >=1.6.0.0 && <1.7\n    , splitmix\n\ntest-suite splitmix-th-test\n  default-language: Haskell2010\n  type:             exitcode-stdio-1.0\n  ghc-options:      -Wall -threaded -rtsopts\n  hs-source-dirs:   tests\n  main-is:          splitmix-th-test.hs\n  build-depends:\n    , base\n    , template-haskell\n    , splitmix\n";
+    package-description-override = "cabal-version:      2.4\nname:               splitmix\nversion:            0.1.3.2\nsynopsis:           Fast Splittable PRNG\ndescription:\n  Pure Haskell implementation of SplitMix described in\n  .\n  Guy L. Steele, Jr., Doug Lea, and Christine H. Flood. 2014.\n  Fast splittable pseudorandom number generators. In Proceedings\n  of the 2014 ACM International Conference on Object Oriented\n  Programming Systems Languages & Applications (OOPSLA '14). ACM,\n  New York, NY, USA, 453-472. DOI:\n  <https://doi.org/10.1145/2660193.2660195>\n  .\n  The paper describes a new algorithm /SplitMix/ for /splittable/\n  pseudorandom number generator that is quite fast: 9 64 bit arithmetic/logical\n  operations per 64 bits generated.\n  .\n  /SplitMix/ is tested with two standard statistical test suites (DieHarder and\n  TestU01, this implementation only using the former) and it appears to be\n  adequate for \"everyday\" use, such as Monte Carlo algorithms and randomized\n  data structures where speed is important.\n  .\n  In particular, it __should not be used for cryptographic or security applications__,\n  because generated sequences of pseudorandom values are too predictable\n  (the mixing functions are easily inverted, and two successive outputs\n  suffice to reconstruct the internal state).\n\nlicense:            BSD-3-Clause\nlicense-file:       LICENSE\nmaintainer:         Oleg Grenrus <oleg.grenrus@iki.fi>\nbug-reports:        https://github.com/haskellari/splitmix/issues\ncategory:           System, Random\nbuild-type:         Simple\ntested-with:\n  GHC ==8.6.5\n   || ==8.8.4\n   || ==8.10.4\n   || ==9.0.2\n   || ==9.2.8\n   || ==9.4.8\n   || ==9.6.7\n   || ==9.8.4\n   || ==9.10.2\n   || ==9.12.2\n   || ==9.14.1\n\nextra-doc-files:\n  Changelog.md\n  README.md\n\nextra-source-files:\n  make-hugs.sh\n  test-hugs.sh\n\nflag optimised-mixer\n  description: Use JavaScript for mix32\n  manual:      True\n  default:     False\n\nlibrary\n  default-language: Haskell2010\n  ghc-options:      -Wall\n  hs-source-dirs:   src\n  exposed-modules:\n    System.Random.SplitMix\n    System.Random.SplitMix32\n\n  other-modules:\n    System.Random.SplitMix.Init\n\n  -- dump-core\n  -- build-depends: dump-core\n  -- ghc-options: -fplugin=DumpCore -fplugin-opt DumpCore:core-html\n\n  build-depends:\n    , base     >=4.12.0.0 && <4.23\n    , deepseq  >=1.4.4.0  && <1.6\n\n  if flag(optimised-mixer)\n    cpp-options: -DOPTIMISED_MIX32=1\n\n  -- We don't want to depend on time, nor unix or Win32 packages\n  -- because it's valuable that splitmix and QuickCheck doesn't\n  -- depend on about anything\n\n  if impl(ghcjs)\n    cpp-options: -DSPLITMIX_INIT_GHCJS=1\n\n  else\n    if impl(ghc)\n      cpp-options: -DSPLITMIX_INIT_C=1\n\n      if os(windows)\n        c-sources: cbits-win/init.c\n\n      elif (os(osx) || os(ios))\n        c-sources:  cbits-apple/init.c\n        frameworks: Security\n\n      else\n        c-sources: cbits-unix/init.c\n\n    else\n      cpp-options:   -DSPLITMIX_INIT_COMPAT=1\n      build-depends: time >=1.2.0.3 && <1.16\n\nsource-repository head\n  type:     git\n  location: https://github.com/haskellari/splitmix.git\n\ntest-suite splitmix-examples\n  type:             exitcode-stdio-1.0\n  default-language: Haskell2010\n  ghc-options:      -Wall\n  hs-source-dirs:   tests\n  main-is:          splitmix-examples.hs\n  build-depends:\n    , base\n    , HUnit     >=1.6.0.0 && <1.7\n    , splitmix\n\ntest-suite splitmix-th-test\n  default-language: Haskell2010\n  type:             exitcode-stdio-1.0\n  ghc-options:      -Wall -threaded -rtsopts\n  hs-source-dirs:   tests\n  main-is:          splitmix-th-test.hs\n  build-depends:\n    , base\n    , template-haskell\n    , splitmix\n";
   }
