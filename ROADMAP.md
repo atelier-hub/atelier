@@ -4,11 +4,7 @@
 
 ### Known Issues
 
-- **Stale warnings dropped on incremental reloads** — ghcib only stores messages from
-  the latest reload cycle. GHC's incremental compilation skips unchanged files, so
-  their warnings are never re-emitted and disappear from ghcib's state. Fix: accumulate
-  messages across reload cycles, merging by file so that a recompiled file replaces its
-  previous messages while untouched files retain theirs.
+_(none)_
 
 ### Features
 

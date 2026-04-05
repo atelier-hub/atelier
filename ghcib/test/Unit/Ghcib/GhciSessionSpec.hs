@@ -5,6 +5,9 @@ import Effectful (IOE, runEff)
 import Effectful.Exception (try)
 import Test.Hspec
 
+import Data.Map.Strict qualified as Map
+import Data.Set qualified as Set
+
 import Ghcib.BuildState (Diagnostic (..), Severity (..))
 import Ghcib.Effects.GhciSession
     ( GhciSession
@@ -14,11 +17,13 @@ import Ghcib.Effects.GhciSession
     , startGhci
     , stopGhci
     )
+import Ghcib.GhciSession (mergeDiagnostics)
 
 
 spec_GhciSession :: Spec
 spec_GhciSession = do
     describe "runGhciSessionScripted" testScripted
+    describe "mergeDiagnostics" testMergeDiagnostics
 
 
 --------------------------------------------------------------------------------
@@ -30,13 +35,13 @@ testScripted = do
     describe "startGhci" do
         it "returns scripted messages" do
             LoadResult {diagnostics = msgs} <-
-                runScripted [Right [errMsg]]
+                runScripted [simpleResult [errMsg]]
                     $ startGhci "cabal repl" "/"
             msgs `shouldBe` [errMsg]
 
         it "returns empty list when scripted result has no messages" do
             LoadResult {diagnostics = msgs} <-
-                runScripted [Right []]
+                runScripted [simpleResult []]
                     $ startGhci "cabal repl" "/"
             msgs `shouldBe` []
 
@@ -49,7 +54,7 @@ testScripted = do
 
     describe "reloadGhci" do
         it "returns scripted messages" do
-            LoadResult {diagnostics = msgs} <- runScripted [Right [warnMsg]] reloadGhci
+            LoadResult {diagnostics = msgs} <- runScripted [simpleResult [warnMsg]] reloadGhci
             msgs `shouldBe` [warnMsg]
 
         it "throws when scripted result is Left" do
@@ -60,14 +65,14 @@ testScripted = do
 
     describe "stopGhci" do
         it "is always a no-op and does not consume from the queue" do
-            LoadResult {diagnostics = msgs} <- runScripted [Right [errMsg]] do
+            LoadResult {diagnostics = msgs} <- runScripted [simpleResult [errMsg]] do
                 stopGhci
                 startGhci "cabal repl" "/"
             msgs `shouldBe` [errMsg]
 
     describe "sequencing" do
         it "consumes results in order across mixed operations" do
-            (a, b) <- runScripted [Right [errMsg], Right [warnMsg]] do
+            (a, b) <- runScripted [simpleResult [errMsg], simpleResult [warnMsg]] do
                 LoadResult {diagnostics = a} <- startGhci "cabal repl" "/"
                 LoadResult {diagnostics = b} <- reloadGhci
                 pure (a, b)
@@ -75,12 +80,66 @@ testScripted = do
             b `shouldBe` [warnMsg]
 
         it "recover scenario: error then success" do
-            result <- runScripted [Left (toException boom), Right []] do
+            result <- runScripted [Left (toException boom), simpleResult []] do
                 r1 <- try @ErrorCall $ startGhci "cabal repl" "/"
                 LoadResult {diagnostics = r2} <- startGhci "cabal repl" "/"
                 pure (r1, r2)
             fst result `shouldSatisfy` isLeft
             snd result `shouldBe` []
+
+
+--------------------------------------------------------------------------------
+-- mergeDiagnostics tests
+--------------------------------------------------------------------------------
+
+testMergeDiagnostics :: Spec
+testMergeDiagnostics = do
+    it "retains diagnostics from files not in compiledFiles" do
+        -- Foo has an error, Bar has a warning.
+        -- Only Foo is recompiled (and fixed). Bar is unchanged, so Bar's
+        -- warning must survive.
+        let prev = Map.fromList [(errMsg.file, [errMsg]), (warnMsg.file, [warnMsg])]
+            result =
+                LoadResult
+                    { moduleCount = 2
+                    , compiledFiles = Set.singleton errMsg.file
+                    , diagnostics = []
+                    }
+        let merged = mergeDiagnostics prev result
+        Map.lookup warnMsg.file merged `shouldBe` Just [warnMsg]
+
+    it "clears diagnostics when a recompiled file now has no issues" do
+        let prev = Map.fromList [(errMsg.file, [errMsg])]
+            result =
+                LoadResult
+                    { moduleCount = 1
+                    , compiledFiles = Set.singleton errMsg.file
+                    , diagnostics = []
+                    }
+        let merged = mergeDiagnostics prev result
+        Map.lookup errMsg.file merged `shouldBe` Nothing
+
+    it "replaces diagnostics for recompiled files" do
+        let newErr = errMsg {title = "new error", text = "new error\n"}
+            prev = Map.fromList [(errMsg.file, [errMsg])]
+            result =
+                LoadResult
+                    { moduleCount = 1
+                    , compiledFiles = Set.singleton errMsg.file
+                    , diagnostics = [newErr]
+                    }
+        let merged = mergeDiagnostics prev result
+        Map.lookup errMsg.file merged `shouldBe` Just [newErr]
+
+    it "accumulates diagnostics for newly seen files" do
+        let result =
+                LoadResult
+                    { moduleCount = 1
+                    , compiledFiles = Set.singleton warnMsg.file
+                    , diagnostics = [warnMsg]
+                    }
+        let merged = mergeDiagnostics Map.empty result
+        Map.lookup warnMsg.file merged `shouldBe` Just [warnMsg]
 
 
 --------------------------------------------------------------------------------
@@ -119,5 +178,10 @@ warnMsg =
         }
 
 
-runScripted :: [Either SomeException [Diagnostic]] -> Eff '[GhciSession, IOE] a -> IO a
+-- | Convenience constructor: a scripted result with no compiled-file info.
+simpleResult :: [Diagnostic] -> Either SomeException LoadResult
+simpleResult msgs = Right LoadResult {moduleCount = 0, compiledFiles = Set.empty, diagnostics = msgs}
+
+
+runScripted :: [Either SomeException LoadResult] -> Eff '[GhciSession, IOE] a -> IO a
 runScripted results = runEff . runGhciSessionScripted results

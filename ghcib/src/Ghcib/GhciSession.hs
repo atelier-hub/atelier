@@ -1,10 +1,12 @@
-module Ghcib.GhciSession (component) where
+module Ghcib.GhciSession (component, mergeDiagnostics) where
 
 import Data.Time (diffUTCTime)
 import Effectful (IOE)
 import Effectful.Exception (throwIO, try)
 import Effectful.Reader.Static (Reader, ask)
 import System.Directory (getCurrentDirectory)
+
+import Data.Map.Strict qualified as Map
 
 import Atelier.Component (Component (..), Listener, defaultComponent)
 import Atelier.Effects.Chan (Chan, OutChan)
@@ -13,7 +15,7 @@ import Atelier.Effects.Delay (Delay, wait)
 import Atelier.Effects.Log (Log)
 import Atelier.Exception (isGracefulShutdown)
 import Atelier.Time (Millisecond)
-import Ghcib.BuildState (BuildId (..), BuildPhase (..), BuildResult (..))
+import Ghcib.BuildState (BuildId (..), BuildPhase (..), BuildResult (..), Diagnostic (..))
 import Ghcib.Config (Config (..), resolveCommand)
 import Ghcib.Effects.BuildStore (BuildStore, setPhase)
 import Ghcib.Effects.GhciSession (GhciSession, LoadResult (..))
@@ -23,6 +25,19 @@ import Atelier.Effects.Chan qualified as Chan
 import Atelier.Effects.Clock qualified as Clock
 import Atelier.Effects.Log qualified as Log
 import Ghcib.Effects.GhciSession qualified as GhciSession
+
+
+-- | Merge a new 'LoadResult' into the accumulated per-file diagnostic map.
+--
+-- Files in 'compiledFiles' have their previous diagnostics cleared and replaced
+-- by any new diagnostics produced for them in this cycle. Files absent from
+-- 'compiledFiles' were skipped by incremental compilation and retain their
+-- previous diagnostics unchanged.
+mergeDiagnostics :: Map.Map FilePath [Diagnostic] -> LoadResult -> Map.Map FilePath [Diagnostic]
+mergeDiagnostics prev LoadResult {compiledFiles, diagnostics} =
+    let cleared = foldr Map.delete prev compiledFiles
+        newByFile = Map.fromListWith (++) [(d.file, [d]) | d <- diagnostics]
+    in  Map.union newByFile cleared
 
 
 -- | GhciSession component.
@@ -83,11 +98,12 @@ sessionListener cmd projectRoot reloadOut = startSession (BuildId 1)
                 Log.info $ "GHCi started (session #" <> show n <> "): " <> show (length msgs) <> " diagnostics"
                 t0 <- Clock.currentTime
                 let buildResult = BuildResult {completedAt = t0, durationMs = 0, moduleCount, diagnostics = msgs}
+                    accumulated = Map.fromListWith (++) [(d.file, [d]) | d <- msgs]
                 setPhase (BuildId n) (Done buildResult)
                 Log.debug $ "Build state updated to Done (session #" <> show n <> ")"
-                listenLoop (BuildId (n + 1))
+                listenLoop (BuildId (n + 1)) accumulated
 
-    listenLoop (BuildId n) = do
+    listenLoop (BuildId n) accumulated = do
         Log.debug $ "GhciSession: waiting for reload request (build #" <> show n <> ")"
         request <- Chan.readChan reloadOut
         let nextId = BuildId (n + 1)
@@ -96,19 +112,21 @@ sessionListener cmd projectRoot reloadOut = startSession (BuildId 1)
         t0 <- Clock.currentTime
         result <- try @SomeException $ case request of
             Reload -> GhciSession.reloadGhci
-            Restart -> GhciSession.stopGhci >> pure LoadResult {moduleCount = 0, diagnostics = []}
+            Restart -> GhciSession.stopGhci >> pure LoadResult {moduleCount = 0, compiledFiles = mempty, diagnostics = []}
         case result of
             Left ex -> do
                 when (isGracefulShutdown ex) $ throwIO ex
                 Log.warn "GHCi session died; restarting"
                 void $ try @SomeException GhciSession.stopGhci
                 startSession nextId
-            Right LoadResult {moduleCount, diagnostics = msgs} -> do
+            Right loadResult -> do
                 t1 <- Clock.currentTime
                 let durationMs = round (realToFrac (diffUTCTime t1 t0) * 1000 :: Double) :: Int
-                    buildResult = BuildResult {completedAt = t1, durationMs, moduleCount, diagnostics = msgs}
+                    newAccumulated = mergeDiagnostics accumulated loadResult
+                    allMsgs = concat (Map.elems newAccumulated)
+                    buildResult = BuildResult {completedAt = t1, durationMs, moduleCount = loadResult.moduleCount, diagnostics = allMsgs}
                 setPhase (BuildId n) (Done buildResult)
                 if request == Restart then
                     startSession nextId
                 else
-                    listenLoop nextId
+                    listenLoop nextId newAccumulated

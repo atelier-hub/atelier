@@ -14,12 +14,14 @@ module Ghcib.Effects.GhciSession
     ) where
 
 import Control.Exception (throwIO, try)
+import Data.Set (Set)
 import Effectful (Effect, IOE)
 import Effectful.Dispatch.Dynamic (reinterpret)
 import Effectful.State.Static.Shared (State, evalState, get, put)
 import Effectful.TH (makeEffect)
 import Language.Haskell.Ghcid (Load (..))
 
+import Data.Set qualified as Set
 import Language.Haskell.Ghcid qualified as Ghcid
 
 import Ghcib.BuildState (Diagnostic (..), Severity (..))
@@ -30,6 +32,10 @@ import Ghcib.BuildState qualified as BuildState
 -- | The result of a GHCi load or reload operation.
 data LoadResult = LoadResult
     { moduleCount :: Int
+    , compiledFiles :: Set FilePath
+    -- ^ Files that were compiled in this cycle (derived from 'Language.Haskell.Ghcid.Loading' items).
+    -- Used by 'Ghcib.GhciSession.mergeDiagnostics' to decide which files' previous
+    -- diagnostics to replace vs. retain.
     , diagnostics :: [Diagnostic]
     }
     deriving stock (Eq, Show)
@@ -78,14 +84,14 @@ runGhciSessionIO = reinterpret (evalState (Nothing :: Maybe Ghcid.Ghci)) $ \_ ->
 --
 -- Requires 'IOE' so that 'Left' exceptions can be thrown into the effectful
 -- context, enabling tests of error-handling logic.
-runGhciSessionScripted :: forall es a. (IOE :> es) => [Either SomeException [Diagnostic]] -> Eff (GhciSession : es) a -> Eff es a
+runGhciSessionScripted :: forall es a. (IOE :> es) => [Either SomeException LoadResult] -> Eff (GhciSession : es) a -> Eff es a
 runGhciSessionScripted results = reinterpret (evalState results) $ \_ ->
-    let popResult :: Eff (State [Either SomeException [Diagnostic]] : es) LoadResult
+    let popResult :: Eff (State [Either SomeException LoadResult] : es) LoadResult
         popResult =
             get >>= \case
                 [] -> error "GhciSessionScripted: no more results in queue"
                 Left ex : rest -> put rest >> liftIO (throwIO ex)
-                Right msgs : rest -> put rest >> pure LoadResult {moduleCount = 0, diagnostics = msgs}
+                Right r : rest -> put rest >> pure r
     in  \case
             StartGhci _ _ -> popResult
             ReloadGhci -> popResult
@@ -99,7 +105,8 @@ stopGhciSilently ghci = void $ try @SomeException $ Ghcid.stopGhci ghci
 collectResult :: Ghcid.Ghci -> [Load] -> IO LoadResult
 collectResult ghci loads = do
     moduleCount <- length <$> Ghcid.showModules ghci
-    pure LoadResult {moduleCount, diagnostics = toDiagnostics loads}
+    let compiledFiles = Set.fromList [loadFile l | l@Ghcid.Loading {} <- loads]
+    pure LoadResult {moduleCount, compiledFiles, diagnostics = toDiagnostics loads}
 
 
 toDiagnostics :: [Load] -> [Diagnostic]

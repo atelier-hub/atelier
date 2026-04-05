@@ -199,6 +199,7 @@ internal-libraries:
     - aeson
     - ansi-terminal
     - bytestring
+    - containers
     - data-default
     - directory
     - effectful
@@ -297,6 +298,7 @@ tests:
     - ghcib
     - aeson
     - atelier
+    - containers
     - data-default
     - effectful
     - hspec
