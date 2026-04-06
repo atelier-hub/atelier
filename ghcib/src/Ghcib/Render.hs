@@ -11,6 +11,10 @@ module Ghcib.Render
     , diagnosticDoc
     , daemonInfoDoc
     , durationDoc
+
+      -- * Plain-text formatting
+    , diagnosticLine
+    , formatDuration
     ) where
 
 import Data.Time (UTCTime)
@@ -125,6 +129,17 @@ daemonInfoDoc di =
             "(all)"
         else
             pretty (intercalate " " (map toString di.targets))
+
+
+-- | Single-line diagnostic for plain-text / shell output.
+--
+-- Format: @E src\/Foo\/Bar.hs:42 \`something\` not in scope@
+diagnosticLine :: Diagnostic -> String
+diagnosticLine d =
+    prefix d.severity <> " " <> d.file <> ":" <> show d.line <> " " <> toString d.title
+  where
+    prefix SError = "E"
+    prefix SWarning = "W"
 
 
 instance Pretty Diagnostic where
