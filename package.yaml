@@ -221,6 +221,7 @@ tests:
         - hiding (Prelude)
     - atelier-prelude
     - ghcib
+    - Cabal-syntax
     - aeson
     - atelier
     - containers

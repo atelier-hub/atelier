@@ -369,6 +369,7 @@ test-suite ghcib-test
   other-modules:
       Unit.Ghcib.BuildStateSpec
       Unit.Ghcib.BuildStoreSpec
+      Unit.Ghcib.ConfigSpec
       Unit.Ghcib.DebounceSpec
       Unit.Ghcib.FileWatcherSpec
       Unit.Ghcib.GhciSessionSpec
@@ -400,7 +401,8 @@ test-suite ghcib-test
   build-tool-depends:
       tasty-discover:tasty-discover
   build-depends:
-      aeson
+      Cabal-syntax
+    , aeson
     , atelier
     , atelier-prelude
     , base

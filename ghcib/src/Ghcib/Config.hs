@@ -4,7 +4,10 @@ module Ghcib.Config
     ( Config (..)
     , loadConfig
     , resolveCommand
+    , resolveTargets
     , resolveWatchDirs
+    , allComponentTargets
+    , sourceDirsForTarget
     ) where
 
 import Data.Aeson (FromJSON)
@@ -20,10 +23,14 @@ import Distribution.Types.GenericPackageDescription
     , condLibrary
     , condSubLibraries
     , condTestSuites
+    , packageDescription
     )
 import Distribution.Types.Library (libBuildInfo)
+import Distribution.Types.PackageDescription (package)
+import Distribution.Types.PackageId (pkgName)
+import Distribution.Types.PackageName (unPackageName)
 import Distribution.Types.TestSuite (testBuildInfo)
-import Distribution.Types.UnqualComponentName (mkUnqualComponentName)
+import Distribution.Types.UnqualComponentName (mkUnqualComponentName, unUnqualComponentName)
 import Distribution.Utils.Path (getSymbolicPath)
 import System.FilePath (takeExtension, (</>))
 import TOML (DecodeTOML (..), decode, getFieldOpt, getFieldOr)
@@ -134,6 +141,34 @@ resolveWatchDirs targets projectRoot = do
                     in  pure $ if null dirs then ["."] else map (projectRoot </>) dirs
 
 
+-- | Infer the effective targets to build and watch.
+-- Returns the configured targets as-is, or auto-detects all components
+-- from the .cabal file when no targets are configured.
+resolveTargets :: (FileSystem :> es) => [Text] -> FilePath -> Eff es [Text]
+resolveTargets targets@(_ : _) _ = pure targets
+resolveTargets [] projectRoot = do
+    cabalFiles <- filter (\f -> takeExtension f == ".cabal") <$> listDirectory projectRoot
+    case cabalFiles of
+        [] -> pure []
+        (cabalFile : _) -> do
+            contents <- readFileBs (projectRoot </> cabalFile)
+            pure $ maybe [] allComponentTargets (parseGenericPackageDescriptionMaybe contents)
+
+
+allComponentTargets :: GenericPackageDescription -> [Text]
+allComponentTargets gpd =
+    mainLibTargets
+        ++ subLibTargets
+        ++ exeTargets
+        ++ testTargets
+  where
+    mainPkgName = toText $ unPackageName . pkgName . package . packageDescription $ gpd
+    mainLibTargets = maybe [] (const ["lib:" <> mainPkgName]) (condLibrary gpd)
+    subLibTargets = map (\(n, _) -> "lib:" <> toText (unUnqualComponentName n)) (condSubLibraries gpd)
+    exeTargets = map (\(n, _) -> "exe:" <> toText (unUnqualComponentName n)) (condExecutables gpd)
+    testTargets = map (\(n, _) -> "test:" <> toText (unUnqualComponentName n)) (condTestSuites gpd)
+
+
 sourceDirsForTarget :: GenericPackageDescription -> Text -> [FilePath]
 sourceDirsForTarget gpd target =
     map getSymbolicPath $ case T.splitOn ":" target of
@@ -141,7 +176,11 @@ sourceDirsForTarget gpd target =
             maybe [] (libDirs . condTreeData) (condLibrary gpd)
         ["lib", name] ->
             let ucn = mkUnqualComponentName (toString name)
-            in  concatMap (libDirs . condTreeData . snd) $ filter ((== ucn) . fst) (condSubLibraries gpd)
+                mainLibName = unPackageName . pkgName . package . packageDescription $ gpd
+            in  if toString name == mainLibName then
+                    maybe [] (libDirs . condTreeData) (condLibrary gpd)
+                else
+                    concatMap (libDirs . condTreeData . snd) $ filter ((== ucn) . fst) (condSubLibraries gpd)
         ["test", name] ->
             let ucn = mkUnqualComponentName (toString name)
             in  concatMap (testDirs . condTreeData . snd) $ filter ((== ucn) . fst) (condTestSuites gpd)

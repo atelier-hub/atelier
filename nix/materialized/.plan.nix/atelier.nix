@@ -191,6 +191,7 @@
         };
         "ghcib-test" = {
           depends = [
+            (hsPkgs."Cabal-syntax" or (errorHandler.buildDepError "Cabal-syntax"))
             (hsPkgs."aeson" or (errorHandler.buildDepError "aeson"))
             (hsPkgs."atelier" or (errorHandler.buildDepError "atelier"))
             (hsPkgs."atelier".components.sublibs.atelier-prelude or (errorHandler.buildDepError "atelier:atelier-prelude"))

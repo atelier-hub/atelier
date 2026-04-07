@@ -19,7 +19,7 @@ import Atelier.Effects.FileSystem (removeFile, runFileSystemIO)
 import Atelier.Effects.Log (Severity (..), runLogNoOp, runLogToHandle)
 import Atelier.Effects.Monitoring.Tracing (runTracingNoOp)
 import Ghcib.BuildState (DaemonInfo (..))
-import Ghcib.Config (Config (..), loadConfig, resolveWatchDirs)
+import Ghcib.Config (Config (..), loadConfig, resolveTargets, resolveWatchDirs)
 import Ghcib.Effects.BuildStore (runBuildStore)
 import Ghcib.Effects.FileWatcher (runFileWatcherIO)
 import Ghcib.Effects.GhciSession (runGhciSessionIO)
@@ -27,6 +27,7 @@ import Ghcib.Effects.UnixSocket (runUnixSocketIO)
 import Ghcib.Socket.Client (socketPath)
 
 import Atelier.Effects.Conc qualified as Conc
+import Ghcib.Config qualified as Config
 import Ghcib.GhciSession qualified as GhciSession
 import Ghcib.Socket.Server qualified as SocketServer
 import Ghcib.Watcher qualified as Watcher
@@ -36,23 +37,27 @@ import Ghcib.Watcher qualified as Watcher
 -- Blocks forever; all work happens inside the component system.
 runDaemon :: FilePath -> Config -> IO ()
 runDaemon projectRoot cfg = do
-    (sockPath, watchDirs) <-
-        runEff . runFileSystemIO
-            $ liftA2 (,) (socketPath projectRoot) (resolveWatchDirs cfg.targets projectRoot)
+    (sockPath, effectiveTargets, watchDirs) <-
+        runEff . runFileSystemIO $ do
+            sp <- socketPath projectRoot
+            et <- resolveTargets cfg.targets projectRoot
+            wd <- resolveWatchDirs et projectRoot
+            pure (sp, et, wd)
+    let effectiveCfg = cfg {Config.targets = effectiveTargets}
     let daemonInfo =
             DaemonInfo
-                { targets = cfg.targets
+                { targets = effectiveTargets
                 , watchDirs = map (makeRelative projectRoot) watchDirs
                 , sockPath
                 , logFile = cfg.logFile
                 }
     case cfg.logFile of
-        Nothing -> runWith runLogNoOp sockPath daemonInfo
+        Nothing -> runWith runLogNoOp sockPath daemonInfo effectiveCfg
         Just path -> withFile path AppendMode $ \h -> do
             hSetBuffering h LineBuffering
-            runWith (runLogToHandle h INFO) sockPath daemonInfo
+            runWith (runLogToHandle h INFO) sockPath daemonInfo effectiveCfg
   where
-    runWith runLogger sockPath daemonInfo =
+    runWith runLogger sockPath daemonInfo effectiveCfg =
         runEff
             . runConcurrent
             . runTracingNoOp
@@ -64,7 +69,7 @@ runDaemon projectRoot cfg = do
             . runGhciSessionIO
             . runUnixSocketIO
             . runFileSystemIO
-            . runReader cfg
+            . runReader effectiveCfg
             $ do
                 runBuildStore daemonInfo do
                     runSystem
