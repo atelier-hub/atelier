@@ -1,3 +1,10 @@
+---
+name: ghcib
+description: Check GHCi build status using the ghcib daemon. Use when asked to check the build, see compiler errors/warnings, or run ghcib.
+user-invocable: true
+allowed-tools: Bash(ghcib *)
+---
+
 # Using ghcib to Check Build Status
 
 ghcib is a daemon-based GHCi build monitor. It exposes build state over a Unix socket and outputs human-readable text by default, or JSON with `--json` for tool integration.
