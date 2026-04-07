@@ -49,7 +49,7 @@
     };
   } // {
     src = pkgs.lib.mkDefault (pkgs.fetchurl {
-      url = "https://chap.intersectmbo.org/package/optparse-applicative-0.19.0.0.tar.gz";
+      url = "http://hackage.haskell.org/package/optparse-applicative-0.19.0.0.tar.gz";
       sha256 = "cf16aeefd821730c7738447fa7c6b7ada7ca1c9cc25400d64ef283294d345871";
     });
   }) // {

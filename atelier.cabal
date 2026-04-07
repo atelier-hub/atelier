@@ -1,0 +1,423 @@
+cabal-version: 2.0
+
+-- This file has been generated from package.yaml by hpack version 0.38.2.
+--
+-- see: https://github.com/sol/hpack
+
+name:           atelier
+version:        0.1.0.0
+synopsis:       TODO write a short description
+description:    TODO write a long description
+author:         Christian Georgii
+maintainer:     cgeorgii@gmail.com
+license:        MIT
+build-type:     Simple
+
+library
+  exposed-modules:
+      Atelier.Component
+      Atelier.Config
+      Atelier.Effects.Cache
+      Atelier.Effects.Cache.Config
+      Atelier.Effects.Cache.Singleflight
+      Atelier.Effects.Chan
+      Atelier.Effects.Clock
+      Atelier.Effects.Conc
+      Atelier.Effects.Conc.Traced
+      Atelier.Effects.DB
+      Atelier.Effects.DB.Config
+      Atelier.Effects.DB.Rel8
+      Atelier.Effects.Delay
+      Atelier.Effects.Env
+      Atelier.Effects.Log
+      Atelier.Effects.Monitoring.Metrics
+      Atelier.Effects.Monitoring.Metrics.Registry
+      Atelier.Effects.Monitoring.Tracing
+      Atelier.Effects.Monitoring.Tracing.Provider
+      Atelier.Effects.Publishing
+      Atelier.Effects.Tally
+      Atelier.Effects.UUID
+      Atelier.Exception
+      Atelier.Time
+      Atelier.Types.Base64
+      Atelier.Types.HttpApiDataReadShow
+      Atelier.Types.JsonReadShow
+      Atelier.Types.QuietSnake
+  other-modules:
+      Paths_atelier
+  autogen-modules:
+      Paths_atelier
+  hs-source-dirs:
+      atelier/src
+  default-extensions:
+      BlockArguments
+      DataKinds
+      DeriveAnyClass
+      DerivingStrategies
+      DerivingVia
+      DuplicateRecordFields
+      FlexibleContexts
+      GADTs
+      LambdaCase
+      MultiWayIf
+      OverloadedLabels
+      OverloadedRecordDot
+      OverloadedStrings
+      StrictData
+      TemplateHaskell
+      TypeFamilies
+  ghc-options: -Weverything -Wno-unsafe -Wno-missing-safe-haskell-mode -Wno-monomorphism-restriction -Wno-missing-kind-signatures -Wno-missing-poly-kind-signatures -Wno-missing-role-annotations -Wno-missing-local-signatures -Wno-missing-import-lists -Wno-implicit-prelude -Wno-unticked-promoted-constructors -Wno-unused-packages -O0 -fplugin=Effectful.Plugin -threaded
+  build-depends:
+      aeson
+    , atelier-prelude
+    , base
+    , base64-bytestring
+    , bytestring
+    , casing
+    , containers
+    , contra-tracer
+    , data-default
+    , effectful
+    , effectful-core
+    , effectful-plugin
+    , effectful-th
+    , hasql
+    , hasql-pool
+    , hasql-transaction
+    , hs-opentelemetry-api
+    , hs-opentelemetry-exporter-otlp
+    , hs-opentelemetry-sdk
+    , http-api-data
+    , ki
+    , list-t
+    , prometheus-client
+    , prometheus-metrics-ghc
+    , rel8
+    , stm-containers
+    , text
+    , time
+    , time-units
+    , unagi-chan
+    , unordered-containers
+    , uuid
+  mixins:
+      base hiding (Prelude)
+  default-language: GHC2021
+
+library atelier-prelude
+  exposed-modules:
+      Prelude
+  other-modules:
+      Paths_atelier
+  autogen-modules:
+      Paths_atelier
+  hs-source-dirs:
+      atelier/prelude
+  default-extensions:
+      BlockArguments
+      DataKinds
+      DeriveAnyClass
+      DerivingStrategies
+      DerivingVia
+      DuplicateRecordFields
+      FlexibleContexts
+      GADTs
+      LambdaCase
+      MultiWayIf
+      OverloadedLabels
+      OverloadedRecordDot
+      OverloadedStrings
+      StrictData
+      TemplateHaskell
+      TypeFamilies
+  ghc-options: -Weverything -Wno-unsafe -Wno-missing-safe-haskell-mode -Wno-monomorphism-restriction -Wno-missing-kind-signatures -Wno-missing-poly-kind-signatures -Wno-missing-role-annotations -Wno-missing-local-signatures -Wno-missing-import-lists -Wno-implicit-prelude -Wno-unticked-promoted-constructors -Wno-unused-packages -O0 -fplugin=Effectful.Plugin -threaded
+  build-depends:
+      base
+    , effectful-core
+    , effectful-plugin
+    , relude
+  default-language: GHC2021
+
+library atelier-testing
+  exposed-modules:
+      Atelier.Testing.Database
+  other-modules:
+      Paths_atelier
+  autogen-modules:
+      Paths_atelier
+  hs-source-dirs:
+      atelier/testing
+  default-extensions:
+      BlockArguments
+      DataKinds
+      DeriveAnyClass
+      DerivingStrategies
+      DerivingVia
+      DuplicateRecordFields
+      FlexibleContexts
+      GADTs
+      LambdaCase
+      MultiWayIf
+      OverloadedLabels
+      OverloadedRecordDot
+      OverloadedStrings
+      StrictData
+      TemplateHaskell
+      TypeFamilies
+  ghc-options: -Weverything -Wno-unsafe -Wno-missing-safe-haskell-mode -Wno-monomorphism-restriction -Wno-missing-kind-signatures -Wno-missing-poly-kind-signatures -Wno-missing-role-annotations -Wno-missing-local-signatures -Wno-missing-import-lists -Wno-implicit-prelude -Wno-unticked-promoted-constructors -Wno-unused-packages -O0 -fplugin=Effectful.Plugin -threaded
+  build-depends:
+      atelier
+    , atelier-prelude
+    , base
+    , effectful-core
+    , effectful-plugin
+    , hasql
+    , hasql-pool
+    , hspec
+    , postgres-options
+    , string-conversions
+    , text
+    , tmp-postgres
+    , unix
+    , uuid
+  mixins:
+      base hiding (Prelude)
+  default-language: GHC2021
+
+library ghcib
+  exposed-modules:
+      Ghcib.BuildState
+      Ghcib.Config
+      Ghcib.Daemon
+      Ghcib.Debounce
+      Ghcib.Effects.BuildStore
+      Ghcib.Effects.Display
+      Ghcib.Effects.FileWatcher
+      Ghcib.Effects.GhciSession
+      Ghcib.Effects.UnixSocket
+      Ghcib.Events.FileChanged
+      Ghcib.GhciSession
+      Ghcib.Render
+      Ghcib.Socket.Client
+      Ghcib.Socket.Protocol
+      Ghcib.Socket.Server
+      Ghcib.Watch
+      Ghcib.Watcher
+  other-modules:
+      Paths_atelier
+  autogen-modules:
+      Paths_atelier
+  hs-source-dirs:
+      ghcib/src
+  default-extensions:
+      BlockArguments
+      DataKinds
+      DeriveAnyClass
+      DerivingStrategies
+      DerivingVia
+      DuplicateRecordFields
+      FlexibleContexts
+      GADTs
+      LambdaCase
+      MultiWayIf
+      OverloadedLabels
+      OverloadedRecordDot
+      OverloadedStrings
+      StrictData
+      TemplateHaskell
+      TypeFamilies
+  ghc-options: -Weverything -Wno-unsafe -Wno-missing-safe-haskell-mode -Wno-monomorphism-restriction -Wno-missing-kind-signatures -Wno-missing-poly-kind-signatures -Wno-missing-role-annotations -Wno-missing-local-signatures -Wno-missing-import-lists -Wno-implicit-prelude -Wno-unticked-promoted-constructors -Wno-unused-packages -O0 -fplugin=Effectful.Plugin -threaded
+  build-depends:
+      Cabal-syntax
+    , aeson
+    , ansi-terminal
+    , atelier
+    , atelier-prelude
+    , base
+    , bytestring
+    , containers
+    , data-default
+    , directory
+    , effectful
+    , effectful-core
+    , effectful-plugin
+    , effectful-th
+    , filepath
+    , fsnotify
+    , ghcid
+    , network
+    , prettyprinter
+    , prettyprinter-ansi-terminal
+    , stm
+    , text
+    , time
+    , time-units
+    , toml-reader
+    , unix
+  mixins:
+      base hiding (Prelude)
+  default-language: GHC2021
+
+executable ghcib-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_atelier
+  autogen-modules:
+      Paths_atelier
+  hs-source-dirs:
+      ghcib/app
+  default-extensions:
+      BlockArguments
+      DataKinds
+      DeriveAnyClass
+      DerivingStrategies
+      DerivingVia
+      DuplicateRecordFields
+      FlexibleContexts
+      GADTs
+      LambdaCase
+      MultiWayIf
+      OverloadedLabels
+      OverloadedRecordDot
+      OverloadedStrings
+      StrictData
+      TemplateHaskell
+      TypeFamilies
+  ghc-options: -Weverything -Wno-unsafe -Wno-missing-safe-haskell-mode -Wno-monomorphism-restriction -Wno-missing-kind-signatures -Wno-missing-poly-kind-signatures -Wno-missing-role-annotations -Wno-missing-local-signatures -Wno-missing-import-lists -Wno-implicit-prelude -Wno-unticked-promoted-constructors -Wno-unused-packages -O0 -fplugin=Effectful.Plugin -threaded "-with-rtsopts=-N"
+  build-depends:
+      aeson
+    , atelier
+    , atelier-prelude
+    , base
+    , bytestring
+    , data-default
+    , directory
+    , effectful
+    , effectful-core
+    , effectful-plugin
+    , ghcib
+    , optparse-applicative
+    , time
+  mixins:
+      base hiding (Prelude)
+  default-language: GHC2021
+
+test-suite atelier-test
+  type: exitcode-stdio-1.0
+  main-is: Driver.hs
+  other-modules:
+      Unit.Atelier.Effects.Cache.SingleflightSpec
+      Unit.Atelier.Effects.CacheSpec
+      Unit.Atelier.Effects.ChanSpec
+      Unit.Atelier.Effects.Conc.TracedSpec
+      Unit.Atelier.Effects.ConcSpec
+      Unit.Atelier.Effects.DelaySpec
+      Unit.Atelier.Effects.LogSpec
+      Unit.Atelier.Effects.PublishingSpec
+      Unit.Atelier.Effects.TallySpec
+      Paths_atelier
+  autogen-modules:
+      Paths_atelier
+  hs-source-dirs:
+      atelier/test
+  default-extensions:
+      BlockArguments
+      DataKinds
+      DeriveAnyClass
+      DerivingStrategies
+      DerivingVia
+      DuplicateRecordFields
+      FlexibleContexts
+      GADTs
+      LambdaCase
+      MultiWayIf
+      OverloadedLabels
+      OverloadedRecordDot
+      OverloadedStrings
+      StrictData
+      TemplateHaskell
+      TypeFamilies
+  ghc-options: -Weverything -Wno-unsafe -Wno-missing-safe-haskell-mode -Wno-monomorphism-restriction -Wno-missing-kind-signatures -Wno-missing-poly-kind-signatures -Wno-missing-role-annotations -Wno-missing-local-signatures -Wno-missing-import-lists -Wno-implicit-prelude -Wno-unticked-promoted-constructors -Wno-unused-packages -O0 -fplugin=Effectful.Plugin -threaded -Wno-prepositive-qualified-module -threaded
+  build-tool-depends:
+      tasty-discover:tasty-discover
+  build-depends:
+      async
+    , atelier
+    , atelier-prelude
+    , base
+    , containers
+    , effectful
+    , effectful-core
+    , effectful-plugin
+    , hedgehog
+    , hs-opentelemetry-api
+    , hspec
+    , hspec-hedgehog
+    , stm
+    , tasty
+    , tasty-hspec
+    , time
+  mixins:
+      base hiding (Prelude)
+  default-language: GHC2021
+
+test-suite ghcib-test
+  type: exitcode-stdio-1.0
+  main-is: Driver.hs
+  other-modules:
+      Unit.Ghcib.BuildStateSpec
+      Unit.Ghcib.BuildStoreSpec
+      Unit.Ghcib.DebounceSpec
+      Unit.Ghcib.FileWatcherSpec
+      Unit.Ghcib.GhciSessionSpec
+      Unit.Ghcib.SocketSpec
+      Unit.Ghcib.WatchSpec
+      Paths_atelier
+  autogen-modules:
+      Paths_atelier
+  hs-source-dirs:
+      ghcib/test
+  default-extensions:
+      BlockArguments
+      DataKinds
+      DeriveAnyClass
+      DerivingStrategies
+      DerivingVia
+      DuplicateRecordFields
+      FlexibleContexts
+      GADTs
+      LambdaCase
+      MultiWayIf
+      OverloadedLabels
+      OverloadedRecordDot
+      OverloadedStrings
+      StrictData
+      TemplateHaskell
+      TypeFamilies
+  ghc-options: -Weverything -Wno-unsafe -Wno-missing-safe-haskell-mode -Wno-monomorphism-restriction -Wno-missing-kind-signatures -Wno-missing-poly-kind-signatures -Wno-missing-role-annotations -Wno-missing-local-signatures -Wno-missing-import-lists -Wno-implicit-prelude -Wno-unticked-promoted-constructors -Wno-unused-packages -O0 -fplugin=Effectful.Plugin -threaded -Wno-prepositive-qualified-module -threaded
+  build-tool-depends:
+      tasty-discover:tasty-discover
+  build-depends:
+      aeson
+    , atelier
+    , atelier-prelude
+    , base
+    , containers
+    , data-default
+    , effectful
+    , effectful-core
+    , effectful-plugin
+    , ghcib
+    , hspec
+    , prettyprinter
+    , prettyprinter-ansi-terminal
+    , stm
+    , tasty
+    , tasty-discover
+    , tasty-hspec
+    , text
+    , time
+    , time-units
+  mixins:
+      base hiding (Prelude)
+  default-language: GHC2021

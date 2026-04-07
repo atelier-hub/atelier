@@ -73,36 +73,12 @@ let
       )
     ];
   };
-
-  # Import custom app modules
-  secretsApps = import ./secrets.nix { inherit pkgs; };
-  cardanoNode = import ./cardano-node.nix { inherit pkgs inputs system; };
-  monitoringApps = import ./monitoring.nix { inherit pkgs lib; };
 in
 {
   # Expose packages built by haskell.nix
-  packages =
-    projectFlake.packages
-    // {
-      default = projectFlake.packages."hoard:exe:hoard-exe";
-    }
-    # Merge in cardano-node packages (mithril-client-cli, etc.)
-    // cardanoNode.packages
-    // (lib.listToAttrs (
-      map
-        (deployment: {
-          name = "docker-${deployment}";
-          value = import ./docker.nix {
-            inherit pkgs deployment;
-            hoardExe = projectFlake.packages."hoard:exe:hoard-exe";
-          };
-        })
-        [
-          "dev"
-          "staging"
-          "prod"
-        ]
-    ));
+  packages = projectFlake.packages // {
+    default = projectFlake.packages."atelier:exe:ghcib-exe";
+  };
 
   # Development shell
   devShells.default = import ./shell.nix {
@@ -121,8 +97,8 @@ in
       type = "app";
       program = "${pkgs.writeShellScript "ghcid-multi" ''
         exec ${pkgs.haskell-nix.tool compiler-nix-name "ghcid" "latest"}/bin/ghcid \
-          -c 'cabal repl --enable-multi-repl all hoard-test' \
-          --restart=hoard.cabal \
+          -c 'cabal repl --enable-multi-repl all atelier-test ghcib-test' \
+          --restart=atelier.cabal \
           --clear \
           --outputfile=build.log \
           "$@"
@@ -153,20 +129,12 @@ in
       ''}";
     };
 
-  }
-  # Merge in secrets management apps
-  // secretsApps
-  # Import postgres app from separate module
-  // (import ./postgres.nix { inherit pkgs; })
-  # Import cardano-node and Mithril apps from separate module
-  // cardanoNode.apps
-  # Import monitoring apps (Prometheus, Grafana, node_exporter)
-  // monitoringApps.apps;
+  };
 
   # Checks
   checks = projectFlake.checks // {
     git-hooks = gitHooks;
     # Ensure the executable builds in CI
-    hoard-exe = projectFlake.packages."hoard:exe:hoard-exe";
+    ghcib-exe = projectFlake.packages."atelier:exe:ghcib-exe";
   };
 }

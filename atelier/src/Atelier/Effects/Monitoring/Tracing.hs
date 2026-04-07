@@ -24,7 +24,6 @@ module Atelier.Effects.Monitoring.Tracing
     , addEvent
     , setStatus
     , getSpanContext
-    , asTracer
     , OT.ToAttribute (..)
     , Attr (..)
     , ToAttributeShow (..)
@@ -42,7 +41,6 @@ module Atelier.Effects.Monitoring.Tracing
     , SpanContext
     ) where
 
-import Control.Tracer (Tracer (..))
 import Data.Aeson (FromJSON)
 import Data.Default (Default (..))
 import Effectful (Effect, IOE, Limit (..), Persistence (..), UnliftStrategy (..))
@@ -141,14 +139,6 @@ instance (Show a) => OT.ToAttribute (ToAttributeShow a)
 
 
 makeEffect ''Tracing
-
-
--- | Create a Tracer that emits protocol messages as trace events.
---
--- Useful for integrating ouroboros-network protocol tracers with OpenTelemetry.
-asTracer :: (Tracing :> es) => (forall x. Eff es x -> m x) -> Text -> Tracer m String
-asTracer unlift eventName =
-    Tracer $ \msg -> unlift $ addEvent eventName [("message", toText msg)]
 
 
 -- | Run an action with automatic span link propagation for fire-and-forget forks.

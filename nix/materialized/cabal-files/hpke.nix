@@ -11,7 +11,7 @@
     flags = {};
     package = {
       specVersion = "1.10";
-      identifier = { name = "hpke"; version = "0.0.0"; };
+      identifier = { name = "hpke"; version = "0.1.0"; };
       license = "BSD-3-Clause";
       copyright = "";
       maintainer = "kazu@iij.ad.jp";
@@ -29,7 +29,7 @@
           (hsPkgs."base16-bytestring" or (errorHandler.buildDepError "base16-bytestring"))
           (hsPkgs."bytestring" or (errorHandler.buildDepError "bytestring"))
           (hsPkgs."crypton" or (errorHandler.buildDepError "crypton"))
-          (hsPkgs."memory" or (errorHandler.buildDepError "memory"))
+          (hsPkgs."ram" or (errorHandler.buildDepError "ram"))
         ];
         buildable = true;
       };
@@ -52,9 +52,9 @@
     };
   } // {
     src = pkgs.lib.mkDefault (pkgs.fetchurl {
-      url = "http://hackage.haskell.org/package/hpke-0.0.0.tar.gz";
-      sha256 = "7b0b7dfb4f7081beab54c4cb0cb3df3f3c03ce05cb11747f190bab22df19b83c";
+      url = "http://hackage.haskell.org/package/hpke-0.1.0.tar.gz";
+      sha256 = "1a00e05c344b17f7d2b28ae19576c2aec348d71c995583f8588264a59dc87fa2";
     });
   }) // {
-    package-description-override = "cabal-version:      >=1.10\r\nname:               hpke\r\nversion:            0.0.0\r\nx-revision: 1\r\nlicense:            BSD3\r\nlicense-file:       LICENSE\r\nmaintainer:         kazu@iij.ad.jp\r\nauthor:             Kazu Yamamoto\r\nsynopsis:           Hybrid Public Key Encryption\r\ndescription:\r\n    Hybrid Public Key Encryption defined in RFC9180\r\n\r\ncategory:           Cryptography\r\nbuild-type:         Simple\r\nextra-source-files: ChangeLog.md\r\n\r\nlibrary\r\n    exposed-modules:  Crypto.HPKE\r\n                      Crypto.HPKE.Internal\r\n    other-modules:    Crypto.HPKE.AEAD\r\n                      Crypto.HPKE.Context\r\n                      Crypto.HPKE.ID\r\n                      Crypto.HPKE.KDF\r\n                      Crypto.HPKE.KEM\r\n                      Crypto.HPKE.KeyPair\r\n                      Crypto.HPKE.KeySchedule\r\n                      Crypto.HPKE.PublicKey\r\n                      Crypto.HPKE.Setup\r\n                      Crypto.HPKE.Types\r\n    default-language: Haskell2010\r\n    ghc-options:      -Wall\r\n    build-depends:\r\n        base >=4.7 && <5,\r\n        base16-bytestring,\r\n        bytestring,\r\n        crypton >= 1.0.2 && < 1.1,\r\n        memory\r\n\r\n    default-extensions: Strict StrictData\r\n\r\ntest-suite spec\r\n    type:               exitcode-stdio-1.0\r\n    main-is:            Spec.hs\r\n    build-tool-depends: hspec-discover:hspec-discover\r\n    hs-source-dirs:     test\r\n    other-modules:      A1Spec\r\n                        A2Spec\r\n                        A3Spec\r\n                        A4Spec\r\n                        A5Spec\r\n                        A6Spec\r\n                        Test\r\n\r\n    default-language:   Haskell2010\r\n    default-extensions: Strict StrictData\r\n    ghc-options:        -Wall -threaded -rtsopts\r\n    build-depends:\r\n        base >=4.9 && <5,\r\n        QuickCheck,\r\n        bytestring,\r\n        base16-bytestring,\r\n        hpke,\r\n        hspec\r\n";
+    package-description-override = "cabal-version:      >=1.10\nname:               hpke\nversion:            0.1.0\nlicense:            BSD3\nlicense-file:       LICENSE\nmaintainer:         kazu@iij.ad.jp\nauthor:             Kazu Yamamoto\nsynopsis:           Hybrid Public Key Encryption\ndescription:\n    Hybrid Public Key Encryption defined in RFC9180\n\ncategory:           Cryptography\nbuild-type:         Simple\nextra-source-files: ChangeLog.md\n\nlibrary\n    exposed-modules:  Crypto.HPKE\n                      Crypto.HPKE.Internal\n    other-modules:    Crypto.HPKE.AEAD\n                      Crypto.HPKE.Context\n                      Crypto.HPKE.ID\n                      Crypto.HPKE.KDF\n                      Crypto.HPKE.KEM\n                      Crypto.HPKE.KeyPair\n                      Crypto.HPKE.KeySchedule\n                      Crypto.HPKE.PublicKey\n                      Crypto.HPKE.Setup\n                      Crypto.HPKE.Types\n    default-language: Haskell2010\n    ghc-options:      -Wall\n    build-depends:\n        base >=4.7 && <5,\n        base16-bytestring,\n        bytestring,\n        crypton >= 1.1.0 && <1.2,\n        ram\n\n    default-extensions: Strict StrictData\n\ntest-suite spec\n    type:               exitcode-stdio-1.0\n    main-is:            Spec.hs\n    build-tool-depends: hspec-discover:hspec-discover\n    hs-source-dirs:     test\n    other-modules:      A1Spec\n                        A2Spec\n                        A3Spec\n                        A4Spec\n                        A5Spec\n                        A6Spec\n                        Test\n\n    default-language:   Haskell2010\n    default-extensions: Strict StrictData\n    ghc-options:        -Wall -threaded -rtsopts\n    build-depends:\n        base >=4.9 && <5,\n        QuickCheck,\n        bytestring,\n        base16-bytestring,\n        hpke,\n        hspec\n";
   }

@@ -11,15 +11,15 @@
     flags = {};
     package = {
       specVersion = "1.10";
-      identifier = { name = "contra-tracer"; version = "0.1.0.2"; };
+      identifier = { name = "contra-tracer"; version = "0.2.0.0"; };
       license = "Apache-2.0";
-      copyright = "2019 IOHK";
-      maintainer = "operations@iohk.io";
-      author = "Neil Davies, Alexander Diemand, Andreas Triantafyllos";
+      copyright = "2019-2021 Input Output (Hong Kong) Ltd., 2019-2021 Well-Typed LLP, 2019-2021 Alexander Vieth";
+      maintainer = "aovieth@gmail.com";
+      author = "Alexander Vieth";
       homepage = "";
       url = "";
-      synopsis = "A simple interface for logging, tracing or monitoring.";
-      description = "";
+      synopsis = "Arrow and contravariant tracers";
+      description = "A simple interface for logging, tracing and monitoring";
       buildType = "Simple";
     };
     components = {
@@ -32,9 +32,9 @@
     };
   } // {
     src = pkgs.lib.mkDefault (pkgs.fetchurl {
-      url = "https://chap.intersectmbo.org/package/contra-tracer-0.1.0.2.tar.gz";
-      sha256 = "aece5861203eb196cc7c852ff2dfe1d593f5baaef81b81aa5f9ba43c1d6dbb54";
+      url = "http://hackage.haskell.org/package/contra-tracer-0.2.0.0.tar.gz";
+      sha256 = "9eebc1e410b2e50a7da6418b9bf194e22c92f2c05b3724aec502d82ca87262e5";
     });
   }) // {
-    package-description-override = "name:                contra-tracer\nversion:             0.1.0.2\nsynopsis:            A simple interface for logging, tracing or monitoring.\n-- description:\nlicense:             Apache-2.0\nlicense-files:       LICENSE, NOTICE\nauthor:              Neil Davies, Alexander Diemand, Andreas Triantafyllos\nmaintainer:          operations@iohk.io\ncopyright:           2019 IOHK\ncategory:            Logging\nbuild-type:          Simple\nextra-source-files:  README.md\ncabal-version:       >=1.10\n\nlibrary\n  hs-source-dirs:      src\n  exposed-modules:     Control.Tracer\n                       Control.Tracer.Observe\n\n  default-language:    Haskell2010\n  build-depends:       base\n  if impl(ghc < 8.5)\n    build-depends:     contravariant\n  ghc-options:         -Wall -Werror\n";
+    package-description-override = "name:                contra-tracer\nversion:             0.2.0.0\nsynopsis:            Arrow and contravariant tracers\ndescription:         A simple interface for logging, tracing and monitoring\nlicense:             Apache-2.0\nlicense-files:       LICENSE\nauthor:              Alexander Vieth\nmaintainer:          aovieth@gmail.com\ncopyright:           2019-2021 Input Output (Hong Kong) Ltd., 2019-2021 Well-Typed LLP, 2019-2021 Alexander Vieth\ncategory:            Logging\nbuild-type:          Simple\nextra-source-files:  README.md CHANGELOG.md\ncabal-version:       >=1.10\n\nsource-repository head\n  type: git\n  location: https://github.com/avieth/contra-tracer\n\nlibrary\n  hs-source-dirs:      src\n  exposed-modules:     Control.Tracer\n                       Control.Tracer.Arrow\n\n  default-language:    Haskell2010\n  build-depends:       base < 5\n  if impl(ghc < 8.5)\n    build-depends:     contravariant\n";
   }
