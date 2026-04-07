@@ -32,24 +32,10 @@ pkgs.haskell-nix.cabalProject' {
         # Disable tests for tmp-postgres
         tmp-postgres.doCheck = false;
 
-        # Configure hoard package
-        hoard = {
+        # Configure atelier package
+        atelier = {
           # Treat warnings as errors in Nix builds (CI), but not in local dev
           ghcOptions = [ "-Werror" ];
-
-          # Configure test suite component
-          components.tests.hoard-test = {
-            # Add build-time tools needed for tests
-            build-tools = [
-              pkgs.postgresql
-              pkgs.sqitchPg
-            ];
-
-            # Set HOME for initdb in tests
-            preCheck = ''
-              export HOME="$TMPDIR"
-            '';
-          };
         };
       };
     }

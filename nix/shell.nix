@@ -14,16 +14,13 @@ let
       nixfmt-rfc-style
       postgresql
       pre-commit
-      sqitchPg
-      sops
-      age
     ]);
 in
 project.shellFor {
-  name = "hoard-shell-${compiler-nix-name}";
+  name = "ghcib-shell-${compiler-nix-name}";
 
-  # Include your local packages
-  packages = ps: [ ps.hoard ];
+  # Include local packages
+  packages = ps: [ ps.atelier ];
 
   # Enable Hoogle documentation
   withHoogle = true;
@@ -41,9 +38,5 @@ project.shellFor {
   shellHook = ''
     # Git hooks integration
     ${gitHooks.shellHook}
-
-    # PostgreSQL configuration
-    export PGHOST="$PWD/data/postgres"
-    echo "PostgreSQL socket directory: $PGHOST"
   '';
 }

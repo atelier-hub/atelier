@@ -11,7 +11,7 @@
     flags = {};
     package = {
       specVersion = "1.10";
-      identifier = { name = "crypton-x509-store"; version = "1.8.0"; };
+      identifier = { name = "crypton-x509-store"; version = "1.9.0"; };
       license = "BSD-3-Clause";
       copyright = "Vincent Hanquez <vincent@snarc.org>";
       maintainer = "Kazu Yamamoto <kazu@iij.ad.jp>";
@@ -55,9 +55,9 @@
     };
   } // {
     src = pkgs.lib.mkDefault (pkgs.fetchurl {
-      url = "http://hackage.haskell.org/package/crypton-x509-store-1.8.0.tar.gz";
-      sha256 = "a77da8312640f3315453768c895de025f9f5f9714d92dcb1f33a1924720ffa7e";
+      url = "http://hackage.haskell.org/package/crypton-x509-store-1.9.0.tar.gz";
+      sha256 = "de9193403c11d1fb090083382646be6f6cf68ed984f475d1a0e142f77efb8766";
     });
   }) // {
-    package-description-override = "cabal-version:      >=1.10\nname:               crypton-x509-store\nversion:            1.8.0\nlicense:            BSD3\nlicense-file:       LICENSE\ncopyright:          Vincent Hanquez <vincent@snarc.org>\nmaintainer:         Kazu Yamamoto <kazu@iij.ad.jp>\nauthor:             Vincent Hanquez <vincent@snarc.org>\nstability:          experimental\nhomepage:           https://github.com/kazu-yamamoto/crypton-certificate\nsynopsis:           X.509 collection accessing and storing methods\ndescription:\n    X.509 collection accessing and storing methods for certificate, crl, exception list\n\ncategory:           Data\nbuild-type:         Simple\nextra-source-files: ChangeLog.md\n\nsource-repository head\n    type:     git\n    location: https://github.com/kazu-yamamoto/crypton-certificate\n    subdir:   x509-store\n\nlibrary\n    exposed-modules:\n        Data.X509.CertificateStore\n        Data.X509.File\n        Data.X509.Memory\n\n    default-language: Haskell2010\n    ghc-options:      -Wall\n    build-depends:\n        base >=3 && <5,\n        bytestring,\n        containers,\n        crypton,\n        crypton-asn1-encoding >=0.10.0 && <0.11,\n        crypton-asn1-types >=0.4.1 && <0.5,\n        crypton-pem >=0.2.4 && <0.4,\n        crypton-x509 >=1.8.0,\n        directory,\n        filepath,\n        mtl\n\n    if !os(windows)\n        build-depends: unix\n\ntest-suite test-x509-store\n    type:             exitcode-stdio-1.0\n    main-is:          Tests.hs\n    hs-source-dirs:   Tests\n    default-language: Haskell2010\n    ghc-options:      -Wall\n    build-depends:\n        base >=3 && <5,\n        bytestring,\n        tasty,\n        tasty-hunit,\n        crypton-x509,\n        crypton-x509-store\n";
+    package-description-override = "cabal-version:      >=1.10\nname:               crypton-x509-store\nversion:            1.9.0\nlicense:            BSD3\nlicense-file:       LICENSE\ncopyright:          Vincent Hanquez <vincent@snarc.org>\nmaintainer:         Kazu Yamamoto <kazu@iij.ad.jp>\nauthor:             Vincent Hanquez <vincent@snarc.org>\nstability:          experimental\nhomepage:           https://github.com/kazu-yamamoto/crypton-certificate\nsynopsis:           X.509 collection accessing and storing methods\ndescription:\n    X.509 collection accessing and storing methods for certificate, crl, exception list\n\ncategory:           Data\nbuild-type:         Simple\nextra-source-files: ChangeLog.md\n\nsource-repository head\n    type:     git\n    location: https://github.com/kazu-yamamoto/crypton-certificate\n    subdir:   x509-store\n\nlibrary\n    exposed-modules:\n        Data.X509.CertificateStore\n        Data.X509.File\n        Data.X509.Memory\n\n    default-language: Haskell2010\n    ghc-options:      -Wall\n    build-depends:\n        base >=3 && <5,\n        bytestring,\n        containers,\n        crypton >=1.1.0 && < 1.2,\n        crypton-asn1-encoding >=0.10.0 && <0.11,\n        crypton-asn1-types >=0.4.1 && <0.5,\n        crypton-pem >=0.2.4 && <0.4,\n        crypton-x509 >=1.9.0 && <1.10,\n        directory,\n        filepath,\n        mtl\n\n    if !os(windows)\n        build-depends: unix\n\ntest-suite test-x509-store\n    type:             exitcode-stdio-1.0\n    main-is:          Tests.hs\n    hs-source-dirs:   Tests\n    default-language: Haskell2010\n    ghc-options:      -Wall\n    build-depends:\n        base >=3 && <5,\n        bytestring,\n        tasty,\n        tasty-hunit,\n        crypton-x509,\n        crypton-x509-store\n";
   }
