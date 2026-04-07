@@ -19,6 +19,7 @@ import Ghcib.Effects.BuildStore (BuildStore, runBuildStoreSTM, waitUntilDone)
 import Ghcib.Effects.GhciSession
     ( GhciSession
     , LoadResult (..)
+    , extractTitle
     , reloadGhci
     , runGhciSessionScripted
     , startGhci
@@ -32,6 +33,7 @@ spec_GhciSession = do
     describe "runGhciSessionScripted" testScripted
     describe "sessionListener" testSessionListener
     describe "mergeDiagnostics" testMergeDiagnostics
+    describe "extractTitle" testExtractTitle
 
 
 --------------------------------------------------------------------------------
@@ -174,6 +176,84 @@ testMergeDiagnostics = do
                     }
         let merged = mergeDiagnostics Map.empty result
         Map.lookup warnMsg.file merged `shouldBe` Just [warnMsg]
+
+
+--------------------------------------------------------------------------------
+-- extractTitle tests
+--------------------------------------------------------------------------------
+
+testExtractTitle :: Spec
+testExtractTitle = do
+    it "returns empty string for empty message" do
+        extractTitle [] `shouldBe` ""
+
+    -- New GHC style: header ends with [GHC-XXXXX], content on body lines.
+    -- Captured from GHC 9.10.2 with -Weverything.
+    it "extracts first body line for error with [GHC-XXXXX] code" do
+        extractTitle
+            [ "src/Ghcib/Config.hs:39:20: error: [GHC-83865]"
+            , "    \8226 Couldn't match expected type 'Int' with actual type 'Bool'"
+            , "    \8226 In the expression: True"
+            , "      In an equation for '_deliberateError': _deliberateError = True"
+            , "   |"
+            , "39 | _deliberateError = True"
+            , "   |                    ^^^^"
+            ]
+            `shouldBe` "\8226 Couldn't match expected type 'Int' with actual type 'Bool'"
+
+    it "extracts first body line for warning with [GHC-XXXXX] [-Wfoo] codes" do
+        extractTitle
+            [ "src/Ghcib/Config.hs:38:26: warning: [GHC-55631] [-Wmissing-deriving-strategies]"
+            , "    No deriving strategy specified. Did you want stock, newtype, or anyclass?"
+            , "   |"
+            , "38 | data TestWarn = TestWarn deriving (Eq)"
+            , "   |                          ^^^^^^^^^^^^^"
+            ]
+            `shouldBe` "No deriving strategy specified. Did you want stock, newtype, or anyclass?"
+
+    -- Old GHC style: message text is inline on the header line.
+    it "extracts inline content for old-style single-line error" do
+        extractTitle ["GHCi.hs:70:1: error: Parse error: naked expression at top level"]
+            `shouldBe` "Parse error: naked expression at top level"
+
+    it "extracts inline content for old-style Warning (capital W)" do
+        extractTitle ["GHCi.hs:81:1: Warning: Defined but not used: \8216foo\8217"]
+            `shouldBe` "Defined but not used: \8216foo\8217"
+
+    -- Multi-line without any inline message: position-only or "Warning:" header.
+    it "extracts first body line when header has position only" do
+        extractTitle
+            [ "GHCi.hs:72:13:"
+            , "    No instance for (Num ([String] -> [String]))"
+            , "      arising from the literal '1'"
+            ]
+            `shouldBe` "No instance for (Num ([String] -> [String]))"
+
+    it "extracts first body line when header ends with 'Warning:'" do
+        extractTitle
+            [ "/src/TrieSpec.hs:(192,7)-(193,76): Warning:"
+            , "    A do-notation statement discarded a result of type '[()]'"
+            ]
+            `shouldBe` "A do-notation statement discarded a result of type '[()]'"
+
+    -- Source display lines (pipe/caret) must be skipped.
+    it "skips source display lines when scanning body" do
+        extractTitle
+            [ "file.hs:1:1: error: [GHC-12345]"
+            , "   |"
+            , "1 | foo bar"
+            , "   |     ^^^"
+            , "    actual content here"
+            ]
+            `shouldBe` "actual content here"
+
+    -- ANSI-escaped header (colour output): strip escapes before searching.
+    it "handles ANSI-escaped headers" do
+        extractTitle
+            [ "\ESC[;1msrc/Types.hs:11:1: \ESC[35mwarning:\ESC[0m \ESC[35m[-Wunused-imports]\ESC[0m"
+            , "    The import of 'Data.Data' is redundant"
+            ]
+            `shouldBe` "The import of 'Data.Data' is redundant"
 
 
 --------------------------------------------------------------------------------
