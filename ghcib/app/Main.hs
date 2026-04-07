@@ -4,19 +4,19 @@ import Control.Concurrent (threadDelay)
 import Data.Aeson (encode)
 import Data.Time.Format (defaultTimeLocale, formatTime)
 import Data.Time.LocalTime (getCurrentTimeZone, utcToLocalTime)
-import Effectful (runEff)
+import Effectful (IOE, runEff)
 import Options.Applicative
 import System.IO (hGetLine)
 
 import Data.ByteString.Lazy qualified as BSL
 
-import Atelier.Effects.Clock (runClock)
-import Atelier.Effects.FileSystem (doesFileExist, getCurrentDirectory, readFileLbs, runFileSystemIO)
+import Atelier.Effects.Clock (Clock, runClock)
+import Atelier.Effects.FileSystem (FileSystem, doesFileExist, getCurrentDirectory, readFileLbs, runFileSystemIO)
 import Ghcib.BuildState (BuildPhase (..), BuildResult (..), BuildState (..), DaemonInfo (..), Diagnostic (..), Severity (..))
 import Ghcib.Config (loadConfig)
 import Ghcib.Daemon (startDaemon, stopDaemon)
-import Ghcib.Effects.Display (runDisplayIO)
-import Ghcib.Effects.UnixSocket (runUnixSocketIO)
+import Ghcib.Effects.Display (Display, runDisplayIO)
+import Ghcib.Effects.UnixSocket (UnixSocket, runUnixSocketIO)
 import Ghcib.Render (diagnosticLine, formatDuration)
 import Ghcib.Socket.Client
     ( isDaemonRunning
@@ -32,7 +32,7 @@ import Ghcib.Config qualified as Config
 main :: IO ()
 main = do
     cmd <- execParser opts
-    run cmd
+    runEff . runFileSystemIO . runClock . runUnixSocketIO . runDisplayIO $ run cmd
   where
     opts =
         info (commandParser <**> helper)
@@ -83,49 +83,46 @@ statusParser =
             )
 
 
-run :: Command -> IO ()
-run Start =
-    runEff . runFileSystemIO . runUnixSocketIO $ do
-        projectRoot <- getCurrentDirectory
-        sp <- socketPath projectRoot
-        running <- isDaemonRunning sp
-        liftIO
-            $ if running then
-                putStrLn "Daemon already running."
+run :: (Clock :> es, Display :> es, FileSystem :> es, IOE :> es, UnixSocket :> es) => Command -> Eff es ()
+run Start = do
+    projectRoot <- getCurrentDirectory
+    sp <- socketPath projectRoot
+    running <- isDaemonRunning sp
+    liftIO
+        $ if running then
+            putStrLn "Daemon already running."
+        else
+            startDaemon projectRoot >> putStrLn "Daemon started."
+run Stop = do
+    projectRoot <- getCurrentDirectory
+    liftIO $ stopDaemon projectRoot >> putStrLn "Daemon stopped."
+run (Status waitFlag jsonFlag) = do
+    projectRoot <- getCurrentDirectory
+    sockPath <- socketPath projectRoot
+    running <- isDaemonRunning sockPath
+    unless running $ liftIO $ startDaemon projectRoot >> waitForSocket sockPath
+    when (waitFlag && not jsonFlag) $ do
+        current <- queryStatus sockPath
+        case current of
+            Right BuildState {phase = Building} -> liftIO $ putStrLn "Building..."
+            _ -> pure ()
+    result <-
+        if waitFlag then
+            queryStatusWait sockPath
+        else
+            queryStatus sockPath
+    liftIO $ case result of
+        Left err -> putStrLn $ "Error: " <> toString err
+        Right state ->
+            if jsonFlag then
+                BSL.putStr (encode state) >> putStrLn ""
             else
-                startDaemon projectRoot >> putStrLn "Daemon started."
-run Stop =
-    runEff . runFileSystemIO $ do
-        projectRoot <- getCurrentDirectory
-        liftIO $ stopDaemon projectRoot >> putStrLn "Daemon stopped."
-run (Status waitFlag jsonFlag) =
-    runEff . runFileSystemIO . runUnixSocketIO $ do
-        projectRoot <- getCurrentDirectory
-        sockPath <- socketPath projectRoot
-        running <- isDaemonRunning sockPath
-        unless running $ liftIO $ startDaemon projectRoot >> waitForSocket sockPath
-        when (waitFlag && not jsonFlag) $ do
-            current <- queryStatus sockPath
-            case current of
-                Right BuildState {phase = Building} -> liftIO $ putStrLn "Building..."
-                _ -> pure ()
-        result <-
-            if waitFlag then
-                queryStatusWait sockPath
-            else
-                queryStatus sockPath
-        liftIO $ case result of
-            Left err -> putStrLn $ "Error: " <> toString err
-            Right state ->
-                if jsonFlag then
-                    BSL.putStr (encode state) >> putStrLn ""
-                else
-                    renderText state
+                renderText state
 run (Log followFlag) = do
-    mLogFile <- runEff . runFileSystemIO . runUnixSocketIO $ do
-        projectRoot <- getCurrentDirectory
-        sp <- socketPath projectRoot
-        running <- isDaemonRunning sp
+    projectRoot <- getCurrentDirectory
+    sp <- socketPath projectRoot
+    running <- isDaemonRunning sp
+    mLogFile <-
         if running then do
             result <- queryStatus sp
             pure $ case result of
@@ -135,23 +132,22 @@ run (Log followFlag) = do
             Config.logFile <$> loadConfig projectRoot
     case mLogFile of
         Nothing ->
-            putStrLn "No log file configured. Add `log_file = \"/path/to/ghcib.log\"` to .ghcib.toml"
+            liftIO $ putStrLn "No log file configured. Add `log_file = \"/path/to/ghcib.log\"` to .ghcib.toml"
         Just path -> do
-            exists <- runEff . runFileSystemIO $ doesFileExist path
+            exists <- doesFileExist path
             if not exists then
-                putStrLn $ "Log file does not exist yet: " <> path
+                liftIO $ putStrLn $ "Log file does not exist yet: " <> path
             else
                 if followFlag then
-                    followLog path
+                    liftIO $ followLog path
                 else
-                    runEff (runFileSystemIO (readFileLbs path)) >>= BSL.putStr
-run Watch =
-    runEff . runFileSystemIO . runClock . runUnixSocketIO . runDisplayIO $ do
-        projectRoot <- getCurrentDirectory
-        sockPath <- socketPath projectRoot
-        running <- isDaemonRunning sockPath
-        unless running $ liftIO $ startDaemon projectRoot >> waitForSocket sockPath
-        watchDisplay sockPath
+                    readFileLbs path >>= liftIO . BSL.putStr
+run Watch = do
+    projectRoot <- getCurrentDirectory
+    sockPath <- socketPath projectRoot
+    running <- isDaemonRunning sockPath
+    unless running $ liftIO $ startDaemon projectRoot >> waitForSocket sockPath
+    watchDisplay sockPath
 
 
 renderText :: BuildState -> IO ()
