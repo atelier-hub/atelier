@@ -234,7 +234,7 @@ testExtractTitle = do
     -- Captured from GHC 9.10.2 with -Weverything.
     it "extracts first body line for error with [GHC-XXXXX] code" do
         extractTitle
-            [ "src/Ghcib/Config.hs:39:20: error: [GHC-83865]"
+            [ "src/Tricorder/Config.hs:39:20: error: [GHC-83865]"
             , "    \8226 Couldn't match expected type 'Int' with actual type 'Bool'"
             , "    \8226 In the expression: True"
             , "      In an equation for '_deliberateError': _deliberateError = True"
@@ -246,7 +246,7 @@ testExtractTitle = do
 
     it "extracts first body line for warning with [GHC-XXXXX] [-Wfoo] codes" do
         extractTitle
-            [ "src/Ghcib/Config.hs:38:26: warning: [GHC-55631] [-Wmissing-deriving-strategies]"
+            [ "src/Tricorder/Config.hs:38:26: warning: [GHC-55631] [-Wmissing-deriving-strategies]"
             , "    No deriving strategy specified. Did you want stock, newtype, or anyclass?"
             , "   |"
             , "38 | data TestWarn = TestWarn deriving (Eq)"

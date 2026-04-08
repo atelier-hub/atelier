@@ -9,6 +9,7 @@ module Tricorder.Config
     , resolveWatchDirs
     , allComponentTargets
     , sourceDirsForTarget
+    , runConfig
     ) where
 
 import Data.Aeson (FromJSON)
@@ -33,6 +34,7 @@ import Distribution.Types.PackageName (unPackageName)
 import Distribution.Types.TestSuite (testBuildInfo)
 import Distribution.Types.UnqualComponentName (mkUnqualComponentName, unUnqualComponentName)
 import Distribution.Utils.Path (getSymbolicPath)
+import Effectful.Reader.Static (Reader, ask, runReader)
 import System.FilePath (takeExtension, (</>))
 import TOML (DecodeTOML (..), decode, getFieldOpt, getFieldOr)
 
@@ -41,6 +43,7 @@ import Data.Text qualified as T
 import Atelier.Effects.FileSystem (FileSystem, doesFileExist, listDirectory, readFileBs)
 import Atelier.Time (Millisecond)
 import Atelier.Types.QuietSnake (QuietSnake (..))
+import Tricorder.Project (ProjectRoot (..))
 
 
 data Config = Config
@@ -225,3 +228,18 @@ resolveTestTargets :: Config -> [Text]
 resolveTestTargets cfg = case cfg.testTargets of
     Just explicit -> explicit
     Nothing -> filter ("test:" `T.isPrefixOf`) cfg.targets
+
+
+runConfig
+    :: ( FileSystem :> es
+       , HasCallStack
+       , Reader ProjectRoot :> es
+       )
+    => Eff (Reader Config : es) a
+    -> Eff es a
+runConfig act = do
+    ProjectRoot projectRoot <- ask
+    cfg <- loadConfig projectRoot
+    effectiveTargets <- resolveTargets cfg.targets projectRoot
+    let cfg' = cfg {targets = effectiveTargets}
+    runReader cfg' act

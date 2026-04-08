@@ -6,6 +6,7 @@ module Tricorder.BuildState
     , TestRun (..)
     , TestOutcome (..)
     , DaemonInfo (..)
+    , runDaemonInfo
     , Diagnostic (..)
     , Severity (..)
     , BuildStateRef (..)
@@ -17,6 +18,13 @@ module Tricorder.BuildState
 import Data.Aeson (FromJSON (..), ToJSON (..), withText)
 import Data.Time (UTCTime)
 import Effectful.Concurrent.STM (TVar)
+import Effectful.Reader.Static (Reader, ask, runReader)
+import System.FilePath (makeRelative)
+
+import Atelier.Effects.FileSystem (FileSystem)
+import Tricorder.Config (Config (..), resolveWatchDirs)
+import Tricorder.Project (ProjectRoot (..))
+import Tricorder.Socket.SocketPath (SocketPath (..))
 
 
 newtype BuildId = BuildId Int
@@ -33,6 +41,29 @@ data DaemonInfo = DaemonInfo
     }
     deriving stock (Eq, Generic, Show)
     deriving anyclass (FromJSON, ToJSON)
+
+
+runDaemonInfo
+    :: ( FileSystem :> es
+       , Reader Config :> es
+       , Reader ProjectRoot :> es
+       , Reader SocketPath :> es
+       )
+    => Eff (Reader DaemonInfo : es) a -> Eff es a
+runDaemonInfo act = do
+    cfg <- ask
+    ProjectRoot projectRoot <- ask
+    SocketPath sockPath <- ask
+    watchDirs <- resolveWatchDirs cfg projectRoot
+    let daemonInfo =
+            DaemonInfo
+                { targets = cfg.targets
+                , watchDirs = map (makeRelative projectRoot) watchDirs
+                , sockPath
+                , logFile = cfg.logFile
+                , metricsPort = cfg.metricsPort
+                }
+    runReader daemonInfo act
 
 
 data TestOutcome = TestsPassed | TestsFailed | TestsError Text

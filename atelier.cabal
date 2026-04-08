@@ -206,6 +206,7 @@ library tricorder
       Tricorder.Effects.FileWatcher
       Tricorder.Effects.GhciSession
       Tricorder.Effects.GhcPkg
+      Tricorder.Effects.Logging
       Tricorder.Effects.TestRunner
       Tricorder.Effects.UnixSocket
       Tricorder.Events.FileChanged
@@ -213,10 +214,12 @@ library tricorder
       Tricorder.GhcPkg.Types
       Tricorder.Observability
       Tricorder.Program
+      Tricorder.Project
       Tricorder.Render
       Tricorder.Socket.Client
       Tricorder.Socket.Protocol
       Tricorder.Socket.Server
+      Tricorder.Socket.SocketPath
       Tricorder.SourceLookup
       Tricorder.Watch
       Tricorder.Watcher
@@ -307,6 +310,7 @@ executable tricorder-exe
       atelier
     , atelier-prelude
     , base
+    , data-default
     , effectful
     , effectful-core
     , effectful-plugin

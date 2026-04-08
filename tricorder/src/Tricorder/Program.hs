@@ -8,7 +8,9 @@ import Effectful.Reader.Static (Reader, ask)
 
 import Data.ByteString.Lazy qualified as BSL
 
+import Atelier.Effects.Cache (Cache)
 import Atelier.Effects.Clock (Clock)
+import Atelier.Effects.Conc (Conc)
 import Atelier.Effects.Console (Console)
 import Atelier.Effects.Delay (Delay)
 import Atelier.Effects.File (File)
@@ -18,6 +20,7 @@ import Atelier.Effects.FileSystem
     , getCurrentDirectory
     , readFileLbs
     )
+import Atelier.Effects.Monitoring.Tracing (Tracing)
 import Atelier.Effects.Posix.Process (Process)
 import Atelier.Time (Millisecond)
 import Tricorder.Arguments (Command (..))
@@ -31,37 +34,55 @@ import Tricorder.BuildState
     , TestOutcome (..)
     , TestRun (..)
     )
-import Tricorder.Config (loadConfig)
+import Tricorder.Config (Config, loadConfig)
 import Tricorder.Daemon (startDaemon, stopDaemon)
+import Tricorder.Effects.BuildStore (BuildStore)
 import Tricorder.Effects.Display (Display)
+import Tricorder.Effects.FileWatcher (FileWatcher)
+import Tricorder.Effects.GhcPkg (GhcPkg)
+import Tricorder.Effects.GhciSession (GhciSession)
+import Tricorder.Effects.TestRunner (TestRunner)
 import Tricorder.Effects.UnixSocket (UnixSocket)
-import Tricorder.GhcPkg.Types (ModuleName)
+import Tricorder.GhcPkg.Types (ModuleName, PackageId)
 import Tricorder.Render (diagnosticBlock, diagnosticLine, formatDuration, renderSourceResults)
 import Tricorder.Socket.Client
     ( isDaemonRunning
     , querySource
     , queryStatus
     , queryStatusWait
-    , socketPath
     )
+import Tricorder.Socket.SocketPath (SocketPath, socketPath)
 import Tricorder.Watch (watchDisplay)
 
 import Atelier.Effects.Console qualified as Console
 import Atelier.Effects.Delay qualified as Delay
 import Atelier.Effects.File qualified as File
+import Atelier.Effects.Log qualified as Log
 import Tricorder.Config qualified as Config
 
 
 run
-    :: ( Clock :> es
+    :: ( BuildStore :> es
+       , Cache (PackageId, ModuleName) Text :> es
+       , Cache ModuleName PackageId :> es
+       , Clock :> es
+       , Conc :> es
        , Console :> es
        , Delay :> es
        , Display :> es
        , File :> es
        , FileSystem :> es
+       , FileWatcher :> es
+       , GhcPkg :> es
+       , GhciSession :> es
        , IOE :> es
+       , Log.Log :> es
        , Process :> es
        , Reader Command :> es
+       , Reader Config :> es
+       , Reader SocketPath :> es
+       , TestRunner :> es
+       , Tracing :> es
        , UnixSocket :> es
        )
     => Eff es ()
@@ -75,7 +96,28 @@ run =
         (Source moduleNames) -> showSource moduleNames
 
 
-start :: (Console :> es, FileSystem :> es, IOE :> es, Process :> es, UnixSocket :> es) => Eff es ()
+start
+    :: ( BuildStore :> es
+       , Cache (PackageId, ModuleName) Text :> es
+       , Cache ModuleName PackageId :> es
+       , Clock :> es
+       , Conc :> es
+       , Console :> es
+       , Delay :> es
+       , FileSystem :> es
+       , FileWatcher :> es
+       , GhcPkg :> es
+       , GhciSession :> es
+       , IOE :> es
+       , Log.Log :> es
+       , Process :> es
+       , Reader Config :> es
+       , Reader SocketPath :> es
+       , TestRunner :> es
+       , Tracing :> es
+       , UnixSocket :> es
+       )
+    => Eff es ()
 start = do
     projectRoot <- getCurrentDirectory
     sp <- socketPath projectRoot
@@ -83,14 +125,13 @@ start = do
     if running then
         Console.putStrLn "Daemon already running."
     else do
-        startDaemon projectRoot
+        startDaemon
         Console.putStrLn "Daemon started."
 
 
-stop :: (Console :> es, FileSystem :> es, IOE :> es) => Eff es ()
+stop :: (Console :> es, FileSystem :> es, Reader SocketPath :> es) => Eff es ()
 stop = do
-    projectRoot <- getCurrentDirectory
-    liftIO $ stopDaemon projectRoot
+    stopDaemon
     Console.putStrLn "Daemon stopped."
 
 
@@ -212,13 +253,25 @@ showLog followFlag = do
 
 
 watch
-    :: ( Clock :> es
+    :: ( BuildStore :> es
+       , Cache (PackageId, ModuleName) Text :> es
+       , Cache ModuleName PackageId :> es
+       , Clock :> es
+       , Conc :> es
        , Delay :> es
        , Display :> es
        , File :> es
        , FileSystem :> es
+       , FileWatcher :> es
+       , GhcPkg :> es
+       , GhciSession :> es
        , IOE :> es
+       , Log.Log :> es
        , Process :> es
+       , Reader Config :> es
+       , Reader SocketPath :> es
+       , TestRunner :> es
+       , Tracing :> es
        , UnixSocket :> es
        )
     => Eff es ()
@@ -227,18 +280,31 @@ watch = do
     sockPath <- socketPath projectRoot
     running <- isDaemonRunning sockPath
     unless running $ do
-        startDaemon projectRoot
+        startDaemon
         waitForSocket sockPath
     watchDisplay sockPath
 
 
 showSource
-    :: ( Console :> es
+    :: ( BuildStore :> es
+       , Cache (PackageId, ModuleName) Text :> es
+       , Cache ModuleName PackageId :> es
+       , Clock :> es
+       , Conc :> es
+       , Console :> es
        , Delay :> es
        , File :> es
        , FileSystem :> es
+       , FileWatcher :> es
+       , GhcPkg :> es
+       , GhciSession :> es
        , IOE :> es
+       , Log.Log :> es
        , Process :> es
+       , Reader Config :> es
+       , Reader SocketPath :> es
+       , TestRunner :> es
+       , Tracing :> es
        , UnixSocket :> es
        )
     => [ModuleName]
@@ -248,7 +314,7 @@ showSource moduleNames = do
     sockPath <- socketPath projectRoot
     running <- isDaemonRunning sockPath
     unless running $ do
-        startDaemon projectRoot
+        startDaemon
         waitForSocket sockPath
     result <- querySource sockPath moduleNames
     case result of
