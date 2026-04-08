@@ -16,6 +16,7 @@ import Tricorder.Effects.UnixSocket
     , socketFileExists
     )
 import Tricorder.Socket.Server (SocketRemoved (..), socketMonitorTrigger)
+import Tricorder.Socket.SocketPath (runSocketPathConst)
 
 
 spec_Socket :: Spec
@@ -67,7 +68,8 @@ testMonitor = do
         result <-
             runMonitor [NextFileCheck False]
                 $ try @SocketRemoved
-                $ socketMonitorTrigger "/sock"
+                $ runSocketPathConst "/sock"
+                $ socketMonitorTrigger
         result `shouldBe` Left SocketRemoved
 
     it "checks again after each delay cycle" do
@@ -75,7 +77,8 @@ testMonitor = do
         result <-
             runMonitor [NextFileCheck True, NextFileCheck True, NextFileCheck False]
                 $ try @SocketRemoved
-                $ socketMonitorTrigger "/sock"
+                $ runSocketPathConst "/sock"
+                $ socketMonitorTrigger
         result `shouldBe` Left SocketRemoved
 
     it "does not throw while file exists" do
@@ -84,7 +87,8 @@ testMonitor = do
         result <-
             runMonitor [NextFileCheck True, NextFileCheck False]
                 $ try @SocketRemoved
-                $ socketMonitorTrigger "/sock"
+                $ runSocketPathConst "/sock"
+                $ socketMonitorTrigger
         result `shouldBe` Left SocketRemoved -- eventually throws on the False
 
 

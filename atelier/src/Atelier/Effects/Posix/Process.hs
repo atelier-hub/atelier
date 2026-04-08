@@ -7,7 +7,14 @@ module Atelier.Effects.Posix.Process
     , runProcess
     ) where
 
-import Effectful (Dispatch (..), DispatchOf, Effect, IOE, Limit (..), Persistence (..))
+import Effectful
+    ( Dispatch (..)
+    , DispatchOf
+    , Effect
+    , IOE
+    , Limit (..)
+    , Persistence (..)
+    )
 import Effectful.Dispatch.Static
     ( SideEffects (..)
     , StaticRep
@@ -40,4 +47,5 @@ createSession = unsafeEff_ Posix.createSession
 
 -- | Lifted `System.Posix.Process.forkProcess`.
 forkProcess :: (HasCallStack, Process :> es) => Eff es () -> Eff es ProcessID
-forkProcess f = unsafeConcUnliftIO Persistent Unlimited \unlift -> Posix.forkProcess $ unlift f
+forkProcess f = unsafeConcUnliftIO Persistent Unlimited \unlift ->
+    Posix.forkProcess $ unlift f

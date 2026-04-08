@@ -3,19 +3,15 @@ module Tricorder.Socket.Client
     , queryStatusWait
     , queryWatch
     , querySource
-    , socketPath
     , isDaemonRunning
     ) where
 
 import Data.Aeson (decode, eitherDecode, encode)
 import Effectful.Exception (try)
-import Numeric (showHex)
-import System.FilePath ((</>))
 
 import Data.ByteString.Lazy qualified as BSL
 
 import Atelier.Effects.File (File)
-import Atelier.Effects.FileSystem (FileSystem, canonicalizePath, createDirectoryIfMissing, getXdgRuntimeDir)
 import Tricorder.BuildState (BuildState)
 import Tricorder.Effects.UnixSocket (UnixSocket, withConnection)
 import Tricorder.GhcPkg.Types (ModuleName)
@@ -83,16 +79,6 @@ isDaemonRunning sockPath = do
     pure $ isRight result
 
 
--- | Compute the Unix socket path for the given project root.
-socketPath :: (FileSystem :> es) => FilePath -> Eff es FilePath
-socketPath rawRoot = do
-    root <- canonicalizePath rawRoot
-    runtimeDir <- getXdgRuntimeDir
-    let dir = runtimeDir </> "tricorder"
-    createDirectoryIfMissing True dir
-    pure $ dir </> hashPath root <> ".sock"
-
-
 -- internals
 
 sendQuery :: (File :> es) => Handle -> Query -> Eff es ()
@@ -105,10 +91,3 @@ receiveState h = do
     case eitherDecode (BSL.fromStrict (encodeUtf8 (toText line))) of
         Left err -> pure $ Left (toText err)
         Right state -> pure $ Right state
-
-
--- | Polynomial hash of a file path, returned as a hex string.
-hashPath :: FilePath -> String
-hashPath path =
-    let n = foldl' (\acc c -> acc * 31 + toInteger (ord c)) (0 :: Integer) path
-    in  showHex (abs n `mod` (16 ^ (16 :: Integer))) ""

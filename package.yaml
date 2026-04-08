@@ -177,6 +177,7 @@ executables:
     - tricorder
     - atelier
     - effectful
+    - data-default
 
 tests:
   atelier-test:

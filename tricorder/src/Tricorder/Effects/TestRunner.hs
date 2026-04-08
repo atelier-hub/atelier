@@ -13,8 +13,9 @@ module Tricorder.Effects.TestRunner
 
 import Control.Exception (throwIO)
 import Effectful (Effect, IOE)
-import Effectful.Dispatch.Dynamic (interpret_, reinterpret)
+import Effectful.Dispatch.Dynamic (interpretWith_, reinterpret)
 import Effectful.Exception (try)
+import Effectful.Reader.Static (Reader, ask)
 import Effectful.State.Static.Shared (State, evalState, get, put)
 import Effectful.TH (makeEffect)
 import System.Process.Typed (byteStringInput, proc, readProcess, setStdin, setWorkingDir)
@@ -24,6 +25,7 @@ import Data.List qualified as List
 import Data.Text qualified as T
 
 import Tricorder.BuildState (TestOutcome (..), TestRun (..))
+import Tricorder.Project (ProjectRoot (..))
 
 
 data TestRunner :: Effect where
@@ -38,22 +40,24 @@ makeEffect ''TestRunner
 -- | Production interpreter that spawns a short-lived @cabal repl test:\<name\>@
 -- process for each suite, feeds @:main\\n:quit\\n@ to stdin, captures combined
 -- stdout+stderr, and detects the outcome via 'detectOutcome'.
-runTestRunnerIO :: (IOE :> es) => FilePath -> Eff (TestRunner : es) a -> Eff es a
-runTestRunnerIO projectRoot = interpret_ \case
-    RunTestSuite target -> do
-        result <- try @SomeException $ liftIO do
-            let config =
-                    setStdin (byteStringInput ":main\n:quit\n")
-                        $ setWorkingDir projectRoot
-                        $ proc "cabal" ["repl", toString target]
-            (_, out, err) <- readProcess config
-            pure (out, err)
-        pure $ case result of
-            Left ex ->
-                TestRun {target, outcome = TestsError (show ex :: Text), output = ""}
-            Right (out, err) ->
-                let output = decodeUtf8 (BSL.toStrict out) <> decodeUtf8 (BSL.toStrict err)
-                in  TestRun {target, outcome = detectOutcome output, output}
+runTestRunnerIO :: (IOE :> es, Reader ProjectRoot :> es) => Eff (TestRunner : es) a -> Eff es a
+runTestRunnerIO act = do
+    ProjectRoot projectRoot <- ask
+    interpretWith_ act \case
+        RunTestSuite target -> do
+            result <- try @SomeException $ liftIO do
+                let config =
+                        setStdin (byteStringInput ":main\n:quit\n")
+                            $ setWorkingDir projectRoot
+                            $ proc "cabal" ["repl", toString target]
+                (_, out, err) <- readProcess config
+                pure (out, err)
+            pure $ case result of
+                Left ex ->
+                    TestRun {target, outcome = TestsError (show ex :: Text), output = ""}
+                Right (out, err) ->
+                    let output = decodeUtf8 (BSL.toStrict out) <> decodeUtf8 (BSL.toStrict err)
+                    in  TestRun {target, outcome = detectOutcome output, output}
 
 
 -- | Scripted interpreter for testing.

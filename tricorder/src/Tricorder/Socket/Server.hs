@@ -2,6 +2,7 @@ module Tricorder.Socket.Server (component, socketMonitorTrigger, SocketRemoved (
 
 import Data.Aeson (ToJSON, decode, encode)
 import Effectful.Exception (finally, throwIO)
+import Effectful.Reader.Static (Reader, ask)
 
 import Data.ByteString.Lazy qualified as BSL
 
@@ -26,6 +27,7 @@ import Tricorder.Effects.UnixSocket
     , socketFileExists
     )
 import Tricorder.Socket.Protocol (ErrorResponse (..), Query (..), StatusQuery (..))
+import Tricorder.Socket.SocketPath (SocketPath (..))
 import Tricorder.SourceLookup (ModuleName, PackageId, lookupModuleSource)
 
 import Atelier.Effects.Conc qualified as Conc
@@ -47,15 +49,17 @@ component
        , FileSystem :> es
        , GhcPkg :> es
        , Log :> es
+       , Reader SocketPath :> es
        , UnixSocket :> es
        )
-    => FilePath
-    -> Component es
-component sockPath =
+    => Component es
+component =
     defaultComponent
         { name = "SocketServer"
-        , setup = removeSocketFile sockPath
-        , triggers = pure [acceptTrigger sockPath, socketMonitorTrigger sockPath]
+        , setup = do
+            SocketPath sockPath <- ask
+            removeSocketFile sockPath
+        , triggers = pure [acceptTrigger, socketMonitorTrigger]
         }
 
 
@@ -68,11 +72,12 @@ acceptTrigger
        , FileSystem :> es
        , GhcPkg :> es
        , Log :> es
+       , Reader SocketPath :> es
        , UnixSocket :> es
        )
-    => FilePath
-    -> Trigger es
-acceptTrigger sockPath = do
+    => Trigger es
+acceptTrigger = do
+    SocketPath sockPath <- ask
     sock <- bindSocket sockPath
     forever do
         h <- acceptHandle sock
@@ -81,11 +86,18 @@ acceptTrigger sockPath = do
 
 -- | Poll for the socket file's existence every 500ms.
 -- Throws 'SocketRemoved' when the file is gone, causing the component system to shut down.
-socketMonitorTrigger :: (Delay :> es, UnixSocket :> es) => FilePath -> Trigger es
-socketMonitorTrigger sockPath = forever do
-    wait (500 :: Millisecond)
-    exists <- socketFileExists sockPath
-    unless exists $ throwIO SocketRemoved
+socketMonitorTrigger
+    :: ( Delay :> es
+       , Reader SocketPath :> es
+       , UnixSocket :> es
+       )
+    => Trigger es
+socketMonitorTrigger = do
+    SocketPath sockPath <- ask
+    forever do
+        wait (500 :: Millisecond)
+        exists <- socketFileExists sockPath
+        unless exists $ throwIO SocketRemoved
 
 
 handleConnection

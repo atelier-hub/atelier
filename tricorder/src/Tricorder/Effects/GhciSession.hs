@@ -40,7 +40,7 @@ data LoadResult = LoadResult
     { moduleCount :: Int
     , compiledFiles :: Set FilePath
     -- ^ Files that were compiled in this cycle (derived from 'Language.Haskell.Ghcid.Loading' items).
-    -- Used by 'Ghcib.GhciSession.mergeDiagnostics' to decide which files' previous
+    -- Used by 'Tricorder.GhciSession.mergeDiagnostics' to decide which files' previous
     -- diagnostics to replace vs. retain.
     , diagnostics :: [Diagnostic]
     }

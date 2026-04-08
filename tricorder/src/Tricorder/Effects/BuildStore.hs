@@ -20,6 +20,7 @@ import Effectful (Effect)
 import Effectful.Concurrent (Concurrent)
 import Effectful.Concurrent.STM (TVar, atomically, modifyTVar, newTVar, readTVar, writeTVar)
 import Effectful.Dispatch.Dynamic (interpret_, reinterpret)
+import Effectful.Reader.Static (Reader, ask)
 import Effectful.State.Static.Shared (State, evalState, get, modify, put)
 import Effectful.TH (makeEffect)
 
@@ -171,8 +172,14 @@ runBuildStoreScripted states = reinterpret (evalState states) $ \_ -> \case
 --
 -- Creates a 'TVar' initialised with 'initialBuildState' for the given
 -- 'DaemonInfo' and runs the supplied action under 'runBuildStoreRef'.
-runBuildStore :: (Concurrent :> es, Delay :> es) => DaemonInfo -> Eff (BuildStore : es) a -> Eff es a
-runBuildStore di eff = do
+runBuildStore
+    :: ( Concurrent :> es
+       , Delay :> es
+       , Reader DaemonInfo :> es
+       )
+    => Eff (BuildStore : es) a -> Eff es a
+runBuildStore eff = do
+    di <- ask
     ref <- atomically (newTVar (initialBuildState di))
     dirtyRef <- atomically (newTVar Nothing)
     runBuildStoreRef BuildStateRef {stateRef = ref, dirtyRef} eff
