@@ -188,6 +188,7 @@ library atelier-testing
 
 library ghcib
   exposed-modules:
+      Ghcib.Arguments
       Ghcib.BuildState
       Ghcib.Config
       Ghcib.Daemon
@@ -248,6 +249,7 @@ library ghcib
     , fsnotify
     , ghcid
     , network
+    , optparse-applicative
     , prettyprinter
     , prettyprinter-ansi-terminal
     , stm
@@ -298,7 +300,6 @@ executable ghcib-exe
     , effectful-core
     , effectful-plugin
     , ghcib
-    , optparse-applicative
     , time
   mixins:
       base hiding (Prelude)

@@ -149,6 +149,7 @@ internal-libraries:
     - network
     - prettyprinter
     - prettyprinter-ansi-terminal
+    - optparse-applicative
     - stm
     - text
     - time
@@ -172,7 +173,6 @@ executables:
     - atelier
     - data-default
     - effectful
-    - optparse-applicative
     - aeson
     - directory
     - bytestring

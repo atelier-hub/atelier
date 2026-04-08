@@ -5,14 +5,28 @@ import Data.Aeson (encode)
 import Data.Time.Format (defaultTimeLocale, formatTime)
 import Data.Time.LocalTime (getCurrentTimeZone, utcToLocalTime)
 import Effectful (IOE, runEff)
-import Options.Applicative
+import Effectful.Reader.Static (Reader, ask)
 import System.IO (hGetLine)
 
 import Data.ByteString.Lazy qualified as BSL
 
 import Atelier.Effects.Clock (Clock, runClock)
-import Atelier.Effects.FileSystem (FileSystem, doesFileExist, getCurrentDirectory, readFileLbs, runFileSystemIO)
-import Ghcib.BuildState (BuildPhase (..), BuildResult (..), BuildState (..), DaemonInfo (..), Diagnostic (..), Severity (..))
+import Atelier.Effects.FileSystem
+    ( FileSystem
+    , doesFileExist
+    , getCurrentDirectory
+    , readFileLbs
+    , runFileSystemIO
+    )
+import Ghcib.Arguments (Command (..), runArguments)
+import Ghcib.BuildState
+    ( BuildPhase (..)
+    , BuildResult (..)
+    , BuildState (..)
+    , DaemonInfo (..)
+    , Diagnostic (..)
+    , Severity (..)
+    )
 import Ghcib.Config (loadConfig)
 import Ghcib.Daemon (startDaemon, stopDaemon)
 import Ghcib.Effects.Display (Display, runDisplayIO)
@@ -30,129 +44,83 @@ import Ghcib.Config qualified as Config
 
 
 main :: IO ()
-main = do
-    cmd <- execParser opts
-    runEff . runFileSystemIO . runClock . runUnixSocketIO . runDisplayIO $ run cmd
-  where
-    opts =
-        info (commandParser <**> helper)
-            $ fullDesc
-                <> progDesc "ghcib — daemon-based GHCi build status"
-                <> header "ghcib — robust GHCi daemon with structured querying"
+main =
+    runEff
+        . runFileSystemIO
+        . runArguments
+        . runClock
+        . runUnixSocketIO
+        . runDisplayIO
+        $ run
 
 
-data Command
-    = Start
-    | Stop
-    | Status Bool Bool Bool
-    | Watch
-    | Log Bool
-
-
-commandParser :: Parser Command
-commandParser =
-    hsubparser
-        ( command "start" (info (pure Start) (progDesc "Start the daemon (no-op if already running)"))
-            <> command "stop" (info (pure Stop) (progDesc "Stop the daemon"))
-            <> command "status" (info statusParser (progDesc "Print build diagnostics (--json for machine-readable output)"))
-            <> command "watch" (info (pure Watch) (progDesc "Auto-refreshing terminal display"))
-            <> command "log" (info logParser (progDesc "Show daemon log output"))
-        )
-
-
-logParser :: Parser Command
-logParser =
-    Log
-        <$> switch
-            ( long "follow"
-                <> short 'f'
-                <> help "Keep streaming new log lines as they are written"
-            )
-
-
-statusParser :: Parser Command
-statusParser =
-    Status
-        <$> switch
-            ( long "wait"
-                <> help "Block until the current build cycle completes"
-            )
-        <*> switch
-            ( long "json"
-                <> help "Output full build state as JSON"
-            )
-        <*> switch
-            ( long "verbose"
-                <> short 'v'
-                <> help "Print full GHC message body under each diagnostic"
-            )
-
-
-run :: (Clock :> es, Display :> es, FileSystem :> es, IOE :> es, UnixSocket :> es) => Command -> Eff es ()
-run Start = do
-    projectRoot <- getCurrentDirectory
-    sp <- socketPath projectRoot
-    running <- isDaemonRunning sp
-    liftIO
-        $ if running then
-            putStrLn "Daemon already running."
-        else
-            startDaemon projectRoot >> putStrLn "Daemon started."
-run Stop = do
-    projectRoot <- getCurrentDirectory
-    liftIO $ stopDaemon projectRoot >> putStrLn "Daemon stopped."
-run (Status waitFlag jsonFlag verboseFlag) = do
-    projectRoot <- getCurrentDirectory
-    sockPath <- socketPath projectRoot
-    running <- isDaemonRunning sockPath
-    unless running $ liftIO $ startDaemon projectRoot >> waitForSocket sockPath
-    when (waitFlag && not jsonFlag) $ do
-        current <- queryStatus sockPath
-        case current of
-            Right BuildState {phase = Building} -> liftIO $ putStrLn "Building..."
-            _ -> pure ()
-    result <-
-        if waitFlag then
-            queryStatusWait sockPath
-        else
-            queryStatus sockPath
-    liftIO $ case result of
-        Left err -> putStrLn $ "Error: " <> toString err
-        Right state ->
-            if jsonFlag then
-                BSL.putStr (encode state) >> putStrLn ""
-            else
-                renderText verboseFlag state
-run (Log followFlag) = do
-    projectRoot <- getCurrentDirectory
-    sp <- socketPath projectRoot
-    running <- isDaemonRunning sp
-    mLogFile <-
-        if running then do
-            result <- queryStatus sp
-            pure $ case result of
-                Right state -> state.daemonInfo.logFile
-                Left _ -> Nothing
-        else
-            Config.logFile <$> loadConfig projectRoot
-    case mLogFile of
-        Nothing ->
-            liftIO $ putStrLn "No log file configured. Add `log_file = \"/path/to/ghcib.log\"` to .ghcib.toml"
-        Just path -> do
-            exists <- doesFileExist path
-            if not exists then
-                liftIO $ putStrLn $ "Log file does not exist yet: " <> path
-            else
-                if followFlag then
-                    liftIO $ followLog path
+run :: (Clock :> es, Display :> es, FileSystem :> es, IOE :> es, Reader Command :> es, UnixSocket :> es) => Eff es ()
+run =
+    ask >>= \case
+        Start -> do
+            projectRoot <- getCurrentDirectory
+            sp <- socketPath projectRoot
+            running <- isDaemonRunning sp
+            liftIO
+                $ if running then
+                    putStrLn "Daemon already running."
                 else
-                    readFileLbs path >>= liftIO . BSL.putStr
-run Watch = do
-    projectRoot <- getCurrentDirectory
-    sockPath <- socketPath projectRoot
-    running <- isDaemonRunning sockPath
-    unless running $ liftIO $ startDaemon projectRoot >> waitForSocket sockPath
-    watchDisplay sockPath
+                    startDaemon projectRoot >> putStrLn "Daemon started."
+        Stop -> do
+            projectRoot <- getCurrentDirectory
+            liftIO $ stopDaemon projectRoot >> putStrLn "Daemon stopped."
+        (Status waitFlag jsonFlag verboseFlag) -> do
+            projectRoot <- getCurrentDirectory
+            sockPath <- socketPath projectRoot
+            running <- isDaemonRunning sockPath
+            unless running $ liftIO $ startDaemon projectRoot >> waitForSocket sockPath
+            when (waitFlag && not jsonFlag) $ do
+                current <- queryStatus sockPath
+                case current of
+                    Right BuildState {phase = Building} -> liftIO $ putStrLn "Building..."
+                    _ -> pure ()
+            result <-
+                if waitFlag then
+                    queryStatusWait sockPath
+                else
+                    queryStatus sockPath
+            liftIO $ case result of
+                Left err -> putStrLn $ "Error: " <> toString err
+                Right state ->
+                    if jsonFlag then
+                        BSL.putStr (encode state) >> putStrLn ""
+                    else
+                        renderText verboseFlag state
+        (Log followFlag) -> do
+            projectRoot <- getCurrentDirectory
+            sp <- socketPath projectRoot
+            running <- isDaemonRunning sp
+            mLogFile <-
+                if running then do
+                    result <- queryStatus sp
+                    pure $ case result of
+                        Right state -> state.daemonInfo.logFile
+                        Left _ -> Nothing
+                else
+                    Config.logFile <$> loadConfig projectRoot
+            case mLogFile of
+                Nothing ->
+                    liftIO $ putStrLn "No log file configured. Add `log_file = \"/path/to/ghcib.log\"` to .ghcib.toml"
+                Just path -> do
+                    exists <- doesFileExist path
+                    if not exists then
+                        liftIO $ putStrLn $ "Log file does not exist yet: " <> path
+                    else
+                        if followFlag then
+                            liftIO $ followLog path
+                        else
+                            readFileLbs path >>= liftIO . BSL.putStr
+        Watch -> do
+            projectRoot <- getCurrentDirectory
+            sockPath <- socketPath projectRoot
+            running <- isDaemonRunning sockPath
+            unless running $ liftIO $ startDaemon projectRoot >> waitForSocket sockPath
+            watchDisplay sockPath
 
 
 renderText :: Bool -> BuildState -> IO ()
