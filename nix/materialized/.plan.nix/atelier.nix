@@ -124,6 +124,7 @@
             (hsPkgs."fsnotify" or (errorHandler.buildDepError "fsnotify"))
             (hsPkgs."ghcid" or (errorHandler.buildDepError "ghcid"))
             (hsPkgs."network" or (errorHandler.buildDepError "network"))
+            (hsPkgs."optparse-applicative" or (errorHandler.buildDepError "optparse-applicative"))
             (hsPkgs."prettyprinter" or (errorHandler.buildDepError "prettyprinter"))
             (hsPkgs."prettyprinter-ansi-terminal" or (errorHandler.buildDepError "prettyprinter-ansi-terminal"))
             (hsPkgs."stm" or (errorHandler.buildDepError "stm"))
@@ -152,7 +153,6 @@
             (hsPkgs."effectful-core" or (errorHandler.buildDepError "effectful-core"))
             (hsPkgs."effectful-plugin" or (errorHandler.buildDepError "effectful-plugin"))
             (hsPkgs."atelier".components.sublibs.ghcib or (errorHandler.buildDepError "atelier:ghcib"))
-            (hsPkgs."optparse-applicative" or (errorHandler.buildDepError "optparse-applicative"))
             (hsPkgs."time" or (errorHandler.buildDepError "time"))
           ];
           buildable = true;
