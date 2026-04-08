@@ -150,6 +150,7 @@
             (hsPkgs."atelier" or (errorHandler.buildDepError "atelier"))
             (hsPkgs."atelier".components.sublibs.atelier-prelude or (errorHandler.buildDepError "atelier:atelier-prelude"))
             (hsPkgs."base" or (errorHandler.buildDepError "base"))
+            (hsPkgs."data-default" or (errorHandler.buildDepError "data-default"))
             (hsPkgs."effectful" or (errorHandler.buildDepError "effectful"))
             (hsPkgs."effectful-core" or (errorHandler.buildDepError "effectful-core"))
             (hsPkgs."effectful-plugin" or (errorHandler.buildDepError "effectful-plugin"))
