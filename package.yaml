@@ -101,6 +101,7 @@ library:
   - time
   - time-units
   - unagi-chan
+  - unix
   - unordered-containers
   - uuid
 
@@ -161,7 +162,6 @@ internal-libraries:
     - time-units
     - Cabal-syntax
     - toml-reader
-    - unix
 
 executables:
   ghcib-exe:

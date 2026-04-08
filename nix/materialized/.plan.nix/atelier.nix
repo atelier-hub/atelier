@@ -65,6 +65,7 @@
           (hsPkgs."time" or (errorHandler.buildDepError "time"))
           (hsPkgs."time-units" or (errorHandler.buildDepError "time-units"))
           (hsPkgs."unagi-chan" or (errorHandler.buildDepError "unagi-chan"))
+          (hsPkgs."unix" or (errorHandler.buildDepError "unix"))
           (hsPkgs."unordered-containers" or (errorHandler.buildDepError "unordered-containers"))
           (hsPkgs."uuid" or (errorHandler.buildDepError "uuid"))
           (hsPkgs."wai" or (errorHandler.buildDepError "wai"))
@@ -137,7 +138,6 @@
             (hsPkgs."time-units" or (errorHandler.buildDepError "time-units"))
             (hsPkgs."toml-reader" or (errorHandler.buildDepError "toml-reader"))
             (hsPkgs."typed-process" or (errorHandler.buildDepError "typed-process"))
-            (hsPkgs."unix" or (errorHandler.buildDepError "unix"))
           ];
           buildable = true;
           modules = [ "Paths_atelier" ];

@@ -6,21 +6,21 @@ module Ghcib.Daemon
 
 import Control.Exception (try)
 import Data.Default (def)
-import Effectful (runEff)
+import Effectful (IOE, runEff)
 import Effectful.Concurrent (runConcurrent)
 import Effectful.Reader.Static (runReader)
 import System.FilePath (makeRelative)
-import System.Posix.Process (createSession, forkProcess)
 
 import Atelier.Component (runSystem)
 import Atelier.Effects.Cache (runCacheTtl)
 import Atelier.Effects.Clock (runClock)
 import Atelier.Effects.Conc (runConc)
 import Atelier.Effects.Delay (runDelay)
-import Atelier.Effects.FileSystem (removeFile, runFileSystemIO)
+import Atelier.Effects.FileSystem (FileSystem, removeFile, runFileSystemIO)
 import Atelier.Effects.Log (Severity (..), runLogNoOp, runLogToHandle)
 import Atelier.Effects.Monitoring.Metrics (runMetrics)
 import Atelier.Effects.Monitoring.Tracing (runTracingNoOp)
+import Atelier.Effects.Posix.Process (Process, createSession, forkProcess)
 import Ghcib.BuildState (DaemonInfo (..))
 import Ghcib.Config (Config (..), loadConfig, resolveTargets, resolveWatchDirs)
 import Ghcib.Effects.BuildStore (runBuildStore)
@@ -99,12 +99,12 @@ runDaemon projectRoot cfg = do
 
 -- | Fork the daemon as a background process and return immediately.
 -- No-op if the daemon is already running (caller should check beforehand).
-startDaemon :: FilePath -> IO ()
+startDaemon :: (FileSystem :> es, IOE :> es, Process :> es) => FilePath -> Eff es ()
 startDaemon projectRoot = do
-    cfg <- runEff . runFileSystemIO $ loadConfig projectRoot
+    cfg <- loadConfig projectRoot
     void $ forkProcess do
         void createSession -- detach from terminal
-        runDaemon projectRoot cfg
+        liftIO $ runDaemon projectRoot cfg
 
 
 -- | Remove the daemon's socket file, which causes the socket server to stop.

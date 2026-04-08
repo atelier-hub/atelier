@@ -18,6 +18,7 @@ import Atelier.Effects.FileSystem
     , getCurrentDirectory
     , readFileLbs
     )
+import Atelier.Effects.Posix.Process (Process)
 import Atelier.Time (Millisecond)
 import Ghcib.Arguments (Command (..))
 import Ghcib.BuildState
@@ -59,6 +60,7 @@ run
        , File :> es
        , FileSystem :> es
        , IOE :> es
+       , Process :> es
        , Reader Command :> es
        , UnixSocket :> es
        )
@@ -73,7 +75,7 @@ run =
         (Source moduleNames) -> showSource moduleNames
 
 
-start :: (Console :> es, FileSystem :> es, IOE :> es, UnixSocket :> es) => Eff es ()
+start :: (Console :> es, FileSystem :> es, IOE :> es, Process :> es, UnixSocket :> es) => Eff es ()
 start = do
     projectRoot <- getCurrentDirectory
     sp <- socketPath projectRoot
@@ -81,7 +83,7 @@ start = do
     if running then
         Console.putStrLn "Daemon already running."
     else do
-        liftIO $ startDaemon projectRoot
+        startDaemon projectRoot
         Console.putStrLn "Daemon started."
 
 
@@ -98,6 +100,7 @@ showStatus
        , File :> es
        , FileSystem :> es
        , IOE :> es
+       , Process :> es
        , UnixSocket :> es
        )
     => Bool -> Bool -> Bool -> Eff es ()
@@ -106,7 +109,7 @@ showStatus waitFlag jsonFlag verboseFlag = do
     sockPath <- socketPath projectRoot
     running <- isDaemonRunning sockPath
     unless running $ do
-        liftIO $ startDaemon projectRoot
+        startDaemon projectRoot
         waitForSocket sockPath
     when (waitFlag && not jsonFlag) $ do
         current <- queryStatus sockPath
@@ -217,6 +220,7 @@ watch
        , File :> es
        , FileSystem :> es
        , IOE :> es
+       , Process :> es
        , UnixSocket :> es
        )
     => Eff es ()
@@ -225,7 +229,7 @@ watch = do
     sockPath <- socketPath projectRoot
     running <- isDaemonRunning sockPath
     unless running $ do
-        liftIO $ startDaemon projectRoot
+        startDaemon projectRoot
         waitForSocket sockPath
     watchDisplay sockPath
 
@@ -236,6 +240,7 @@ showSource
        , File :> es
        , FileSystem :> es
        , IOE :> es
+       , Process :> es
        , UnixSocket :> es
        )
     => [ModuleName]
@@ -245,7 +250,7 @@ showSource moduleNames = do
     sockPath <- socketPath projectRoot
     running <- isDaemonRunning sockPath
     unless running $ do
-        liftIO $ startDaemon projectRoot
+        startDaemon projectRoot
         waitForSocket sockPath
     result <- querySource sockPath moduleNames
     case result of
