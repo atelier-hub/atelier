@@ -112,7 +112,7 @@ timestampDoc :: TimeZone -> UTCTime -> Doc ann
 timestampDoc tz t = pretty ("— " <> formatTime defaultTimeLocale "%H:%M:%S" (utcToLocalTime tz t))
 
 
-formatDuration :: Int -> String
+formatDuration :: Int -> Text
 formatDuration ms =
     if ms < 1000 then
         show ms <> "ms"

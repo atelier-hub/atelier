@@ -8,6 +8,7 @@ import Atelier.Effects.Console (runConsole)
 import Atelier.Effects.Delay (runDelay)
 import Atelier.Effects.File (runFile)
 import Atelier.Effects.FileSystem (runFileSystemIO)
+import Atelier.Effects.Posix.Process (runProcess)
 import Ghcib.Arguments (runArguments)
 import Ghcib.Effects.Display (runDisplayIO)
 import Ghcib.Effects.UnixSocket (runUnixSocketIO)
@@ -20,6 +21,7 @@ main =
     runEff
         . runConcurrent
         . runConsole
+        . runProcess
         . runDelay
         . runFile
         . runFileSystemIO

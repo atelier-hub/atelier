@@ -38,6 +38,7 @@ library
       Atelier.Effects.Monitoring.Metrics.Server
       Atelier.Effects.Monitoring.Tracing
       Atelier.Effects.Monitoring.Tracing.Provider
+      Atelier.Effects.Posix.Process
       Atelier.Effects.Publishing
       Atelier.Effects.Tally
       Atelier.Effects.UUID
@@ -104,6 +105,7 @@ library
     , time
     , time-units
     , unagi-chan
+    , unix
     , unordered-containers
     , uuid
     , wai
@@ -271,7 +273,6 @@ library ghcib
     , time-units
     , toml-reader
     , typed-process
-    , unix
   mixins:
       base hiding (Prelude)
   default-language: GHC2021
