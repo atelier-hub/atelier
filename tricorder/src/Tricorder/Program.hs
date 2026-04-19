@@ -20,6 +20,7 @@ import Atelier.Effects.FileSystem
     , getCurrentDirectory
     , readFileLbs
     )
+import Atelier.Effects.FileWatcher (FileWatcher)
 import Atelier.Effects.Monitoring.Tracing (Tracing)
 import Atelier.Effects.Posix.Process (Process)
 import Atelier.Time (Millisecond)
@@ -38,7 +39,6 @@ import Tricorder.Config (Config)
 import Tricorder.Daemon (startDaemon, stopDaemon)
 import Tricorder.Effects.BuildStore (BuildStore)
 import Tricorder.Effects.Display (Display)
-import Tricorder.Effects.FileWatcher (FileWatcher)
 import Tricorder.Effects.GhcPkg (GhcPkg)
 import Tricorder.Effects.GhciSession (GhciSession)
 import Tricorder.Effects.TestRunner (TestRunner)

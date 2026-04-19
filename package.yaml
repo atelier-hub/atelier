@@ -81,6 +81,9 @@ library:
   - directory
   - effectful
   - effectful-th
+  - filepath
+  - fsnotify
+  - stm
   - hasql
   - hasql-pool
   - hasql-transaction
@@ -148,7 +151,6 @@ internal-libraries:
     - effectful
     - effectful-th
     - filepath
-    - fsnotify
     - ghcid
     - network
     - prettyprinter
