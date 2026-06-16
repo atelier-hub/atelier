@@ -15,17 +15,14 @@ concurrency:
 
 jobs:
   materialize:
-    name: Materialize ${{ matrix.system }}/${{ matrix.ghc-version }}
+    name: Materialize ${{ matrix.system }}
     strategy:
+      # One job per system, not per (system, GHC): evaluating `legacyChecks`
+      # forces every GHC's materialization check, so a single job already drives
+      # the whole platform's set to convergence. Splitting per GHC just made
+      # each job redundantly regenerate all of them.
+      fail-fast: false
       matrix:
-        os:
-          - macos-14
-          - ubuntu-latest
-        ghc-version:
-          - ghc9102
-          - ghc912
-          - ghc914
-          - ghc98
         include:
           - os: macos-14
             system: aarch64-darwin
@@ -51,21 +48,23 @@ jobs:
           name: atelier
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
-      - name: Regenerate ${{ matrix.system }}/${{ matrix.ghc-version }} materialization
+      - name: Regenerate ${{ matrix.system }} materialization
         run: |
           set -o pipefail
-          target='.#legacyChecks.${{ matrix.system }}.${{ matrix.ghc-version }}.materialization-target'
-          # haskell.nix reports only one missing `generateMaterialized` command
-          # per build, in dependency order (e.g. the bootstrap compiler before
-          # this matrix instance's GHC). Loop, running whichever command it
-          # emits, until the build succeeds — so each job fully materializes
-          # everything it needs in one pass, even on a fresh platform. The
-          # upload below is scoped to this job's GHC directory, so regenerating
-          # another GHC's bootstrap materialization here does not leak into the
-          # artifact.
+          # Build every GHC's materialization-target together. haskell.nix emits
+          # only one `generateMaterialized` command per build (the first missing
+          # or stale one), so loop: run whichever it asks for, then rebuild,
+          # until the whole set is consistent. Each command is generated exactly
+          # once this way — including the bootstrap compiler shared by the rest.
+          targets=(
+            '.#legacyChecks.${{ matrix.system }}.ghc9102.materialization-target'
+            '.#legacyChecks.${{ matrix.system }}.ghc98.materialization-target'
+            '.#legacyChecks.${{ matrix.system }}.ghc912.materialization-target'
+            '.#legacyChecks.${{ matrix.system }}.ghc914.materialization-target'
+          )
           converged=
-          for attempt in $(seq 1 8); do
-            if nix build --no-link "$target" 2>&1 | tee /tmp/build.log; then
+          for attempt in $(seq 1 12); do
+            if nix build --no-link "${targets[@]}" 2>&1 | tee /tmp/build.log; then
               converged=1
               break
             fi
@@ -77,6 +76,10 @@ jobs:
             cmd="$(grep -o '/[/[:alnum:]._-]*-generateMaterialized [/_[:alnum:]/.-]*$' /tmp/build.log)"
             echo "Generating materialized files (attempt $attempt): $cmd" >&2
             eval "$cmd"
+            # Nix flakes only see git-tracked files, so a newly created
+            # materialization directory is invisible to the next build until it
+            # is staged. Without this the loop regenerates the same dir forever.
+            git add -A nix/materialized
           done
           if [ -z "$converged" ]; then
             echo "Materialization did not converge after multiple attempts" >&2
@@ -86,8 +89,10 @@ jobs:
       - name: Produce materialization patch
         id: patch
         run: |
-          dir='nix/materialized/${{ matrix.system }}/${{ matrix.ghc-version }}'
-          # Stage adds, modifications and deletions within this job's directory.
+          # This system's materialized directories are disjoint from the other
+          # system's, so each job's patch touches only its own files.
+          dir='nix/materialized/${{ matrix.system }}'
+          # Stage adds, modifications and deletions.
           git add -A "$dir"
           if git diff --cached --quiet -- "$dir"; then
             echo "No materialization changes for $dir" >&2
@@ -100,14 +105,14 @@ jobs:
           # source-repository-package and its cabal-files entry disappears.
           mkdir -p /tmp/patches
           git diff --cached --binary -- "$dir" \
-            > "/tmp/patches/${{ matrix.system }}-${{ matrix.ghc-version }}.patch"
+            > "/tmp/patches/${{ matrix.system }}.patch"
           echo "upload=true" >> "$GITHUB_OUTPUT"
 
       - uses: actions/upload-artifact@v7
         if: ${{ steps.patch.outputs.upload == 'true' }}
         with:
-          name: materialization-${{ matrix.system }}-${{ matrix.ghc-version }}
-          path: /tmp/patches/${{ matrix.system }}-${{ matrix.ghc-version }}.patch
+          name: materialization-${{ matrix.system }}
+          path: /tmp/patches/${{ matrix.system }}.patch
 
   commit:
     runs-on: ubuntu-latest
