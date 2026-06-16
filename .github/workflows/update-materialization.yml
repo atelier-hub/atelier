@@ -54,51 +54,60 @@ jobs:
       - name: Regenerate ${{ matrix.system }}/${{ matrix.ghc-version }} materialization
         run: |
           set -o pipefail
-          nix build --no-link .#legacyChecks.${{ matrix.system }}.${{ matrix.ghc-version }}.materialization-target 2>&1 | tee /tmp/build.log || {
-            if grep -q 'generateMaterialized' /tmp/build.log; then
-              cmd="$(grep -o '/[/[:alnum:]._-]*-generateMaterialized [/_[:alnum:]/.-]*$' /tmp/build.log)"
-              found_ghc_version="$(echo "$cmd" | grep -E -o 'ghc[[:digit:]]+')"
-              # To prevent duplicate artifacts of materialized changes to be
-              # created, only care about materialization for this matrix
-              # instance's GHC version.
-              if [ "$found_ghc_version" = '${{ matrix.ghc-version }}' ]; then
-                echo "Generating materialized files: $cmd" >&2
-                eval "$cmd"
-                # git diff does not see untracked files.
-                git add -N .
-                if git diff --quiet; then
-                  echo "No files changed when generating materialized files!" >&2
-                  exit 1
-                fi
-              else
-                echo "Materialization necessary for a different GHC version: $found_ghc_version" >&2
-              fi
-            else
+          target='.#legacyChecks.${{ matrix.system }}.${{ matrix.ghc-version }}.materialization-target'
+          # haskell.nix reports only one missing `generateMaterialized` command
+          # per build, in dependency order (e.g. the bootstrap compiler before
+          # this matrix instance's GHC). Loop, running whichever command it
+          # emits, until the build succeeds — so each job fully materializes
+          # everything it needs in one pass, even on a fresh platform. The
+          # upload below is scoped to this job's GHC directory, so regenerating
+          # another GHC's bootstrap materialization here does not leak into the
+          # artifact.
+          converged=
+          for attempt in $(seq 1 8); do
+            if nix build --no-link "$target" 2>&1 | tee /tmp/build.log; then
+              converged=1
+              break
+            fi
+            if ! grep -q 'generateMaterialized' /tmp/build.log; then
               echo "Build failed for a reason unrelated to materialization" >&2
               cat /tmp/build.log >&2
               exit 1
             fi
-          }
-
-      - name: Check for changes
-        id: check-for-change
-        run: |
-          git diff --name-only
-          if ! git diff --quiet; then
-            echo "Materialization changed" >&2
-            echo "upload=true" >> "$GITHUB_OUTPUT"
+            cmd="$(grep -o '/[/[:alnum:]._-]*-generateMaterialized [/_[:alnum:]/.-]*$' /tmp/build.log)"
+            echo "Generating materialized files (attempt $attempt): $cmd" >&2
+            eval "$cmd"
+          done
+          if [ -z "$converged" ]; then
+            echo "Materialization did not converge after multiple attempts" >&2
+            exit 1
           fi
 
+      - name: Produce materialization patch
+        id: patch
+        run: |
+          dir='nix/materialized/${{ matrix.system }}/${{ matrix.ghc-version }}'
+          # Stage adds, modifications and deletions within this job's directory.
+          git add -A "$dir"
+          if git diff --cached --quiet -- "$dir"; then
+            echo "No materialization changes for $dir" >&2
+            exit 0
+          fi
+          git diff --name-status --cached -- "$dir"
+          # A git patch (unlike an uploaded directory) carries deletions, so the
+          # commit job can faithfully reproduce regenerations that remove files
+          # — e.g. when a dependency moves from Hackage to a
+          # source-repository-package and its cabal-files entry disappears.
+          mkdir -p /tmp/patches
+          git diff --cached --binary -- "$dir" \
+            > "/tmp/patches/${{ matrix.system }}-${{ matrix.ghc-version }}.patch"
+          echo "upload=true" >> "$GITHUB_OUTPUT"
+
       - uses: actions/upload-artifact@v7
-        if: ${{ steps.check-for-change.outputs.upload == 'true' }}
+        if: ${{ steps.patch.outputs.upload == 'true' }}
         with:
           name: materialization-${{ matrix.system }}-${{ matrix.ghc-version }}
-          # Include the hie.yaml to make `upload-artifact` base the artifact
-          # in the root of the repo.
-          path: |
-            nix/materialized/${{ matrix.system }}/${{ matrix.ghc-version }}
-            hie.yaml
-          include-hidden-files: true
+          path: /tmp/patches/${{ matrix.system }}-${{ matrix.ghc-version }}.patch
 
   commit:
     runs-on: ubuntu-latest
@@ -119,6 +128,22 @@ jobs:
         with:
           pattern: materialization-*
           merge-multiple: true
+          path: patches
+
+      - name: Apply materialization patches
+        run: |
+          shopt -s nullglob
+          patches=(patches/*.patch)
+          if [ ${#patches[@]} -eq 0 ]; then
+            echo "No materialization patches to apply." >&2
+            exit 0
+          fi
+          for p in "${patches[@]}"; do
+            echo "Applying $p" >&2
+            # --index stages adds, modifications and deletions so the PR action
+            # commits them all.
+            git apply --index "$p"
+          done
 
       - uses: peter-evans/create-pull-request@v8
         if: >-
