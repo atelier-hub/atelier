@@ -16,7 +16,7 @@
       copyright = "";
       maintainer = "christian.georgii@tweag.io";
       author = "Christian Georgii";
-      homepage = "https://github.com/atelier-hub/tricorder#readme";
+      homepage = "https://github.com/atelier-hub/atelier#readme";
       url = "";
       synopsis = "Database-backed test utilities for atelier";
       description = "Test utilities for database-backed tests using tmp-postgres — part of the atelier toolkit.";

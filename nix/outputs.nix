@@ -1,7 +1,6 @@
 {
   inputs,
   system,
-  self,
   # GHC version to use across all tools and the project
   compiler-nix-name,
 }:
@@ -15,7 +14,6 @@ let
       inputs
       pkgs
       compiler-nix-name
-      self
       ;
   };
 
@@ -39,8 +37,21 @@ let
   # Observability stack (Prometheus, Grafana, Tempo, Loki, Node Exporter)
   observability = import ./observability {
     inherit pkgs lib;
-    config = "config/tricorder.yaml";
+    config = "config/atelier.yaml";
   };
+
+  # The first-party libraries published by this repo, exposed individually so a
+  # consumer can build one without forcing the others (e.g. build atelier-core
+  # even when atelier-db is broken).
+  atelierPackageNames = [
+    "atelier-prelude"
+    "atelier-core"
+    "atelier-db"
+    "atelier-testing"
+  ];
+  atelierPackages = lib.genAttrs atelierPackageNames (
+    name: projectFlake.packages."${name}:lib:${name}"
+  );
 
   # Custom hook to check materialization is up to date
   checkMaterialization = pkgs.writeShellScript "check-materialization" ''
@@ -59,9 +70,6 @@ let
       fi
     fi
   '';
-
-  # The cabal executable is named `tricorder`, so it can be consumed directly.
-  tricorder = projectFlake.packages."tricorder:exe:tricorder";
 
   # Git hooks check (defined once, used in both checks and shell)
   gitHooks = inputs.git-hooks.lib.${system}.run {
@@ -104,36 +112,21 @@ let
 
   checks = projectFlake.checks // {
     git-hooks = gitHooks;
-    # Ensure the executable builds in CI
-    tricorder = tricorder;
-    # Ensure the overlay correctly exposes pkgs.tricorder
-    overlay =
-      pkgs.runCommand "check-overlay"
-        {
-          tricorder =
-            (pkgs.extend (
-              (import ./overlays.nix {
-                ${pkgs.stdenv.system}.default = tricorder;
-              }).default
-            )).tricorder;
-        }
-        ''
-          ls -la
-          test -x $tricorder/bin/tricorder
-          # Ensuring $out is a directory makes this check compatible with
-          # symlinkJoin.
-          mkdir -p $out
-          touch $out/ok
-        '';
   };
 in
 {
-  # Expose packages built by haskell.nix
-  packages = projectFlake.packages // {
-    default = tricorder;
-    tricorder = tricorder;
-    inherit nix-hpack;
-  };
+  # Expose packages built by haskell.nix. Individual libraries are available by
+  # name; `default` aggregates them all.
+  packages =
+    projectFlake.packages
+    // atelierPackages
+    // {
+      default = pkgs.symlinkJoin {
+        name = "atelier";
+        paths = builtins.attrValues atelierPackages;
+      };
+      inherit nix-hpack;
+    };
 
   # Development shell
   devShells.default = import ./shell.nix {
@@ -147,11 +140,6 @@ in
 
   # Custom apps
   apps = observability.apps // {
-    tricorder = {
-      type = "app";
-      program = "${tricorder}/bin/tricorder";
-    };
-
     # Weeder: detects unused code
     weeder = {
       type = "app";
@@ -169,7 +157,7 @@ in
       program = "${pkgs.writeShellScript "hlint-fix-app" ''
         echo "Running hlint --refactor on all Haskell files..."
         export PATH="${pkgs.haskell-nix.tool compiler-nix-name "apply-refact" "latest"}/bin:$PATH"
-        find atelier-prelude atelier-core atelier-db atelier-testing tricorder -name "*.hs" -exec ${
+        find atelier-prelude atelier-core atelier-db atelier-testing -name "*.hs" -exec ${
           pkgs.haskell-nix.tool compiler-nix-name "hlint" "latest"
         }/bin/hlint --refactor --refactor-options="-i" {} \;
         echo "Hlint refactoring complete!"
@@ -180,14 +168,14 @@ in
   legacyChecks.${compiler-nix-name} = {
     all = pkgs.symlinkJoin {
       name = "all-checks-${compiler-nix-name}";
-      paths = builtins.attrValues checks;
+      paths = builtins.attrValues checks ++ builtins.attrValues atelierPackages;
     };
 
     # Used by CI to build as little as possible in an attempt at checking
     # materialization.
     materialization-target = pkgs.runCommand "${compiler-nix-name}-materialization-target" { } ''
       mkdir -p $out
-      echo ${tricorder.pname} > $out/ok
+      echo ${atelierPackages.atelier-prelude.pname} > $out/ok
     '';
   };
 

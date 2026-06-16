@@ -16,7 +16,7 @@
       copyright = "";
       maintainer = "christian.georgii@tweag.io";
       author = "Christian Georgii";
-      homepage = "https://github.com/atelier-hub/tricorder/tree/main/atelier-prelude";
+      homepage = "https://github.com/atelier-hub/atelier/tree/main/atelier-prelude";
       url = "";
       synopsis = "Custom relude-based prelude with Effectful conventions";
       description = "A custom prelude based on relude, adapted for Effectful — part of the atelier toolkit.";

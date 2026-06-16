@@ -16,7 +16,7 @@
       copyright = "";
       maintainer = "christian.georgii@tweag.io";
       author = "Christian Georgii";
-      homepage = "https://github.com/atelier-hub/tricorder#readme";
+      homepage = "https://github.com/atelier-hub/atelier#readme";
       url = "";
       synopsis = "Foundational Effectful-based effects and utilities";
       description = "Core effects and utilities for effect-based applications, built on Effectful — part of the atelier toolkit.";

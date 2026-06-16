@@ -16,7 +16,7 @@
       copyright = "";
       maintainer = "christian.georgii@tweag.io";
       author = "Christian Georgii";
-      homepage = "https://github.com/atelier-hub/tricorder#readme";
+      homepage = "https://github.com/atelier-hub/atelier#readme";
       url = "";
       synopsis = "Relational database effect for atelier (Hasql/Rel8)";
       description = "Relational database access via Hasql and Rel8, exposed as an Effectful effect — part of the atelier toolkit.";

@@ -1,5 +1,5 @@
 {
-  description = "Tricorder";
+  description = "Atelier";
 
   nixConfig = {
     extra-substituters = [
@@ -63,7 +63,6 @@
             inherit
               inputs
               system
-              self
               compiler-nix-name
               ;
           }
@@ -78,7 +77,5 @@
     )
     // {
       overlays = import ./nix/overlays.nix self.packages;
-      homeManagerModules.default = import ./nix/home-module.nix;
-      nixosModules.default = import ./nix/nixos-module.nix;
     };
 }

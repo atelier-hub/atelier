@@ -2,7 +2,6 @@
   inputs,
   pkgs,
   compiler-nix-name,
-  self,
 }:
 let
   nix-hpack = pkgs.callPackage ./package/nix-hpack.nix { };
@@ -53,16 +52,6 @@ pkgs.haskell-nix.cabalProject' {
         atelier-core.ghcOptions = [ "-Werror" ];
         atelier-db.ghcOptions = [ "-Werror" ];
         atelier-testing.ghcOptions = [ "-Werror" ];
-
-        # Configure tricorder package
-        tricorder = {
-          ghcOptions = [ "-Werror" ];
-          # Embed the flake's git revision so the released binary carries the
-          # correct hash. Falls back to "unknown" on dirty trees (no shortRev).
-          preBuild = ''
-            export TRICORDER_VERSION="${self.shortRev or "unknown"}"
-          '';
-        };
       };
     }
   ];
