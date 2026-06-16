@@ -122,7 +122,6 @@
         serialise.flags.newtime15 = true;
         text-builder-core.revision = import ./cabal-files/text-builder-core.nix;
         stm-chans.revision = import ./cabal-files/stm-chans.nix;
-        rel8.revision = import ./cabal-files/rel8.nix;
         unagi-chan.revision = import ./cabal-files/unagi-chan.nix;
         unagi-chan.flags.compare-benchmarks = false;
         atomic-primops.revision = import ./cabal-files/atomic-primops.nix;
@@ -452,6 +451,7 @@
   extras = hackage:
     {
       packages = {
+        rel8 = ./.plan.nix/rel8.nix;
         atelier-prelude = ./.plan.nix/atelier-prelude.nix;
         atelier-db = ./.plan.nix/atelier-db.nix;
         atelier-testing = ./.plan.nix/atelier-testing.nix;
@@ -498,6 +498,7 @@
     ({ lib, ... }:
       {
         packages = {
+          "rel8" = { flags = {}; };
           "atelier-prelude" = { flags = {}; };
           "atelier-db" = { flags = {}; };
           "atelier-testing" = { flags = {}; };

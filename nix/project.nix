@@ -27,13 +27,25 @@ pkgs.haskell-nix.cabalProject' {
   materialized = ./materialized/${pkgs.stdenv.hostPlatform.system}/${compiler-nix-name};
   checkMaterialization = true;
 
-  # Add tmp-postgres from flake input
+  # Resolve the rel8 source-repository-package against the flake input, so the
+  # revision tracks flake.lock and no manual --sha256 is required. rel8 1.7.0.0
+  # on Hackage does not build with GHC 9.14 / semialign 1.4; the fork carries
+  # the fix pending https://github.com/circuithub/rel8/pull/403.
+  inputMap = {
+    "https://github.com/cgeorgii/rel8" = inputs.rel8;
+  };
+
   cabalProjectLocal = ''
     source-repository-package
       type: git
       location: https://github.com/jfischoff/tmp-postgres
       tag: ${inputs.tmp-postgres.rev}
       --sha256: 0l1gdx5s8ximgawd3yzfy47pv5pgwqmjqp8hx5rbrq68vr04wkbl
+
+    source-repository-package
+      type: git
+      location: https://github.com/cgeorgii/rel8
+      tag: ${inputs.rel8.rev}
   '';
 
   # Package-specific configuration
