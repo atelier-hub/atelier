@@ -35,7 +35,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: ${{ github.head_ref }}
+          ref: ${{ github.head_ref || github.ref_name }}
 
       - uses: cachix/install-nix-action@v30
         with:
@@ -107,7 +107,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: ${{ github.head_ref }}
+          ref: ${{ github.head_ref || github.ref_name }}
 
       - uses: actions/create-github-app-token@v3
         id: app-token
@@ -121,14 +121,16 @@ jobs:
           merge-multiple: true
 
       - uses: peter-evans/create-pull-request@v8
-        if: github.event.pull_request.head.repo.full_name == github.repository
+        if: >-
+          github.event_name == 'workflow_dispatch'
+          || github.event.pull_request.head.repo.full_name == github.repository
         with:
           token: ${{ steps.app-token.outputs.token }}
-          base: ${{ github.head_ref }}
-          branch: ci/update-materialization-${{ github.head_ref }}
+          base: ${{ github.head_ref || github.ref_name }}
+          branch: ci/update-materialization-${{ github.head_ref || github.ref_name }}
           commit-message: "chore: update materialization"
           title: "chore: update materialization"
           body: |
             Automated update of `nix/materialized` triggered by dependency
-            changes on `${{ github.head_ref }}`.
+            changes on `${{ github.head_ref || github.ref_name }}`.
           add-paths: nix/materialized
