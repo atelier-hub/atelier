@@ -40,6 +40,13 @@
       url = "github:jfischoff/tmp-postgres";
       flake = false;
     };
+
+    # rel8 with GHC 9.14 / semialign 1.4 support, pending upstream release.
+    # See https://github.com/circuithub/rel8.
+    rel8 = {
+      url = "github:cgeorgii/rel8/support-ghc-9.14";
+      flake = false;
+    };
   };
 
   outputs =

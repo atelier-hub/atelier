@@ -680,6 +680,23 @@
         "type": "github"
       }
     },
+    "rel8": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1781614992,
+        "narHash": "sha256-UaInmhBPVKnhcunRT20z2aDPszqwMQL9kTOyv+b+FlQ=",
+        "owner": "cgeorgii",
+        "repo": "rel8",
+        "rev": "d9b31f6361c7f1e605e73f22559eeb184ccda19f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "cgeorgii",
+        "ref": "support-ghc-9.14",
+        "repo": "rel8",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
@@ -691,6 +708,7 @@
           "nixpkgs"
         ],
         "nixpkgs-nixos-unstable": "nixpkgs-nixos-unstable",
+        "rel8": "rel8",
         "tmp-postgres": "tmp-postgres"
       }
     },
